@@ -1,17 +1,63 @@
 ﻿@page
 @model IndexModel
 
-<div class="text-center mt-5">
+<div class="container text-center mt-5">
 
-    <h1>Triagem de Saúde Mental</h1>
-    <p>Escolha o teste desejado:</p>
+    <h1 class="display-3 fw-bold">
+        Sua saúde mental <span class="text-primary">importa.</span>
+    </h1>
 
-    <a href="/Ansiedade" class="btn btn-primary btn-lg m-2">
-        Teste de Ansiedade
-    </a>
+    <p class="lead mt-3">
+        Faça uma autoavaliação rápida e encontre profissionais
+        qualificados para te ajudar no caminho do bem-estar emocional.
+    </p>
 
-    <a href="/Depressao" class="btn btn-secondary btn-lg m-2">
-        Teste de Depressão
-    </a>
+    <div class="mt-4">
+        <a href="/Ansiedade" class="btn btn-primary btn-lg me-3">
+            🧠 Teste de Ansiedade
+        </a>
 
+        <a href="/Depressao" class="btn btn-outline-secondary btn-lg">
+            📋 Teste de Depressão
+        </a>
+    </div>
+
+</div>
+
+<hr class="my-5">
+
+<div class="container">
+    <div class="row text-center">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4">
+                <h4>🧠 Teste de Ansiedade</h4>
+                <p>Avalie sintomas comuns de ansiedade.</p>
+                <a href="/Ansiedade" class="btn btn-primary">
+                    Iniciar
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4">
+                <h4>📋 Teste de Depressão</h4>
+                <p>Identifique sinais de depressão.</p>
+                <a href="/Depressao" class="btn btn-secondary">
+                    Iniciar
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4">
+                <h4>👨‍⚕️ Profissionais</h4>
+                <p>Encontre ajuda especializada.</p>
+                <a href="#" class="btn btn-success">
+                    Em breve
+                </a>
+            </div>
+        </div>
+
+    </div>
 </div>

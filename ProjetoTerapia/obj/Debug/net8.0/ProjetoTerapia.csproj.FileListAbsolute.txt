@@ -31,3 +31,4 @@ C:\Users\LeotaOn\Documents\Projetos Individuais\Projeto C#\ProjetoTerapia\Projet
 C:\Users\LeotaOn\Documents\Projetos Individuais\Projeto C#\ProjetoTerapia\ProjetoTerapia\obj\Debug\net8.0\ProjetoTerapia.pdb
 C:\Users\LeotaOn\Documents\Projetos Individuais\Projeto C#\ProjetoTerapia\ProjetoTerapia\obj\Debug\net8.0\ProjetoTerapia.genruntimeconfig.cache
 C:\Users\LeotaOn\Documents\Projetos Individuais\Projeto C#\ProjetoTerapia\ProjetoTerapia\obj\Debug\net8.0\ref\ProjetoTerapia.dll
+C:\Users\LeotaOn\Documents\Projetos Individuais\Projeto C#\ProjetoTerapia\ProjetoTerapia\obj\Debug\net8.0\ProjetoTerapia.sourcelink.json

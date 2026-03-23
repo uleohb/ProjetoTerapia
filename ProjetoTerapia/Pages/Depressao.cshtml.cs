@@ -3,25 +3,25 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ProjetoTerapia.Pages
 {
-    public class AnsiedadeModel : PageModel
+    public class DepressaoModel : PageModel
     {
         public List<string> Perguntas = new List<string>
         {
-            "Você se sente tenso frequentemente?",
-            "Você tem dificuldade para relaxar?",
-            "Seu coração acelera sem motivo aparente?",
-            "Você se preocupa excessivamente com coisas pequenas?",
-            "Você sente inquietação ou nervosismo constante?",
-            "Você tem dificuldade para dormir por causa de pensamentos?",
-            "Você sente tensão muscular frequente?",
-            "Você evita situações por medo ou nervosismo?",
-            "Você sente medo de que algo ruim vai acontecer?",
-            "Você se sente facilmente irritado?",
-            "Você sente falta de ar sem esforço?",
-            "Você sente tontura ou sensação de desmaio?",
-            "Você se assusta com facilidade?",
-            "Você tem dificuldade de concentração por preocupação?",
-            "Você acorda cansado mesmo dormindo?"
+            "Você se sente triste na maior parte do tempo?",
+            "Você perdeu interesse em atividades que antes gostava?",
+            "Você sente cansaço frequente?",
+            "Você tem dificuldade de concentração?",
+            "Você se sente sem esperança?",
+            "Seu apetite mudou significativamente?",
+            "Você dorme demais ou de menos?",
+            "Você se sente inútil ou culpado?",
+            "Você evita contato social?",
+            "Você sente falta de motivação?",
+            "Você chora com facilidade?",
+            "Você sente vazio interior?",
+            "Você tem dificuldade para tomar decisões?",
+            "Você perdeu energia para tarefas simples?",
+            "Você sente que nada faz sentido?"
         };
 
         public int Porcentagem { get; set; } = -1;
@@ -58,5 +58,4 @@ namespace ProjetoTerapia.Pages
         public string Mensagem { get; set; } = "";
         public string Nivel { get; set; } = "";
     }
-
 }
