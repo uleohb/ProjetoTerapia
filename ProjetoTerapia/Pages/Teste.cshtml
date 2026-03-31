@@ -1,4 +1,74 @@
 ﻿@page
 @model ProjetoTerapia.Pages.TesteModel
-@{
+
+<h2 class="text-center">Teste de Saúde Mental</h2>
+
+<div class="text-center mb-3">
+    <span id="contador"></span>
+</div>
+
+<div class="progress mb-4">
+    <div id="barra" class="progress-bar" style="width:0%"></div>
+</div>
+
+<form method="post" id="formTeste">
+
+    @for (int i = 0; i < Model.Perguntas.Count; i++)
+    {
+        <div class="pergunta" style="display:none">
+            <h4>@Model.Perguntas[i].Texto</h4>
+
+            <input type="radio" name="respostas[@i]" value="true" /> Sim
+            <input type="radio" name="respostas[@i]" value="false" /> Não
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <button type="button" onclick="voltar()">Voltar</button>
+        <button type="button" onclick="proximo()">Próximo</button>
+        <button type="submit" id="finalizar" style="display:none">Finalizar</button>
+    </div>
+
+</form>
+
+<script>
+    let atual = 0;
+    let perguntas = document.querySelectorAll(".pergunta");
+
+    function mostrarPergunta() {
+        perguntas.forEach(p => p.style.display = "none");
+        perguntas[atual].style.display = "block";
+
+        document.getElementById("contador").innerText =
+            (atual + 1) + "/" + perguntas.length;
+
+        let progresso = ((atual + 1) / perguntas.length) * 100;
+        document.getElementById("barra").style.width = progresso + "%";
+
+        document.getElementById("finalizar").style.display =
+            (atual === perguntas.length - 1) ? "inline" : "none";
+    }
+
+    function proximo() {
+        if (atual < perguntas.length - 1) {
+            atual++;
+            mostrarPergunta();
+        }
+    }
+
+    function voltar() {
+        if (atual > 0) {
+            atual--;
+            mostrarPergunta();
+        }
+    }
+
+    mostrarPergunta();
+</script>
+
+@if (Model.Resultado != null)
+{
+    <div class="alert alert-info mt-4 text-center">
+        <h4>@Model.Resultado</h4>
+    </div>
 }
