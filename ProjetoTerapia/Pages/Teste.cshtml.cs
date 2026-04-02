@@ -20,6 +20,11 @@ namespace ProjetoTerapia.Pages
             Perguntas = teste.Perguntas;
         }
 
+        public int PorcentagemAnsiedade { get; set; }
+        public int PorcentagemDepressao { get; set; }
+        public string Nivel { get; set; }
+        public string Mensagem { get; set; }
+
         public void OnPost()
         {
             Teste teste = new Teste();
@@ -27,6 +32,9 @@ namespace ProjetoTerapia.Pages
 
             int ansiedade = 0;
             int depressao = 0;
+
+            int maxAnsiedade = 0;
+            int maxDepressao = 0;
 
             for (int i = 0; i < Perguntas.Count; i++)
             {
@@ -41,17 +49,37 @@ namespace ProjetoTerapia.Pages
                     pontos = 5;
 
                 if (Perguntas[i].Tipo == "A")
+                {
                     ansiedade += pontos;
+                    maxAnsiedade += 10;
+                }
                 else
+                {
                     depressao += pontos;
+                    maxDepressao += 10;
+                }
             }
 
-            if (ansiedade > depressao)
-                Resultado = "Você apresenta mais sinais de ansiedade.";
-            else if (depressao > ansiedade)
-                Resultado = "Você apresenta mais sinais de depressão.";
+            PorcentagemAnsiedade = (ansiedade * 100) / maxAnsiedade;
+            PorcentagemDepressao = (depressao * 100) / maxDepressao;
+
+            int maior = Math.Max(PorcentagemAnsiedade, PorcentagemDepressao);
+
+            if (maior < 40)
+            {
+                Nivel = "Baixo";
+                Mensagem = "Você está bem. Continue se cuidando.";
+            }
+            else if (maior < 70)
+            {
+                Nivel = "Moderado";
+                Mensagem = "Fique atento ao seu estado emocional.";
+            }
             else
-                Resultado = "Você apresenta sinais equilibrados.";
+            {
+                Nivel = "Alto";
+                Mensagem = "Recomendamos procurar ajuda profissional.";
+            }
         }
     }
 }

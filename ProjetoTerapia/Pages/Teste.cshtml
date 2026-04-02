@@ -72,3 +72,135 @@
         <h4>@Model.Resultado</h4>
     </div>
 }
+@if (Model.Nivel != null)
+{
+    <div class="container-resultado">
+
+        <!-- TÍTULO -->
+        <h2 class="text-center mb-4">Seu Resultado</h2>
+
+        <!-- CARD PRINCIPAL -->
+        <div class="card-resultado">
+            <h3>@Model.Nivel</h3>
+            <p>@Model.Mensagem</p>
+        </div>
+
+        <!-- BARRAS -->
+        <div class="card-graficos">
+
+            <div class="mb-3">
+                <span>Ansiedade: @Model.PorcentagemAnsiedade%</span>
+                <div class="progress">
+                    <div class="progress-bar barra-ansiedade"
+                         style="width:@Model.PorcentagemAnsiedade%">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <span>Depressão: @Model.PorcentagemDepressao%</span>
+                <div class="progress">
+                    <div class="progress-bar barra-depressao"
+                         style="width:@Model.PorcentagemDepressao%">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CLÍNICAS -->
+        @if (Model.Nivel == "Alto")
+        {
+            <div class="card-clinicas mt-4">
+
+                <h4>Profissionais recomendados</h4>
+
+                <div class="lista-clinicas">
+
+                    <div class="clinica">
+                        <strong>Clínica Vida Mental</strong>
+                        <p>Atendimento psicológico especializado</p>
+                        <button>Agendar</button>
+                    </div>
+
+                    <div class="clinica">
+                        <strong>Centro Psicológico Equilíbrio</strong>
+                        <p>Terapia para ansiedade e depressão</p>
+                        <button>Agendar</button>
+                    </div>
+
+                    <div class="clinica">
+                        <strong>Instituto Bem-Estar</strong>
+                        <p>Atendimento humanizado</p>
+                        <button>Agendar</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+<style>
+    .container-resultado {
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .card-resultado {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .card-graficos {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .progress {
+        height: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #eee;
+    }
+
+    .barra-ansiedade {
+        background: orange;
+    }
+
+    .barra-depressao {
+        background: red;
+    }
+
+    .card-clinicas {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .lista-clinicas {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .clinica {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .clinica button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+</style>
