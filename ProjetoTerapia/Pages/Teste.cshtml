@@ -101,19 +101,18 @@
                 </div>
             </div>
         </div>
-
         @if (Model.Nivel == "Alto")
         {
-            <div class="card-clinicas mt-4">
-                <h4>Profissionais recomendados</h4>
+            <div class="text-center mt-4">
 
-                <div class="lista-clinicas">
-                    <div class="clinica">
-                        <strong>Clínica Vida Mental</strong>
-                        <p>Atendimento psicológico especializado</p>
-                        <button>Agendar</button>
-                    </div>
+                <div class="alert alert-warning">
+                    ⚠️ Recomendamos procurar ajuda profissional
                 </div>
+
+                <a href="/Clinicas" class="btn btn-primary">
+                    Ver profissionais recomendados
+                </a>
+
             </div>
         }
     </div>
