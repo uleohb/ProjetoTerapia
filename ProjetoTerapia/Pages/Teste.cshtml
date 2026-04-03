@@ -1,24 +1,38 @@
 ﻿@page
 @model ProjetoTerapia.Pages.TesteModel
 
-<h2 class="text-center">Teste de Saúde Mental</h2>
+<div class="text-center mt-4">
+    <h1>Teste de Bem-Estar</h1>
+    <p class="subtitulo">Em menos de 1 minuto, descubra como está sua saúde emocional</p>
+</div>
 
-<div class="text-center mb-3">
+<!-- TELA INICIAL -->
+<div id="inicio" class="text-center mt-5">
+    <h3>Você gostaria de saber como você está hoje?</h3>
+    <button class="btn btn-primary mt-3" onclick="iniciarTeste()">
+        Começar agora
+    </button>
+</div>
+
+<!-- CONTADOR -->
+<div class="text-center mb-3" id="topoTeste" style="display:none">
     <span id="contador"></span>
 </div>
 
-<div class="progress mb-4">
+<!-- BARRA -->
+<div class="progress mb-4" id="barraContainer" style="display:none">
     <div id="barra" class="progress-bar" style="width:0%"></div>
 </div>
 
-<form method="post" id="formTeste">
+<!-- FORM -->
+<form method="post" id="formTeste" style="display:none">
 
     @for (int i = 0; i < Model.Perguntas.Count; i++)
     {
         <div class="pergunta" style="display:none">
             <h4>@Model.Perguntas[i].Texto</h4>
 
-            <input type="radio" name="respostas[@i]" value="true" /> Sim
+            <input type="radio" name="respostas[@i]" value="true" required /> Sim
             <input type="radio" name="respostas[@i]" value="false" /> Não
         </div>
     }
@@ -26,14 +40,159 @@
     <div class="text-center mt-4">
         <button type="button" onclick="voltar()">Voltar</button>
         <button type="button" onclick="proximo()">Próximo</button>
-        <button type="submit" id="finalizar" style="display:none">Finalizar</button>
+        <button type="button" id="finalizar" style="display:none" onclick="finalizarTeste()">
+            Finalizar
+        </button>
     </div>
 
 </form>
 
+<!-- FRASE -->
+<div id="fraseAjuda" class="text-center mt-4" style="display:none">
+    <p class="frase-ajuda">
+        Você pode estar precisando de apoio profissional para melhorar seu bem-estar emocional.
+    </p>
+</div>
+
+<!-- BOTÃO RESULTADO -->
+<div id="revelarResultado" class="text-center mt-4" style="display:none">
+    <h4>Quer ver seu resultado?</h4>
+    <button class="btn btn-success mt-2" onclick="enviarFormulario()">
+        Ver resultado
+    </button>
+</div>
+
+<div id="loading" class="text-center mt-5" style="display:none">
+
+    <h3>Analisando suas respostas...</h3>
+
+    <div class="spinner mt-3"></div>
+
+</div>
+
+<!-- RESULTADO -->
+@if (Model.Nivel != null)
+{
+    <div id="resultadoFinal" class="container-resultado mt-4">
+
+        <h2 class="text-center mb-4">Seu Resultado</h2>
+
+        <div class="card-resultado">
+            <h3>@Model.Nivel</h3>
+            <p>@Model.Mensagem</p>
+        </div>
+
+        <div class="card-graficos">
+            <div class="mb-3">
+                <span>Ansiedade: @Model.PorcentagemAnsiedade%</span>
+                <div class="progress">
+                    <div class="progress-bar barra-ansiedade"
+                         style="width:@Model.PorcentagemAnsiedade%">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <span>Depressão: @Model.PorcentagemDepressao%</span>
+                <div class="progress">
+                    <div class="progress-bar barra-depressao"
+                         style="width:@Model.PorcentagemDepressao%">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Nivel == "Alto")
+        {
+            <div class="card-clinicas mt-4">
+                <h4>Profissionais recomendados</h4>
+
+                <div class="lista-clinicas">
+                    <div class="clinica">
+                        <strong>Clínica Vida Mental</strong>
+                        <p>Atendimento psicológico especializado</p>
+                        <button>Agendar</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- CSS -->
+<style>
+    .subtitulo {
+        color: #666;
+        font-size: 18px;
+    }
+
+    .frase-ajuda {
+        font-size: 20px;
+        color: #444;
+    }
+
+    .container-resultado {
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .card-resultado {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+    }
+
+    .card-graficos {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .barra-ansiedade {
+        background: orange;
+    }
+
+    .barra-depressao {
+        background: red;
+    }
+
+    .lista-clinicas {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #ddd;
+        border-top: 5px solid #007bff;
+        border-radius: 50%;
+        animation: girar 1s linear infinite;
+        margin: auto;
+    }
+
+    @@keyframes girar {
+     0%{transform: rotate(0deg);}
+     100% {transform: rotate(360deg);}
+    }
+</style>
+
+<!-- JS -->
 <script>
     let atual = 0;
-    let perguntas = document.querySelectorAll(".pergunta");
+    let perguntas;
+
+    function iniciarTeste() {
+        document.getElementById("inicio").style.display = "none";
+        document.getElementById("formTeste").style.display = "block";
+        document.getElementById("topoTeste").style.display = "block";
+        document.getElementById("barraContainer").style.display = "block";
+
+        perguntas = document.querySelectorAll(".pergunta");
+        mostrarPergunta();
+    }
 
     function mostrarPergunta() {
         perguntas.forEach(p => p.style.display = "none");
@@ -63,144 +222,32 @@
         }
     }
 
-    mostrarPergunta();
+    function mostrarResultado() {
+        document.getElementById("resultadoFinal").style.display = "block";
+        document.getElementById("revelarResultado").style.display = "none";
+    }
+
+        function finalizarTeste() {
+
+        // Esconde perguntas
+        document.getElementById("formTeste").style.display = "none";
+        document.getElementById("topoTeste").style.display = "none";
+        document.getElementById("barraContainer").style.display = "none";
+
+        // Mostra loading
+        document.getElementById("loading").style.display = "block";
+
+        // Delay de 2 segundos
+        setTimeout(() => {
+
+            document.getElementById("loading").style.display = "none";
+
+            document.getElementById("fraseAjuda").style.display = "block";
+            document.getElementById("revelarResultado").style.display = "block";
+
+        }, 2000);
+    }
+        function enviarFormulario() {
+        document.getElementById("formTeste").submit();
+    }
 </script>
-
-@if (Model.Resultado != null)
-{
-    <div class="alert alert-info mt-4 text-center">
-        <h4>@Model.Resultado</h4>
-    </div>
-}
-@if (Model.Nivel != null)
-{
-    <div class="container-resultado">
-
-        <!-- TÍTULO -->
-        <h2 class="text-center mb-4">Seu Resultado</h2>
-
-        <!-- CARD PRINCIPAL -->
-        <div class="card-resultado">
-            <h3>@Model.Nivel</h3>
-            <p>@Model.Mensagem</p>
-        </div>
-
-        <!-- BARRAS -->
-        <div class="card-graficos">
-
-            <div class="mb-3">
-                <span>Ansiedade: @Model.PorcentagemAnsiedade%</span>
-                <div class="progress">
-                    <div class="progress-bar barra-ansiedade"
-                         style="width:@Model.PorcentagemAnsiedade%">
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <span>Depressão: @Model.PorcentagemDepressao%</span>
-                <div class="progress">
-                    <div class="progress-bar barra-depressao"
-                         style="width:@Model.PorcentagemDepressao%">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- CLÍNICAS -->
-        @if (Model.Nivel == "Alto")
-        {
-            <div class="card-clinicas mt-4">
-
-                <h4>Profissionais recomendados</h4>
-
-                <div class="lista-clinicas">
-
-                    <div class="clinica">
-                        <strong>Clínica Vida Mental</strong>
-                        <p>Atendimento psicológico especializado</p>
-                        <button>Agendar</button>
-                    </div>
-
-                    <div class="clinica">
-                        <strong>Centro Psicológico Equilíbrio</strong>
-                        <p>Terapia para ansiedade e depressão</p>
-                        <button>Agendar</button>
-                    </div>
-
-                    <div class="clinica">
-                        <strong>Instituto Bem-Estar</strong>
-                        <p>Atendimento humanizado</p>
-                        <button>Agendar</button>
-                    </div>
-
-                </div>
-            </div>
-        }
-
-    </div>
-}
-
-<style>
-    .container-resultado {
-        max-width: 700px;
-        margin: auto;
-    }
-
-    .card-resultado {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: white;
-        padding: 25px;
-        border-radius: 15px;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .card-graficos {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .progress {
-        height: 20px;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #eee;
-    }
-
-    .barra-ansiedade {
-        background: orange;
-    }
-
-    .barra-depressao {
-        background: red;
-    }
-
-    .card-clinicas {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .lista-clinicas {
-        max-height: 250px;
-        overflow-y: auto;
-    }
-
-    .clinica {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-    }
-
-        .clinica button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
-        }
-</style>
