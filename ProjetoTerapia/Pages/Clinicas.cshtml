@@ -1,0 +1,32 @@
+﻿@page
+@model ProjetoTerapia.Pages.ClinicasModel
+
+<h2 class="text-center mt-4">Profissionais Recomendados</h2>
+
+<div class="container mt-4">
+
+    @foreach (var clinica in Model.Clinicas)
+    {
+        <div class="card-clinica">
+            <h5>@clinica</h5>
+            <p>Atendimento psicológico especializado</p>
+            <button>Agendar</button>
+        </div>
+    }
+
+</div>
+
+<style>
+    .container {
+        max-width: 700px;
+        margin: auto;
+    }
+
+    .card-clinica {
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+</style>
