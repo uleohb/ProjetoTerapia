@@ -32,8 +32,8 @@
         <div class="pergunta" style="display:none">
             <h4>@Model.Perguntas[i].Texto</h4>
 
-            <input type="radio" name="respostas[@i]" value="true" required /> Sim
-            <input type="radio" name="respostas[@i]" value="false" /> Não
+            <input type="radio" name="Respostas[@i]" value="true" required /> Sim
+            <input type="radio" name="Respostas[@i]" value="false" required /> Não
         </div>
     }
 
@@ -70,8 +70,10 @@
 
 </div>
 
+
+
 <!-- RESULTADO -->
-@if (Model.Nivel != null)
+@if (Model.MostrarResultado)
 {
     <div id="resultadoFinal" class="container-resultado mt-4">
 
@@ -171,6 +173,12 @@
         animation: girar 1s linear infinite;
         margin: auto;
     }
+    .progress-bar {
+    background-color: #0d6efd;
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+}
 
     @@keyframes girar {
      0%{transform: rotate(0deg);}
@@ -183,40 +191,41 @@
     let atual = 0;
     let perguntas;
 
-    function iniciarTeste() {
+        function iniciarTeste() {
         document.getElementById("inicio").style.display = "none";
         document.getElementById("formTeste").style.display = "block";
         document.getElementById("topoTeste").style.display = "block";
         document.getElementById("barraContainer").style.display = "block";
 
         perguntas = document.querySelectorAll(".pergunta");
+
+        atualizarBarra(); 
         mostrarPergunta();
     }
 
-    function mostrarPergunta() {
+        function mostrarPergunta() {
         perguntas.forEach(p => p.style.display = "none");
         perguntas[atual].style.display = "block";
 
         document.getElementById("contador").innerText =
             (atual + 1) + "/" + perguntas.length;
 
-        let progresso = ((atual + 1) / perguntas.length) * 100;
-        document.getElementById("barra").style.width = progresso + "%";
-
         document.getElementById("finalizar").style.display =
             (atual === perguntas.length - 1) ? "inline" : "none";
     }
 
-    function proximo() {
+        function proximo() {
         if (atual < perguntas.length - 1) {
             atual++;
+            atualizarBarra(); 
             mostrarPergunta();
         }
     }
 
-    function voltar() {
+        function voltar() {
         if (atual > 0) {
             atual--;
+            atualizarBarra();
             mostrarPergunta();
         }
     }
@@ -248,5 +257,10 @@
     }
         function enviarFormulario() {
         document.getElementById("formTeste").submit();
+    }
+
+        function atualizarBarra() {
+        let progresso = ((atual + 1) / perguntas.length) * 100;
+        document.getElementById("barra").style.width = progresso + "%";
     }
 </script>
