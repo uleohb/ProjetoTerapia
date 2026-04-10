@@ -1,21 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ProjetoTerapia.Models;
 
 namespace ProjetoTerapia.Pages
 {
     public class CadastroClinicaModel : PageModel
     {
         [BindProperty]
-        public string Nome { get; set; } = "";
-
-        [BindProperty]
-        public string Descricao { get; set; } = "";
-
-        [BindProperty]
-        public string Endereco { get; set; } = "";
-
-        [BindProperty]
-        public decimal Valor { get; set; }
+        public Clinica NovaClinica { get; set; } = new Clinica();
 
         public bool Sucesso { get; set; }
 
@@ -23,10 +15,11 @@ namespace ProjetoTerapia.Pages
         {
         }
 
-        public void OnPost()
+        public IActionResult OnPost()
         {
-           
-            Sucesso = true;
+            BancoFake.Clinicas.Add(NovaClinica);
+
+            return RedirectToPage("/Clinicas");
         }
     }
 }

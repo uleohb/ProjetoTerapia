@@ -5,6 +5,12 @@
 
 <div class="container mt-4">
 
+    @if (!Model.Clinicas.Any())
+    {
+        <div class="alert alert-info text-center">
+            Nenhum profissional cadastrado ainda.
+        </div>
+    }
    
     @foreach (var clinica in Model.Clinicas)
     {

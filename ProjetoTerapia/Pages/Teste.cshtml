@@ -125,8 +125,37 @@
                     ⚠️ Recomendamos procurar ajuda profissional
                 </div>
 
-                <a href="/Clinicas" class="btn btn-primary">
+                <a href="/Clinicas" class="btn btn-danger">
                     Ver profissionais recomendados
+                </a>
+
+            </div>
+        }
+        else if (Model.Nivel == "Moderado")
+        {
+            <div class="text-center mt-4">
+
+                <div class="alert alert-info">
+                    💡 Você pode se beneficiar de conversar com um profissional, se quiser.
+                </div>
+
+                <a href="/Clinicas" class="btn btn-outline-primary">
+                    Ver profissionais disponíveis
+                </a>
+
+            </div>
+        }
+
+        else
+        {
+            <div class="text-center mt-4">
+
+                <div class="alert alert-success">
+                    ✅ Continue se cuidando! Se quiser evoluir ainda mais, temos profissionais disponíveis.
+                </div>
+
+                <a href="/Clinicas" class="btn btn-outline-success">
+                    Conhecer profissionais
                 </a>
 
             </div>

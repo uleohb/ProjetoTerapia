@@ -22,29 +22,28 @@
 
         <div class="mb-3">
             <label>Nome da clínica</label>
-            <input type="text" class="form-control" asp-for="Nome" required />
+            <input type="text" class="form-control" asp-for="NovaClinica.Nome" required />
         </div>
 
         <div class="mb-3">
             <label>Descrição</label>
-            <textarea class="form-control" asp-for="Descricao" required></textarea>
+            <textarea class="form-control" asp-for="NovaClinica.Descricao" required></textarea>
         </div>
 
         <div class="mb-3">
             <label>Endereço</label>
-            <input type="text" class="form-control" asp-for="Endereco" required />
+            <input type="text" class="form-control" asp-for="NovaClinica.Endereco" required />
         </div>
 
         <div class="mb-3">
             <label>Valor da consulta (R$)</label>
-            <input type="number" class="form-control" asp-for="Valor" required />
+            <input type="number" class="form-control" asp-for="NovaClinica.Valor" required />
         </div>
 
         <button class="btn btn-primary">Cadastrar</button>
 
-
-
     </form>
+
 
 </div>
 
