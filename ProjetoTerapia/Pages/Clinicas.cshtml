@@ -5,14 +5,25 @@
 
 <div class="container mt-4">
 
+   
     @foreach (var clinica in Model.Clinicas)
     {
         <div class="card-clinica">
-            <h5>@clinica</h5>
-            <p>Atendimento psicológico especializado</p>
+            <h5>@clinica.Nome</h5>
+            <p>@clinica.Descricao</p>
+            <p><strong>R$ @clinica.Valor</strong></p>
+            <p>@clinica.Endereco</p>
             <button>Agendar</button>
         </div>
     }
+
+    <!-- BOTÃO AQUI FORA -->
+    <div class="text-center mt-4">
+        <a href="/CadastroClinica" class="btn btn-success">
+            Sou profissional / clínica
+        </a>
+    </div>
+
 
 </div>
 

@@ -1,0 +1,50 @@
+﻿@page
+@model ProjetoTerapia.Pages.CadastroClinicaModel
+
+<h2 class="text-center mt-4">Cadastrar Clínica</h2>
+
+<div class="container mt-4">
+
+    @if (Model.Sucesso)
+    {
+        <div class="alert alert-success">
+            Clínica cadastrada com sucesso!
+        </div>
+    }
+
+    <form method="post">
+
+        <div class="mb-3">
+            <label>Nome da clínica</label>
+            <input type="text" class="form-control" asp-for="Nome" required />
+        </div>
+
+        <div class="mb-3">
+            <label>Descrição</label>
+            <textarea class="form-control" asp-for="Descricao" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label>Endereço</label>
+            <input type="text" class="form-control" asp-for="Endereco" required />
+        </div>
+
+        <div class="mb-3">
+            <label>Valor da consulta (R$)</label>
+            <input type="number" class="form-control" asp-for="Valor" required />
+        </div>
+
+        <button class="btn btn-primary">Cadastrar</button>
+
+
+
+    </form>
+
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: auto;
+    }
+</style>

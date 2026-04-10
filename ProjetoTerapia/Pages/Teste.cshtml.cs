@@ -42,17 +42,27 @@ namespace ProjetoTerapia.Pages
             int maxAnsiedade = 0;
             int maxDepressao = 0;
 
+            if (Respostas == null || Respostas.Count != Perguntas.Count)
+            {
+                return;
+            }
+
             for (int i = 0; i < Perguntas.Count; i++)
             {
                 bool respondeuSim = Respostas[i];
 
                 int pontos = 0;
 
-                if ((respondeuSim && Perguntas[i].SimSaudavel) ||
-                    (!respondeuSim && !Perguntas[i].SimSaudavel))
-                    pontos = 10;
+                if (!Perguntas[i].SimSaudavel)
+                {
+                    if (respondeuSim)
+                        pontos = 10; // resposta ruim
+                }
                 else
-                    pontos = 5;
+                {
+                    if (!respondeuSim)
+                        pontos = 10; // resposta ruim também
+                }
 
                 if (Perguntas[i].Tipo == "A")
                 {
@@ -72,8 +82,8 @@ namespace ProjetoTerapia.Pages
             bool ansiedadeAlta = PorcentagemAnsiedade >= 70;
             bool depressaoAlta = PorcentagemDepressao >= 70;
 
-            bool ansiedadeModerada = PorcentagemAnsiedade >= 40;
-            bool depressaoModerada = PorcentagemDepressao >= 40;
+            bool ansiedadeModerada = PorcentagemAnsiedade >= 30;
+            bool depressaoModerada = PorcentagemDepressao >= 30;
 
             // 🔴 NÍVEL ALTO
             if (ansiedadeAlta || depressaoAlta)
