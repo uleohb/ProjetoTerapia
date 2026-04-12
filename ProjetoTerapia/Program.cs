@@ -1,11 +1,19 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using ProjetoTerapia.Models;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("Server=localhost;Database=ProjetoTerapiaDB;Trusted_Connection=True;TrustServerCertificate=True"));
+
+
+
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -21,7 +29,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-// 🔥 AQUI (antes do Run)
+
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Teste");

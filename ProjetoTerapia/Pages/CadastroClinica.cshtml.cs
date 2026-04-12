@@ -6,18 +6,20 @@ namespace ProjetoTerapia.Pages
 {
     public class CadastroClinicaModel : PageModel
     {
+        private readonly AppDbContext _context;
+
+        public CadastroClinicaModel(AppDbContext context)
+        {
+            _context = context;
+        }
+
         [BindProperty]
         public Clinica NovaClinica { get; set; } = new Clinica();
 
-        public bool Sucesso { get; set; }
-
-        public void OnGet()
-        {
-        }
-
         public IActionResult OnPost()
         {
-            BancoFake.Clinicas.Add(NovaClinica);
+            _context.Clinicas.Add(NovaClinica);
+            _context.SaveChanges();
 
             return RedirectToPage("/Clinicas");
         }
