@@ -11,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("Ser
 
 builder.Services.AddRazorPages();
 
+
 var app = builder.Build();
 
 
