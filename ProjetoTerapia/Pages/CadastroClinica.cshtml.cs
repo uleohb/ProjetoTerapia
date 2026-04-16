@@ -18,6 +18,8 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
+            NovaClinica.Aprovado = false;
+
             _context.Clinicas.Add(NovaClinica);
             _context.SaveChanges();
 

@@ -14,5 +14,8 @@
 
         public string Telefone { get; set; } = "";
 
+        public bool Aprovado { get; set; } = false;
+
+        public bool Pago { get; set; } = false;
     }
 }

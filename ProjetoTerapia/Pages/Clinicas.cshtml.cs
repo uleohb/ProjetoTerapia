@@ -18,7 +18,9 @@ namespace ProjetoTerapia.Pages
 
         public void OnGet()
         {
-            Clinicas = _context.Clinicas.ToList();
+             Clinicas = _context.Clinicas
+            .Where(c => c.Aprovado && c.Pago)
+            .ToList();
         }
     }
 }

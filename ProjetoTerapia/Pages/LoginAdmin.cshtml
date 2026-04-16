@@ -1,0 +1,81 @@
+﻿@page
+@model ProjetoTerapia.Pages.LoginAdminModel
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <h2 class="titulo">Painel Administrativo</h2>
+
+        @if (Model.Erro)
+        {
+            <div class="erro">
+                Usuário ou senha incorretos
+            </div>
+        }
+
+        <form method="post">
+
+            <label>Usuário</label>
+            <input type="text" asp-for="Usuario" required />
+
+            <label>Senha</label>
+            <input type="password" asp-for="Senha" required />
+
+            <button>Entrar</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+    .login-container {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f5f7fa;
+    }
+
+    .login-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 350px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .titulo {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .erro {
+        background: #ffdddd;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+</style>
