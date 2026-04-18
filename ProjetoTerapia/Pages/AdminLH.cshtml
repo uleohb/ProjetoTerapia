@@ -7,9 +7,9 @@
     <div class="sidebar">
         <h3 class="logo">PsiConecta</h3>
 
-        <a href="#">🏠 Dashboard</a>
-        <a href="#">🏥 Clínicas</a>
-        <a href="#">💰 Pagamentos</a>
+        <a href="javascript:void(0)" onclick="mostrarAba('dashboard', this)">🏠 Dashboard</a>
+        <a href="javascript:void(0)" onclick="mostrarAba('clinicas', this)">🏥 Clínicas</a>
+        <a href="javascript:void(0)" onclick="mostrarAba('pagamentos', this)">💰 Pagamentos</a>
 
         <form method="post" asp-page-handler="Logout">
             <button class="btn-logout">Sair</button>
@@ -19,64 +19,91 @@
     <!-- CONTEÚDO -->
     <div class="conteudo">
 
-        <h2>Dashboard Admnistrativo</h2>
+       <div id="dashboard" class="aba">
 
-        <div class="cards">
+    <h2>📊 Painel Administrativo</h2>
 
-            <div class="card-info">
-                <h4>Pendentes</h4>
-                <p>@Model.Clinicas.Count(c => !c.Aprovado)</p>
-            </div>
-
-            <div class="card-info">
-                <h4>Aprovados</h4>
-                <p>@Model.Clinicas.Count(c => c.Aprovado && !c.Pago)</p>
-            </div>
-
-            <div class="card-info">
-                <h4>Ativos</h4>
-                <p>@Model.Clinicas.Count(c => c.Pago)</p>
-            </div>
-
+    <div class="cards">
+        <div class="card-info">
+            <h4>Pendentes</h4>
+            <p>@Model.Clinicas.Count(c => !c.Aprovado)</p>
         </div>
+
+        <div class="card-info">
+            <h4>Aprovados</h4>
+            <p>@Model.Clinicas.Count(c => c.Aprovado && !c.Pago)</p>
+        </div>
+
+        <div class="card-info">
+            <h4>Ativos</h4>
+            <p>@Model.Clinicas.Count(c => c.Pago)</p>
+        </div>
+    </div>
+
+</div>
 
         <hr />
 
-        <h3>Gerenciar Clínicas</h3>
+        <div id="clinicas" class="aba" style="display:none">
 
-        @foreach (var clinica in Model.Clinicas
-                .OrderBy(c => c.Aprovado)
-                .ThenBy(c => c.Pago)
-                .ThenBy(c => c.Nome))
-        {
-            <div class="card">
+            <h3>Gerenciar Clínicas</h3>
 
-                <h5>@clinica.Nome</h5>
-                <p>@clinica.Descricao</p>
+            @foreach (var clinica in Model.Clinicas
+                        .OrderBy(c => c.Aprovado)
+                        .ThenBy(c => c.Pago))
+            {
+                <div class="card @(clinica.Pago ? "pago" : clinica.Aprovado ? "aprovado" : "pendente")">
 
-                <p>
-                    Status:
-                    @(clinica.Aprovado ? "✅ Aprovado" : "⏳ Pendente")
-                    |
-                    @(clinica.Pago ? "💰 Pago" : "💸 Não pago")
-                </p>
+                    <h5>@clinica.Nome</h5>
+                    <p>@clinica.Descricao</p>
+                    <p><strong>R$ @clinica.Valor</strong></p>
+                    <p>@clinica.Endereco</p>
 
-                <form method="post">
-                    <input type="hidden" name="id" value="@clinica.Id" />
+                    <p>
+                        @(clinica.Aprovado ? "✅ Aprovado" : "⏳ Pendente")
+                        |
+                        @(clinica.Pago ? "💰 Pago" : "💸 Não pago")
+                    </p>
 
-                    @if (!clinica.Aprovado)
-                    {
-                        <button name="acao" value="aprovar">Aprovar</button>
-                    }
+                    <form method="post">
+                        <input type="hidden" name="id" value="@clinica.Id" />
 
-                    @if (clinica.Aprovado && !clinica.Pago)
-                    {
+                        @if (!clinica.Aprovado)
+                        {
+                            <button name="acao" value="aprovar">Aprovar</button>
+                        }
+
+                        @if (clinica.Aprovado && !clinica.Pago)
+                        {
+                            <button name="acao" value="pagar">Confirmar pagamento</button>
+                        }
+                    </form>
+
+                </div>
+            }
+
+        </div>
+
+        <div id="pagamentos" class="aba" style="display:none">
+
+            <h3>💰 Pagamentos</h3>
+
+            @foreach (var clinica in Model.Clinicas.Where(c => c.Aprovado && !c.Pago))
+            {
+                <div class="card">
+
+                    <h5>@clinica.Nome</h5>
+                    <p>Pagamento pendente</p>
+
+                    <form method="post">
+                        <input type="hidden" name="id" value="@clinica.Id" />
                         <button name="acao" value="pagar">Confirmar pagamento</button>
-                    }
-                </form>
+                    </form>
 
-            </div>
-        }
+                </div>
+            }
+
+        </div>
 
     </div>
 
@@ -175,4 +202,49 @@
                 background: #ffc107;
             }
 
+    .aba {
+        animation: fade 0.2s ease-in-out;
+    }
+
+    @@keyframes fade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .sidebar a:hover {
+        background: #333;
+        padding: 5px;
+        border-radius: 6px;
+    }
+
 </style>
+
+<script>
+    function mostrarAba(nome, el) {
+
+        document.querySelectorAll(".aba").forEach(div => {
+            div.style.display = "none";
+        });
+
+        document.querySelectorAll(".sidebar a").forEach(link => {
+            link.classList.remove("ativo");
+        });
+
+        document.getElementById(nome).style.display = "block";
+
+        if (el) {
+            el.classList.add("ativo");
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        mostrarAba('dashboard');
+    });
+</script>
