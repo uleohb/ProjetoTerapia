@@ -38,3 +38,14 @@ app.MapGet("/", context =>
 
 app.Run();
 
+app.MapPost("/webhook", async (HttpContext context, AppDbContext db) =>
+{
+    using var reader = new StreamReader(context.Request.Body);
+    var body = await reader.ReadToEndAsync();
+
+    Console.WriteLine("Webhook recebido: " + body);
+
+    return Results.Ok();
+});
+
+app.MapControllers(); //webhook 

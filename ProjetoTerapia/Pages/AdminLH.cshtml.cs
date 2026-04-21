@@ -38,15 +38,25 @@ namespace ProjetoTerapia.Pages
             if (clinica != null)
             {
                 if (acao == "aprovar")
+                {
                     clinica.Aprovado = true;
+                }
 
                 if (acao == "pagar")
+                {
+                    if (!clinica.Aprovado)
+                    {
+                        // não paga sem aprovar
+                        return RedirectToPage();
+                    }
+
                     clinica.Pago = true;
+                }
 
                 _context.SaveChanges();
             }
 
-            return Redirect("/AdminLH");
+            return RedirectToPage();
         }
 
         public IActionResult OnPostLogout()

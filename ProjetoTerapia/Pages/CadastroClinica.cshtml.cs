@@ -4,6 +4,7 @@ using ProjetoTerapia.Models;
 
 namespace ProjetoTerapia.Pages
 {
+
     public class CadastroClinicaModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -23,7 +24,7 @@ namespace ProjetoTerapia.Pages
             _context.Clinicas.Add(NovaClinica);
             _context.SaveChanges();
 
-            return RedirectToPage("/Clinicas");
+            return RedirectToPage("/PagamentoClinica");
         }
     }
 }
