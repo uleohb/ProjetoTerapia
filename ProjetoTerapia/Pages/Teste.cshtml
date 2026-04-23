@@ -1,36 +1,40 @@
 ﻿@page
 @model ProjetoTerapia.Pages.TesteModel
 
-<div class="intro">
-    <h1>Encontre a clínica ideal para você</h1>
-    <p>Responda algumas perguntas rápidas e receba recomendações personalizadas</p>
+<div class="topo-site">
 
-    <button onclick="iniciarTeste()" class="btn-start">
-        Começar agora
-    </button>
+    <h1 class="logo">Ponto Saúde</h1>
 
-    <br><br>
-
-    <a href="/CadastroClinica" class="btn-clinica">
-        Sou profissional / clínica
-    </a>
-</div>
-
-<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); padding: 20px; border-radius: 0 0 20px 20px;">
-    <h2 style="color: white; text-align:center; margin:0;">
-        Ponto Saúde
+    <h2 class="frase-impacto">
+        Sua saúde emocional merece atenção
     </h2>
-</div>
 
-<div class="text-center mt-4">
-    <h1>Teste de Bem-Estar</h1>
-    <p class="subtitulo">Em menos de 1 minuto, descubra como está sua saúde emocional</p>
+    <p class="sub-frase">
+        Em 1 minuto, saiba como você está e receba recomendações personalizadas
+    </p>
+
+    <div class="acoes-iniciais">
+
+        <button onclick="iniciarTeste()" class="btn-principal">
+            Começar teste gratuito
+        </button>
+
+        <a href="/CadastroClinica" class="btn-clinica">
+            Sou profissional / clínica
+        </a>
+
+    </div>
+
 </div>
 
 <div id="perguntas">
 
 <!-- TELA INICIAL -->
 
+    <div id="tituloPerguntas" class="titulo-perguntas" style="display:none">
+        <h2>Teste de Bem-Estar Emocional</h2>
+        <p>Responda com sinceridade para uma recomendação mais precisa</p>
+    </div>
 
 <!-- CONTADOR -->
 <div class="text-center mb-3" id="topoTeste" style="display:none">
@@ -56,7 +60,7 @@
     }
 
     <div class="text-center mt-4">
-        <button type="button" onclick="voltar()">Voltar</button>
+        <button type="button" id="btnVoltar" onclick="voltar()">Voltar</button>
         <button type="button" onclick="proximo()">Próximo</button>
         <button type="button" id="finalizar" style="display:none" onclick="finalizarTeste()">
             Finalizar
@@ -65,7 +69,7 @@
 
  </form>
 
-</div>
+
 
 <!-- FRASE -->
 <div id="fraseAjuda" class="text-center mt-4" style="display:none">
@@ -81,16 +85,6 @@
         Ver resultado
     </button>
 </div>
-
-<div id="loading" class="text-center mt-5" style="display:none">
-
-    <h3>Analisando suas respostas...</h3>
-
-    <div class="spinner mt-3"></div>
-
-</div>
-
-
 
 <!-- RESULTADO -->
 @if (Model.MostrarResultado)
@@ -169,6 +163,18 @@
     </div>
 }
 
+
+
+    <div id="loading" class="text-center mt-5" style="display:none">
+
+        <h3>Analisando suas respostas...</h3>
+
+        <div class="spinner mt-3"></div>
+
+    </div>
+
+</div>
+
 <!-- CSS -->
 <style>
 
@@ -231,26 +237,67 @@
 }
 
     @@keyframes girar {
-     0%{transform: rotate(0deg);}
-     100% {transform: rotate(360deg);}
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
-    .intro {
+    body {
+        background: #f8fafc;
+    }
+
+    .topo-site {
         text-align: center;
-        padding: 80px 20px;
-        background: linear-gradient(135deg, #009ee3, #00c6ff);
-        color: white;
+        padding: 60px 20px 30px;
     }
 
-        .intro h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
+    .logo {
+        font-size: 42px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+
+    .frase-impacto {
+        font-size: 34px;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 15px;
+    }
+
+    .sub-frase {
+        font-size: 20px;
+        color: #64748b;
+        margin-bottom: 35px;
+    }
+
+    .acoes-iniciais {
+        max-width: 450px;
+        margin: auto;
+    }
+
+    .btn-principal {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 15px;
+        transition: 0.2s;
+    }
+
+        .btn-principal:hover {
+            transform: scale(1.02);
         }
 
-        .intro p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
 
     .btn-start {
         margin-top: 20px;
@@ -264,21 +311,39 @@
     }
 
     .btn-clinica {
-        display: inline-block;
-        padding: 10px 18px;
-        background: transparent;
-        color: white;
-        border: 2px solid white;
-        border-radius: 8px;
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border: 2px solid #009ee3;
+        border-radius: 14px;
         text-decoration: none;
+        color: #009ee3;
         font-weight: bold;
         transition: 0.2s;
     }
 
         .btn-clinica:hover {
-            background: white;
-            color: #009ee3;
+            background: #009ee3;
+            color: white;
         }
+
+    .titulo-perguntas {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 30px;
+    }
+
+        .titulo-perguntas h2 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .titulo-perguntas p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
 </style>
 
 <!-- JS -->
@@ -287,14 +352,25 @@
     let perguntas;
 
         function iniciarTeste() {
+        document.querySelector(".topo-site").style.display = "none";
+
+        document.getElementById("fraseAjuda").style.display = "none";
+        document.getElementById("revelarResultado").style.display = "none";
+
         document.getElementById("formTeste").style.display = "block";
         document.getElementById("topoTeste").style.display = "block";
         document.getElementById("barraContainer").style.display = "block";
 
+        document.getElementById("tituloPerguntas").style.display = "block";
+
         perguntas = document.querySelectorAll(".pergunta");
 
-        atualizarBarra(); 
+        atual = 0;
+
+        atualizarBarra();
         mostrarPergunta();
+
+       
     }
 
         function mostrarPergunta() {
@@ -306,6 +382,9 @@
 
         document.getElementById("finalizar").style.display =
             (atual === perguntas.length - 1) ? "inline" : "none";
+
+        document.getElementById("btnVoltar").style.display =
+            (atual === 0) ? "none" : "inline";
     }
 
         function proximo() {
@@ -330,8 +409,6 @@
     }
 
         function finalizarTeste() {
-
-
         // Esconde perguntas
         document.getElementById("formTeste").style.display = "none";
         document.getElementById("topoTeste").style.display = "none";
@@ -339,6 +416,13 @@
 
         // Mostra loading
         document.getElementById("loading").style.display = "block";
+
+        document.getElementById("tituloPerguntas").style.display = "none";
+
+        window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 
         // Delay de 2 segundos
         setTimeout(() => {
