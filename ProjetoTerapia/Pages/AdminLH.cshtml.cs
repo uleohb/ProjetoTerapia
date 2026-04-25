@@ -20,6 +20,20 @@ namespace ProjetoTerapia.Pages
 
         public List<Clinica> Clinicas { get; set; } = new List<Clinica>();
 
+        // NOVOS DADOS DO DASHBOARD
+
+        public int TotalClinicas { get; set; }
+
+        public int Pendentes { get; set; }
+
+        public int Aprovadas { get; set; }
+
+        public int Ativas { get; set; }
+
+        public decimal ReceitaPrevista { get; set; }
+
+        public int TaxaConversao { get; set; }
+
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("AdminLogado") != "true")
@@ -28,6 +42,29 @@ namespace ProjetoTerapia.Pages
             }
 
             Clinicas = _context.Clinicas.ToList();
+
+            // MÉTRICAS
+
+            TotalClinicas = Clinicas.Count;
+
+            Pendentes = Clinicas.Count(c => !c.Aprovado);
+
+            Aprovadas = Clinicas.Count(c => c.Aprovado && !c.Pago);
+
+            Ativas = Clinicas.Count(c => c.Pago);
+
+            // Exemplo: plano anual R$ 360
+            ReceitaPrevista = Ativas * 360;
+
+            if (Aprovadas + Ativas > 0)
+            {
+                TaxaConversao = (Ativas * 100) / (Aprovadas + Ativas);
+            }
+            else
+            {
+                TaxaConversao = 0;
+            }
+
             return Page();
         }
 
@@ -46,7 +83,6 @@ namespace ProjetoTerapia.Pages
                 {
                     if (!clinica.Aprovado)
                     {
-                        // não paga sem aprovar
                         return RedirectToPage();
                     }
 
@@ -65,5 +101,4 @@ namespace ProjetoTerapia.Pages
             return RedirectToPage("/LoginAdmin");
         }
     }
-
 }

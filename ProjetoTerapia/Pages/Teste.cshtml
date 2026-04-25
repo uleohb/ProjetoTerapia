@@ -15,7 +15,7 @@
 
     <div class="acoes-iniciais">
 
-        <button onclick="iniciarTeste()" class="btn-principal">
+        <button type="button" onclick="iniciarTeste()" class="btn-principal">
             Começar teste gratuito
         </button>
 
@@ -51,118 +51,230 @@
 
     @for (int i = 0; i < Model.Perguntas.Count; i++)
     {
-        <div class="pergunta" style="display:none">
-            <h4>@Model.Perguntas[i].Texto</h4>
+            <div class="pergunta" style="display:none">
+                <div class="card-pergunta">
 
-            <input type="radio" name="Respostas[@i]" value="true" required /> Sim
-            <input type="radio" name="Respostas[@i]" value="false" required /> Não
-        </div>
+                    <h3 class="texto-pergunta">
+                        @Model.Perguntas[i].Texto
+                    </h3>
+
+                    <div class="opcoes-resposta">
+
+                        <label class="opcao-radio">
+                            <input type="radio" name="Respostas[@i]" value="true" required />
+                            <span>Sim</span>
+                        </label>
+
+                        <label class="opcao-radio">
+                            <input type="radio" name="Respostas[@i]" value="false" required />
+                            <span>Não</span>
+                        </label>
+
+                    </div>
+
+                </div>
+            </div>
     }
 
-    <div class="text-center mt-4">
-        <button type="button" id="btnVoltar" onclick="voltar()">Voltar</button>
-        <button type="button" onclick="proximo()">Próximo</button>
-        <button type="button" id="finalizar" style="display:none" onclick="finalizarTeste()">
-            Finalizar
-        </button>
-    </div>
+        <div class="acoes-pergunta">
+
+            <button type="button"
+                    id="btnVoltar"
+                    class="btn-voltar"
+                    onclick="voltar()">
+                ← Voltar
+            </button>
+
+            <button type="button" class="btn-proximo" onclick="proximo()">
+                Próximo →
+            </button>
+
+            <button type="button"
+                    id="finalizar"
+                    class="btn-finalizar"
+                    style="display:none"
+                    onclick="finalizarTeste()">
+                Finalizar teste
+            </button>
+
+        </div>
 
  </form>
 
-
-
-<!-- FRASE -->
-<div id="fraseAjuda" class="text-center mt-4" style="display:none">
-    <p class="frase-ajuda">
-        Você pode estar precisando de apoio profissional para melhorar seu bem-estar emocional.
-    </p>
-</div>
-
 <!-- BOTÃO RESULTADO -->
-<div id="revelarResultado" class="text-center mt-4" style="display:none">
-    <h4>Quer ver seu resultado?</h4>
-    <button class="btn btn-success mt-2" onclick="enviarFormulario()">
-        Ver resultado
-    </button>
-</div>
+    <div id="revelarResultado" class="bloco-resultado" style="display:none">
+
+        <div class="card-revelar-resultado">
+
+            <div class="icone-resultado">
+                ✓
+            </div>
+
+            <h2>
+                Sua análise está pronta
+            </h2>
+
+            <p>
+                Identificamos sinais importantes sobre seu bem-estar emocional.
+                Seu resultado pode ajudar você a entender melhor seu momento atual
+                e mostrar o melhor próximo passo.
+            </p>
+
+            <button type = "button" class="btn-ver-resultado" onclick="enviarFormulario()">
+                Ver meu resultado agora
+            </button>
+
+            <span class="texto-seguro">
+                100% gratuito • confidencial • sem compromisso
+            </span>
+
+        </div>
+
+    </div>
 
 <!-- RESULTADO -->
-@if (Model.MostrarResultado)
-{
-    <div id="resultadoFinal" class="container-resultado mt-4">
+    @if (Model.MostrarResultado)
+    {
+        <div id="resultadoFinal" class="container-resultado mt-4">
 
-        <h2 class="text-center mb-4">Seu Resultado</h2>
+            <h2 class="titulo-resultado">
+                Sua Análise de Bem-Estar Emocional
+            </h2>
 
-        <div class="card-resultado">
-            <h3>@Model.Nivel</h3>
-            <p>@Model.Mensagem</p>
+            <!-- SCORE PRINCIPAL -->
+            <div class="card-score">
+
+                <p class="score-label">
+                    Seu nível de atenção emocional
+                </p>
+
+                <div class="score-valor">
+                    @(Model.PorcentagemAnsiedade + Model.PorcentagemDepressao)%
+                </div>
+
+                <p class="score-sub">
+                    Quanto antes você buscar apoio,
+                    mais rápido pode melhorar seu bem-estar.
+                </p>
+
+            </div>
+
+            <!-- CARD PRINCIPAL PREMIUM -->
+            <div class="card-resultado-premium">
+
+                <span class="badge-nivel
+                    @(Model.Nivel == "Alto" ? "alto" :
+                                        Model.Nivel == "Moderado" ? "moderado" : "baixo")">
+
+                    @(Model.Nivel == "Alto" ? "🔴 Alto" :
+                                    Model.Nivel == "Moderado" ? "🟡 Moderado" : "🟢 Leve")
+
+            </span>
+
+                <h3 class="mt-4">
+                    @Model.Mensagem
+                </h3>
+
+                <p class="recomendacao-personalizada">
+                    Identificamos sinais importantes no seu bem-estar emocional.
+                    Com acompanhamento adequado, é possível melhorar sua qualidade
+                    de vida e recuperar seu equilíbrio emocional.
+                </p>
+
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="card-graficos">
+
+                <div class="grafico-item">
+
+                    <h4>Ansiedade Emocional</h4>
+
+                    <p>
+                        Seu nível está em
+                        <strong>@Model.PorcentagemAnsiedade%</strong>
+                    </p>
+
+                    <div class="progress">
+                        <div class="progress-bar barra-ansiedade"
+                             style="width:@Model.PorcentagemAnsiedade%">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="grafico-item">
+
+                    <h4>Saúde Emocional</h4>
+
+                    <p>
+                        Seu nível está em
+                        <strong>@Model.PorcentagemDepressao%</strong>
+                    </p>
+
+                    <div class="progress">
+                        <div class="progress-bar barra-depressao"
+                             style="width:@Model.PorcentagemDepressao%">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RECOMENDAÇÃO -->
+            <div class="card-recomendacao">
+
+                <h3>
+                    Nossa recomendação para você
+                </h3>
+
+                <p>
+                    Com base nas suas respostas, recomendamos:
+                </p>
+
+                <ul class="lista-recomendacao">
+                    <li>Terapia individual com especialista</li>
+                    <li>Avaliação inicial do seu bem-estar emocional</li>
+                    <li>Orientação profissional personalizada para seu momento atual</li>
+                </ul>
+
+            </div>
+
+            <!-- PROVA SOCIAL -->
+            <div class="prova-social">
+
+                <p>
+                    
+                </p>
+
+            </div>
+
+            <!-- CTA FINAL -->
+            <div class="cta-final">
+
+                <h3>
+                    Quero falar com um especialista agora
+                </h3>
+
+                <p>
+                    Temos profissionais disponíveis para te ajudar imediatamente.
+                </p>
+
+                <a href="/Clinicas" class="btn-especialista">
+                    Encontrar ajuda profissional
+                </a>
+
+                <div class="cta-secundario">
+                    <a href="/Teste">Refazer teste</a>
+                    <span>•</span>
+                    <a href="/Contato">Falar com suporte</a>
+                </div>
+            </div>
+
         </div>
 
-        <div class="card-graficos">
-            <div class="mb-3">
-                <span>Ansiedade: @Model.PorcentagemAnsiedade%</span>
-                <div class="progress">
-                    <div class="progress-bar barra-ansiedade"
-                         style="width:@Model.PorcentagemAnsiedade%">
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <span>Depressão: @Model.PorcentagemDepressao%</span>
-                <div class="progress">
-                    <div class="progress-bar barra-depressao"
-                         style="width:@Model.PorcentagemDepressao%">
-                    </div>
-                </div>
-            </div>
-        </div>
-        @if (Model.Nivel == "Alto")
-        {
-            <div class="text-center mt-4">
-
-                <div class="alert alert-warning">
-                    ⚠️ Recomendamos procurar ajuda profissional
-                </div>
-
-                <a href="/Clinicas" class="btn btn-danger">
-                    Ver profissionais recomendados
-                </a>
-
-            </div>
         }
-        else if (Model.Nivel == "Moderado")
-        {
-            <div class="text-center mt-4">
-
-                <div class="alert alert-info">
-                    💡 Você pode se beneficiar de conversar com um profissional, se quiser.
-                </div>
-
-                <a href="/Clinicas" class="btn btn-outline-primary">
-                    Ver profissionais disponíveis
-                </a>
-
-            </div>
-        }
-
-        else
-        {
-            <div class="text-center mt-4">
-
-                <div class="alert alert-success">
-                    ✅ Continue se cuidando! Se quiser evoluir ainda mais, temos profissionais disponíveis.
-                </div>
-
-                <a href="/Clinicas" class="btn btn-outline-success">
-                    Conhecer profissionais
-                </a>
-
-            </div>
-        }
-    </div>
-}
-
 
 
     <div id="loading" class="text-center mt-5" style="display:none">
@@ -344,6 +456,283 @@
             font-size: 16px;
         }
 
+    .card-pergunta {
+        background: white;
+        max-width: 700px;
+        margin: auto;
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        text-align: center;
+    }
+
+    .texto-pergunta {
+        font-size: 28px;
+        color: #1e293b;
+        margin-bottom: 35px;
+        font-weight: 600;
+    }
+
+    .opcoes-resposta {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .opcao-radio {
+        cursor: pointer;
+    }
+
+        .opcao-radio input {
+            display: none;
+        }
+
+        .opcao-radio span {
+            display: inline-block;
+            padding: 18px 40px;
+            border: 2px solid #dbeafe;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            background: #f8fafc;
+            transition: 0.2s;
+        }
+
+        .opcao-radio input:checked + span {
+            background: #009ee3;
+            color: white;
+            border-color: #009ee3;
+            transform: scale(1.03);
+        }
+
+        .opcao-radio span:hover {
+            transform: scale(1.02);
+        }
+
+    .acoes-pergunta {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 35px;
+        margin-bottom: 80px;
+        flex-wrap: wrap;
+    }
+
+    .btn-voltar,
+    .btn-proximo,
+    .btn-finalizar {
+        padding: 14px 28px;
+        border: none;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-voltar {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+        .btn-voltar:hover {
+            transform: scale(1.03);
+        }
+
+    .btn-proximo {
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+    }
+
+        .btn-proximo:hover {
+            transform: scale(1.03);
+        }
+
+    .btn-finalizar {
+        background: #16a34a;
+        color: white;
+    }
+
+        .btn-finalizar:hover {
+            transform: scale(1.03);
+        }
+
+    .titulo-resultado {
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #0f172a;
+    }
+
+    .card-score {
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+        padding: 35px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    }
+
+    .score-label {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .score-valor {
+        font-size: 64px;
+        font-weight: bold;
+        line-height: 1;
+        margin-bottom: 15px;
+    }
+
+    .score-sub {
+        font-size: 15px;
+        opacity: 0.95;
+    }
+
+    .badge-nivel {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+        .badge-nivel.alto {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-nivel.moderado {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-nivel.baixo {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+    .recomendacao-personalizada {
+        margin-top: 20px;
+        font-size: 17px;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .cta-final {
+        margin-top: 30px;
+        background: white;
+        padding: 35px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .btn-especialista {
+        display: inline-block;
+        margin-top: 20px;
+        background: #16a34a;
+        color: white;
+        padding: 16px 28px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+
+        .btn-especialista:hover {
+            transform: scale(1.03);
+        }
+
+    .bloco-resultado {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        box-sizing: border-box;
+        background: rgba(248, 250, 252, 0.95);
+        z-index: 999;
+    }
+
+    .card-revelar-resultado {
+        background: white;
+        width: 100%;
+        max-width: 760px;
+        padding: 55px;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+    }
+
+    .icone-resultado {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 30px;
+        background: #dcfce7;
+        color: #16a34a;
+        border-radius: 50%;
+        font-size: 42px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-revelar-resultado h2 {
+        font-size: 42px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+
+    .card-revelar-resultado p {
+        font-size: 20px;
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 35px;
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-ver-resultado {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white;
+        border: none;
+        padding: 18px 42px;
+        border-radius: 16px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 10px 25px rgba(34,197,94,0.18);
+    }
+
+        .btn-ver-resultado:hover {
+            transform: scale(1.03);
+        }
+
+    .texto-seguro {
+        display: block;
+        margin-top: 22px;
+        font-size: 15px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    body {
+        background: #f8fafc;
+        margin: 0;
+        padding: 0;
+    }
+
 </style>
 
 <!-- JS -->
@@ -354,7 +743,6 @@
         function iniciarTeste() {
         document.querySelector(".topo-site").style.display = "none";
 
-        document.getElementById("fraseAjuda").style.display = "none";
         document.getElementById("revelarResultado").style.display = "none";
 
         document.getElementById("formTeste").style.display = "block";
@@ -387,13 +775,23 @@
             (atual === 0) ? "none" : "inline";
     }
 
-        function proximo() {
+           function proximo() {
+
+        let perguntaAtual = perguntas[atual];
+        let respostaMarcada = perguntaAtual.querySelector("input[type='radio']:checked");
+
+        if (!respostaMarcada) {
+            alert("Responda esta pergunta antes de continuar.");
+            return;
+        }
+
         if (atual < perguntas.length - 1) {
             atual++;
-            atualizarBarra(); 
+            atualizarBarra();
             mostrarPergunta();
         }
     }
+    
 
         function voltar() {
         if (atual > 0) {
@@ -409,28 +807,30 @@
     }
 
         function finalizarTeste() {
-        // Esconde perguntas
+         let perguntaAtual = perguntas[atual];
+         let respostaMarcada = perguntaAtual.querySelector("input[type='radio']:checked");
+
+        if (!respostaMarcada) {
+            alert("Você precisa responder esta pergunta antes de finalizar.");
+            return;
+        }
+
         document.getElementById("formTeste").style.display = "none";
         document.getElementById("topoTeste").style.display = "none";
         document.getElementById("barraContainer").style.display = "none";
-
-        // Mostra loading
-        document.getElementById("loading").style.display = "block";
-
         document.getElementById("tituloPerguntas").style.display = "none";
+        document.getElementById("loading").style.display = "block";
+        document.querySelector(".topo-site").style.display = "none";
 
         window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+            top: 0,
+            behavior: "smooth"
+        });
 
-        // Delay de 2 segundos
         setTimeout(() => {
 
             document.getElementById("loading").style.display = "none";
-
-            document.getElementById("fraseAjuda").style.display = "block";
-            document.getElementById("revelarResultado").style.display = "block";
+            document.getElementById("revelarResultado").style.display = "flex";
 
         }, 2000);
     }
@@ -448,4 +848,5 @@
             behavior: "smooth"
         });
     }
+
 </script>

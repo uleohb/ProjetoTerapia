@@ -19,28 +19,50 @@
     <!-- CONTEÚDO -->
     <div class="conteudo">
 
-       <div id="dashboard" class="aba">
+        <div id="dashboard" class="aba">
 
-    <h2>📊 Painel Administrativo</h2>
+            <h2 class="titulo-dashboard">📊 Painel Administrativo</h2>
+            <p class="subtitulo-dashboard">
+                Visão geral da plataforma Ponto Saúde
+            </p>
 
-    <div class="cards">
-        <div class="card-info">
-            <h4>Pendentes</h4>
-            <p>@Model.Clinicas.Count(c => !c.Aprovado)</p>
-        </div>
+            <div class="cards-dashboard">
 
-        <div class="card-info">
-            <h4>Aprovados</h4>
-            <p>@Model.Clinicas.Count(c => c.Aprovado && !c.Pago)</p>
-        </div>
+                <div class="card-info">
+                    <span class="card-label">Total de Clínicas</span>
+                    <h3>@Model.TotalClinicas</h3>
+                    <p>Cadastros realizados</p>
+                </div>
 
-        <div class="card-info">
-            <h4>Ativos</h4>
-            <p>@Model.Clinicas.Count(c => c.Pago)</p>
-        </div>
-    </div>
+                <div class="card-info">
+                    <span class="card-label">Pendentes</span>
+                    <h3>@Model.Pendentes</h3>
+                    <p>Aguardando aprovação</p>
+                </div>
 
-</div>
+                <div class="card-info">
+                    <span class="card-label">Ativas</span>
+                    <h3>@Model.Ativas</h3>
+                    <p>Pagamentos confirmados</p>
+                </div>
+
+                <div class="card-info destaque">
+                    <span class="card-label">Receita Anual</span>
+                    <h3>R$ @Model.ReceitaPrevista</h3>
+                    <p>Plano anual ativo</p>
+                </div>
+
+                <div class="card-info destaque-secundario">
+                    <span class="card-label">Taxa de Conversão</span>
+                    <h3>@Model.TaxaConversao%</h3>
+                    <p>De aprovadas para pagas</p>
+                </div>
+
+            </div>
+
+        
+
+         </div>
 
         <hr />
 
@@ -119,7 +141,7 @@
         </div>
 
     </div>
-
+   
 </div>
 
 <style>
@@ -274,6 +296,81 @@
     .btn-pagar:hover {
      background: #007bb5;
     }
+
+    .titulo-dashboard {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .subtitulo-dashboard {
+        color: #64748b;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+
+    .cards-dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
+
+    .card-info {
+        background: white;
+        padding: 28px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid #f1f5f9;
+        transition: 0.2s;
+    }
+
+        .card-info:hover {
+            transform: translateY(-4px);
+        }
+
+    .card-label {
+        display: block;
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .card-info h3 {
+        font-size: 34px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .card-info p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    .card-info.destaque {
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+    }
+
+        .card-info.destaque h3,
+        .card-info.destaque .card-label,
+        .card-info.destaque p {
+            color: white;
+        }
+
+    .card-info.destaque-secundario {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        color: white;
+    }
+
+        .card-info.destaque-secundario h3,
+        .card-info.destaque-secundario .card-label,
+        .card-info.destaque-secundario p {
+            color: white;
+        }
 
 </style>
 

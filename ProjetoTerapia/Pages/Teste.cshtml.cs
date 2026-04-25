@@ -12,11 +12,19 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public List<bool> Respostas { get; set; } = new List<bool>();
 
-        public string Resultado { get; set; } = "";
-
         public bool MostrarResultado { get; set; }
 
-        public string Nivel { get; set; } = ""; 
+        public string Nivel { get; set; } = "";
+
+        public int ScoreFinal { get; set; }
+
+        public int PorcentagemAnsiedade { get; set; }
+
+        public int PorcentagemDepressao { get; set; }
+
+        public string Mensagem { get; set; } = "";
+
+        public string Recomendacao { get; set; } = "";
 
         public void OnGet()
         {
@@ -25,11 +33,6 @@ namespace ProjetoTerapia.Pages
 
             MostrarResultado = false;
         }
-
-        public int PorcentagemAnsiedade { get; set; }
-        public int PorcentagemDepressao { get; set; }
-        
-        public string Mensagem { get; set; } = "";
 
         public void OnPost()
         {
@@ -43,26 +46,11 @@ namespace ProjetoTerapia.Pages
             int maxDepressao = 0;
 
             if (Respostas == null || Respostas.Count != Perguntas.Count)
-            {
                 return;
-            }
 
             for (int i = 0; i < Perguntas.Count; i++)
             {
-                bool respondeuSim = Respostas[i];
-
-                int pontos = 0;
-
-                if (!Perguntas[i].SimSaudavel)
-                {
-                    if (respondeuSim)
-                        pontos = 10; // resposta ruim
-                }
-                else
-                {
-                    if (!respondeuSim)
-                        pontos = 10; // resposta ruim também
-                }
+                int pontos = Respostas[i] ? 10 : 0;
 
                 if (Perguntas[i].Tipo == "A")
                 {
@@ -79,31 +67,36 @@ namespace ProjetoTerapia.Pages
             PorcentagemAnsiedade = (ansiedade * 100) / maxAnsiedade;
             PorcentagemDepressao = (depressao * 100) / maxDepressao;
 
-            bool ansiedadeAlta = PorcentagemAnsiedade >= 70;
-            bool depressaoAlta = PorcentagemDepressao >= 70;
+            ScoreFinal = (PorcentagemAnsiedade + PorcentagemDepressao) / 2;
 
-            bool ansiedadeModerada = PorcentagemAnsiedade >= 30;
-            bool depressaoModerada = PorcentagemDepressao >= 30;
-
-            // 🔴 NÍVEL ALTO
-            if (ansiedadeAlta || depressaoAlta)
+            // NÍVEL ALTO
+            if (ScoreFinal >= 70)
             {
                 Nivel = "Alto";
-                Mensagem = "Você apresenta sinais importantes que merecem atenção. Buscar ajuda profissional pode ser um passo importante.";
+
+                Mensagem = "Seu perfil emocional apresenta sinais importantes que merecem atenção imediata.";
+
+                Recomendacao = "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
             }
 
-            // 🟡 NÍVEL MODERADO
-            else if (ansiedadeModerada || depressaoModerada)
+            // NÍVEL MODERADO
+            else if (ScoreFinal >= 40)
             {
                 Nivel = "Moderado";
-                Mensagem = "Você apresenta alguns sinais de alerta. Vale a pena cuidar mais da sua saúde emocional.";
+
+                Mensagem = "Seu resultado mostra sinais de alerta que indicam a necessidade de maior atenção emocional.";
+
+                Recomendacao = "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
             }
 
-            // 🟢 NÍVEL BAIXO
+            // NÍVEL BAIXO
             else
             {
                 Nivel = "Baixo";
-                Mensagem = "Você aparenta estar bem. Continue se cuidando e mantendo hábitos saudáveis.";
+
+                Mensagem = "Seu resultado indica um bom equilíbrio emocional no momento.";
+
+                Recomendacao = "Continue mantendo hábitos saudáveis, autocuidado e acompanhamento preventivo para preservar seu bem-estar.";
             }
 
             MostrarResultado = true;

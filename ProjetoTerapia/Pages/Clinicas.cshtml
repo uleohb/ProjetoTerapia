@@ -1,52 +1,260 @@
 ﻿@page
 @model ProjetoTerapia.Pages.ClinicasModel
 
-<h2 class="text-center mt-4">Profissionais Recomendados</h2>
+<form method="get" class="busca-clinica">
 
-<div class="container mt-4">
+    <input type="text"
+           name="busca"
+           value="@Model.Busca"
+           placeholder="Buscar profissional, especialidade ou região..." />
+
+    <button type="submit">
+        Buscar
+    </button>
+
+</form>
+
+<div class="topo-clinicas">
+
+    <h1>Profissionais Recomendados</h1>
+
+    <p>
+        Encontre profissionais e clínicas preparados para cuidar da sua saúde emocional
+    </p>
+
+</div>
+
+<div class="container-clinicas">
 
     @if (!Model.Clinicas.Any())
     {
-        <div class="alert alert-info text-center">
-            Nenhum profissional cadastrado ainda.
+        <div class="alerta-vazio">
+            Nenhum profissional cadastrado no momento.
         </div>
     }
-   
+
     @foreach (var clinica in Model.Clinicas)
     {
         <div class="card-clinica">
-            <h5>@clinica.Nome</h5>
-            <p>@clinica.Descricao</p>
-            <p><strong>R$ @clinica.Valor</strong></p>
-            <p>@clinica.Endereco</p>
-            <p><strong>Contato:</strong> @clinica.Telefone</p>
-            <a href="https://wa.me/@clinica.Telefone" target="_blank" class="btn btn-success">
+
+            <div class="topo-card">
+                <div>
+                    <h3>@clinica.Nome</h3>
+                    <span class="selo-aprovado">
+                        ✔ Profissional Verificado
+                    </span>
+                </div>
+
+                <div class="valor">
+                    R$ @clinica.Valor
+                </div>
+            </div>
+
+            <p class="descricao">
+                @clinica.Descricao
+            </p>
+
+            <div class="infos">
+                <p><strong>📍 Endereço:</strong> @clinica.Endereco</p>
+                <p><strong>📞 Contato:</strong> @clinica.Telefone</p>
+            </div>
+
+            <a href="https://wa.me/@clinica.Telefone"
+               target="_blank"
+               class="btn-whatsapp">
                 Falar no WhatsApp
             </a>
+
         </div>
     }
 
-    <!-- BOTÃO AQUI FORA -->
-    <div class="text-center mt-4">
-        <a href="/CadastroClinica" class="btn btn-success">
-            Sou profissional / clínica
+    <div class="area-profissional">
+        <h3>É profissional ou possui clínica?</h3>
+        <p>Cadastre-se e receba pacientes qualificados</p>
+
+        <a href="/CadastroClinica" class="btn-cadastro">
+            Quero cadastrar minha clínica
         </a>
     </div>
-
 
 </div>
 
 <style>
-    .container {
+
+    body {
+        background: #f8fafc;
+    }
+
+    .topo-clinicas {
+        text-align: center;
+        padding: 60px 20px 30px;
+    }
+
+    .topo-clinicas h1 {
+        font-size: 38px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 15px;
+    }
+
+    .topo-clinicas p {
+        font-size: 18px;
+        color: #64748b;
         max-width: 700px;
         margin: auto;
     }
 
-    .card-clinica {
+    .container-clinicas {
+        max-width: 900px;
+        margin: auto;
         padding: 20px;
-        margin-bottom: 15px;
-        border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
+
+    .card-clinica {
+        background: white;
+        border-radius: 18px;
+        padding: 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .topo-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .topo-card h3 {
+        margin: 0;
+        font-size: 24px;
+        color: #111827;
+    }
+
+    .selo-aprovado {
+        display: inline-block;
+        margin-top: 8px;
+        background: #dcfce7;
+        color: #166534;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .valor {
+        font-size: 22px;
+        font-weight: bold;
+        color: #009ee3;
+    }
+
+    .descricao {
+        color: #475569;
+        font-size: 16px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .infos p {
+        margin-bottom: 10px;
+        color: #334155;
+    }
+
+    .btn-whatsapp {
+        display: inline-block;
+        margin-top: 20px;
+        background: #25D366;
+        color: white;
+        padding: 14px 22px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .btn-whatsapp:hover {
+        transform: scale(1.02);
+    }
+
+    .area-profissional {
+        margin-top: 50px;
+        background: white;
+        padding: 35px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .btn-cadastro {
+        display: inline-block;
+        margin-top: 20px;
+        background: #009ee3;
+        color: white;
+        padding: 14px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .alerta-vazio {
+        background: white;
+        padding: 25px;
+        border-radius: 14px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .busca-clinica {
+        max-width: 900px;
+        margin: 30px auto 10px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        background: white;
+        padding: 18px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+        .busca-clinica input {
+            flex: 1;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+            .busca-clinica input:focus {
+                border-color: #009ee3;
+                box-shadow: 0 0 0 4px rgba(0, 158, 227, 0.08);
+            }
+
+        .busca-clinica button {
+            padding: 16px 28px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #00c6ff, #009ee3);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+            .busca-clinica button:hover {
+                transform: scale(1.03);
+            }
+
+    @@media (max-width: 768px) {
+        .busca-clinica {
+            flex-direction: column;
+        }
+
+            .busca-clinica button {
+                width: 100%;
+            }
+    }
+
 </style>

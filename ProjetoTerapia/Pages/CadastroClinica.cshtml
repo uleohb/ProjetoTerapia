@@ -1,59 +1,192 @@
 ﻿@page
 @model ProjetoTerapia.Pages.CadastroClinicaModel
 
-<div style="background: linear-gradient(135deg, #4facfe, #00f2fe); padding: 20px; border-radius: 0 0 20px 20px;">
-    <h2 style="color: white; text-align:center; margin:0;">
-        Ponto Saúde
-    </h2>
+<div class="topo-cadastro">
+
+    <h1>Ponto Saúde</h1>
+
+    <h2>Cadastre sua clínica e receba novos pacientes</h2>
+
+    <p>
+        Conectamos profissionais da saúde emocional com pessoas que realmente precisam de ajuda.
+    </p>
+
 </div>
 
-<h2 class="text-center mt-4">Cadastro de Clínica</h2>
+<div class="container-cadastro">
 
-<div class="container mt-4">
+    <div class="card-cadastro">
 
-    
+        <h3>Cadastro Profissional</h3>
 
-    <form method="post">
+        <p class="subtexto">
+            Preencha suas informações para análise e aprovação da plataforma.
+        </p>
 
-        <div class="mb-3">
-            <label>Nome da clínica</label>
-            <input type="text" class="form-control" asp-for="NovaClinica.Nome" required />
-        </div>
+        <form method="post">
 
-        <div class="mb-3">
-            <label>Descrição</label>
-            <textarea class="form-control" asp-for="NovaClinica.Descricao" required></textarea>
-        </div>
+            <div class="campo">
+                <label>Nome da clínica ou profissional</label>
+                <input type="text"
+                       asp-for="NovaClinica.Nome"
+                       required />
+            </div>
 
-        <div class="mb-3">
-            <label>Endereço</label>
-            <input type="text" class="form-control" asp-for="NovaClinica.Endereco" required />
-        </div>
+            <div class="campo">
+                <label>Descrição profissional</label>
+                <textarea asp-for="NovaClinica.Descricao"
+                          required></textarea>
+            </div>
 
-        <div class="mb-3">
-            <label>Telefone / WhatsApp</label>
-            <input type="text" class="form-control" asp-for="NovaClinica.Telefone" required />
-        </div>
+            <div class="campo">
+                <label>Endereço</label>
+                <input type="text"
+                       asp-for="NovaClinica.Endereco"
+                       required />
+            </div>
 
-        <div class="mb-3">
-            <label>Valor da consulta (R$)</label>
-            <input type="number" class="form-control" asp-for="NovaClinica.Valor" required />
-        </div>
+            <div class="campo">
+                <label>Telefone / WhatsApp</label>
+                <input type="text"
+                       asp-for="NovaClinica.Telefone"
+                       required />
+            </div>
 
-        <button class="btn btn-primary">Cadastrar</button>
+            <div class="campo">
+                <label>Valor da consulta inicial (R$)</label>
+                <input type="number"
+                       asp-for="NovaClinica.Valor"
+                       required />
+            </div>
 
-        <div class="alert alert-info mt-3">
-            Sua clínica será analisada antes de aparecer na plataforma.
-        </div>
+            <button class="btn-cadastrar">
+                Solicitar cadastro
+            </button>
 
-    </form>
+            <div class="alerta-info">
+                Sua clínica passará por uma análise antes de ser exibida na plataforma.
+            </div>
 
+        </form>
+
+    </div>
 
 </div>
 
 <style>
-    .container {
-        max-width: 600px;
-        margin: auto;
+
+    body {
+        background: #f8fafc;
     }
+
+    .topo-cadastro {
+        text-align: center;
+        padding: 60px 20px 30px;
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+        border-radius: 0 0 30px 30px;
+    }
+
+        .topo-cadastro h1 {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .topo-cadastro h2 {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        .topo-cadastro p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: auto;
+            opacity: 0.95;
+        }
+
+    .container-cadastro {
+        max-width: 750px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .card-cadastro {
+        background: white;
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+        .card-cadastro h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+    .subtexto {
+        color: #64748b;
+        margin-bottom: 30px;
+    }
+
+    .campo {
+        margin-bottom: 22px;
+    }
+
+        .campo label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .campo input,
+        .campo textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .campo textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+            .campo input:focus,
+            .campo textarea:focus {
+                border-color: #009ee3;
+                box-shadow: 0 0 0 4px rgba(0, 158, 227, 0.08);
+            }
+
+    .btn-cadastrar {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .btn-cadastrar:hover {
+            transform: scale(1.01);
+        }
+
+    .alerta-info {
+        margin-top: 20px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 18px;
+        border-radius: 14px;
+        color: #1e3a8a;
+        font-size: 14px;
+    }
+
 </style>
