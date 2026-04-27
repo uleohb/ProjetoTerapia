@@ -34,6 +34,12 @@ namespace ProjetoTerapia.Pages
 
         public int TaxaConversao { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string Busca { get; set; } = "";
+
+        [BindProperty(SupportsGet = true)]
+        public string FiltroStatus { get; set; } = "";
+
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("AdminLogado") != "true")
@@ -41,7 +47,26 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage("/LoginAdmin");
             }
 
-            Clinicas = _context.Clinicas.ToList();
+            var query = _context.Clinicas.AsQueryable();
+
+            if (!string.IsNullOrEmpty(Busca))
+            {
+                query = query.Where(c => c.Nome.Contains(Busca));
+            }
+
+            if (!string.IsNullOrEmpty(FiltroStatus))
+            {
+                if (FiltroStatus == "pendente")
+                    query = query.Where(c => !c.Aprovado);
+
+                if (FiltroStatus == "aprovado")
+                    query = query.Where(c => c.Aprovado && !c.Pago);
+
+                if (FiltroStatus == "ativo")
+                    query = query.Where(c => c.Pago);
+            }
+
+            Clinicas = query.ToList();
 
             // MÉTRICAS
 

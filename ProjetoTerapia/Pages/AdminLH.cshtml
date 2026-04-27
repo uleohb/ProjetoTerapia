@@ -11,6 +11,8 @@
         <a href="javascript:void(0)" onclick="mostrarAba('clinicas', this)">🏥 Clínicas</a>
         <a href="javascript:void(0)" onclick="mostrarAba('pagamentos', this)">💰 Pagamentos</a>
 
+        <input type="hidden" id="abaAtual" value="dashboard" /> 
+
         <form method="post" asp-page-handler="Logout">
             <button class="btn-logout">Sair</button>
         </form>
@@ -69,6 +71,28 @@
         <div id="clinicas" class="aba" style="display:none">
 
             <h3>Gerenciar Clínicas</h3>
+            
+            <form method="get" class="filtros-admin"> @*faz a página recarregar*@
+
+                <input type="hidden" name="aba" value="clinicas" /> @*enviar junto com o filtro quando a busca é utilizada*@
+
+                <input type="text"
+                       name="Busca"
+                       value="@Model.Busca"
+                       placeholder="Buscar clínica pelo nome..." />
+
+                <select name="FiltroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="aprovado">Aprovadas</option>
+                    <option value="ativo">Ativas</option>
+                </select>
+
+                <button type="submit" class="btn-filtrar">
+                    Filtrar
+                </button>
+
+            </form>
 
             @foreach (var clinica in Model.Clinicas
                         .OrderBy(c => c.Aprovado)
@@ -372,6 +396,37 @@
             color: white;
         }
 
+    .filtros-admin {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+        .filtros-admin input,
+        .filtros-admin select {
+            padding: 12px 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            font-size: 14px;
+            min-width: 220px;
+            background: white;
+        }
+
+    .btn-filtrar {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #009ee3;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .btn-filtrar:hover {
+            background: #007bb5;
+        }
+
 </style>
 
 <script>
@@ -395,7 +450,13 @@
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        mostrarAba('dashboard');
+        document.addEventListener("DOMContentLoaded", () => {
+		const params = new URLSearchParams(window.location.search);  //le a URL e pega os parâmetros
+        const aba = params.get("aba") || "dashboard";
+
+        const link = [...document.querySelectorAll(".sidebar a")]
+            .find(a => a.getAttribute("onclick")?.includes(aba));
+
+		mostrarAba(aba, link); //chama a função para mostrar a aba correta com base no parâmetro da URL
     });
 </script>
