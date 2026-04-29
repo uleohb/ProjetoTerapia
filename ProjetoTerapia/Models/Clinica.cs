@@ -17,5 +17,14 @@
         public bool Aprovado { get; set; } = false;
 
         public bool Pago { get; set; } = false;
+
+        // data em que a clínica foi aprovada
+        public DateTime? DataAprovacao { get; set; }
+
+        // data em que o pagamento foi confirmado
+        public DateTime? DataPagamento { get; set; }
+
+        // vencimento da assinatura anual
+        public DateTime? DataVencimento { get; set; }
     }
 }

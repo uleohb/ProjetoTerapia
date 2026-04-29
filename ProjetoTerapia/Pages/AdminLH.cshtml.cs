@@ -4,6 +4,7 @@ using ProjetoTerapia.Models;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace ProjetoTerapia.Pages
 {
@@ -39,6 +40,7 @@ namespace ProjetoTerapia.Pages
 
         [BindProperty(SupportsGet = true)]
         public string FiltroStatus { get; set; } = "";
+
 
         public IActionResult OnGet()
         {
@@ -102,22 +104,34 @@ namespace ProjetoTerapia.Pages
                 if (acao == "aprovar")
                 {
                     clinica.Aprovado = true;
+                    clinica.DataAprovacao = DateTime.Now;
+
+                    TempData["MensagemSucesso"] =
+                        $"Clínica {clinica.Nome} aprovada com sucesso!";
                 }
 
                 if (acao == "pagar")
                 {
                     if (!clinica.Aprovado)
                     {
-                        return RedirectToPage();
+                        TempData["MensagemErro"] =
+                            "A clínica precisa ser aprovada antes do pagamento.";
+
+                        return RedirectToPage(new { aba = "clinicas" });
                     }
 
                     clinica.Pago = true;
+                    clinica.DataPagamento = DateTime.Now;
+                    clinica.DataVencimento = DateTime.Now.AddYears(1);
+
+                    TempData["MensagemSucesso"] =
+                        $"Pagamento da clínica {clinica.Nome} confirmado com sucesso!";
                 }
 
                 _context.SaveChanges();
             }
 
-            return RedirectToPage();
+            return RedirectToPage(new { aba = "clinicas" });
         }
 
         public IActionResult OnPostLogout()

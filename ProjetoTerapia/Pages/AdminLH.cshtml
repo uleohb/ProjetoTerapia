@@ -1,8 +1,8 @@
 ﻿@page
 @model ProjetoTerapia.Pages.AdminLHModel
 
-<div class="layout">
 
+<div class="layout">
     <!-- SIDEBAR -->
     <div class="sidebar">
         <h3 class="logo">Ponto Saúde</h3>
@@ -20,6 +20,20 @@
 
     <!-- CONTEÚDO -->
     <div class="conteudo">
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div class="alerta-sucesso">
+                ✅ @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div class="alerta-erro">
+                ⚠️ @TempData["MensagemErro"]
+            </div>
+        }
 
         <div id="dashboard" class="aba">
 
@@ -111,17 +125,38 @@
                         @(clinica.Pago ? "💰 Pago" : "💸 Não pago")
                     </p>
 
+                    @if (clinica.DataAprovacao != null)
+                    {
+                        <p>📅 Aprovado em: @clinica.DataAprovacao.Value.ToString("dd/MM/yyyy")</p>
+                    }
+
+                    @if (clinica.DataVencimento != null)
+                    {
+                        <p>⏳ Vence em: @clinica.DataVencimento.Value.ToString("dd/MM/yyyy")</p>
+                    }
+
                     <form method="post">
                         <input type="hidden" name="id" value="@clinica.Id" />
 
                         @if (!clinica.Aprovado)
                         {
-                            <button name="acao" value="aprovar">Aprovar</button>
+                            <button type="submit"
+                                    name="acao"
+                                    value="aprovar"
+                                    onclick='return confirmarAcao(this, "aprovar esta clínica?")'>
+                                Aprovar
+
+                            </button>
                         }
 
                         @if (clinica.Aprovado && !clinica.Pago)
                         {
-                            <button name="acao" value="pagar">Confirmar pagamento</button>
+                            <button type="submit"
+                             name="acao"
+                             value="pagar"
+                             onclick='return confirmarAcao(this, "confirmar o pagamento desta clínica?")'>
+                              Confirmar pagamento
+                        </button>
                         }
                     </form>
 
@@ -156,7 +191,12 @@
 
                     <form method="post">
                         <input type="hidden" name="id" value="@clinica.Id" />
-                        <button name="acao" value="pagar">Confirmar pagamento</button>
+                        <button type="submit"
+                                name="acao"
+                                value="pagar"
+                                onclick='return confirmarAcao(this, "confirmar o pagamento desta clínica?")'>
+                            Confirmar pagamento
+                        </button>
                     </form>
 
                 </div>
@@ -165,7 +205,30 @@
         </div>
 
     </div>
-   
+
+         <!-- MODAL DE CONFIRMAÇÃO -->
+   <div id="modalConfirmacao" class="modal-confirmacao">
+
+    <div class="modal-box">
+        <h3>Confirmar ação</h3>
+
+        <p id="textoModal">
+            Deseja realmente continuar?
+        </p>
+
+        <div class="modal-botoes">
+            <button type="button" class="btn-cancelar" onclick="fecharModal()">
+                Cancelar
+            </button>
+
+            <button type="button" class="btn-confirmar" id="btnConfirmarFinal">
+                Confirmar
+            </button>
+        </div>
+    </div>
+
+</div>
+
 </div>
 
 <style>
@@ -427,11 +490,111 @@
             background: #007bb5;
         }
 
+    /* MODAL */
+
+    .modal-confirmacao {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-box {
+        background: white;
+        width: 420px;
+        max-width: 90%;
+        padding: 30px;
+        border-radius: 18px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        text-align: center;
+        animation: fadeModal 0.2s ease;
+    }
+
+        .modal-box h3 {
+            margin-bottom: 15px;
+            color: #0f172a;
+        }
+
+        .modal-box p {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+    .modal-botoes {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-cancelar {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #e2e8f0;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-confirmar {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #009ee3;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+        .btn-confirmar:hover {
+            background: #007bb5;
+        }
+
+    @@keyframes fadeModal {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* ALERTAS */
+
+    .alerta-sucesso {
+        background: #dcfce7;
+        color: #166534;
+        padding: 16px 20px;
+        border-radius: 14px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        border: 1px solid #bbf7d0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+
+    .alerta-erro {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 16px 20px;
+        border-radius: 14px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        border: 1px solid #fecaca;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+
 </style>
 
 <script>
-    function mostrarAba(nome, el) {
+    let formParaEnviar = null;
+    let acaoSelecionada = null;
 
+    function mostrarAba(nome, el) {
         document.querySelectorAll(".aba").forEach(div => {
             div.style.display = "none";
         });
@@ -440,23 +603,51 @@
             link.classList.remove("ativo");
         });
 
-
         document.getElementById(nome).style.display = "block";
 
         if (el) {
             el.classList.add("ativo");
         }
     }
-</script>
 
-<script>
-        document.addEventListener("DOMContentLoaded", () => {
-		const params = new URLSearchParams(window.location.search);  //le a URL e pega os parâmetros
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
         const aba = params.get("aba") || "dashboard";
 
         const link = [...document.querySelectorAll(".sidebar a")]
             .find(a => a.getAttribute("onclick")?.includes(aba));
 
-		mostrarAba(aba, link); //chama a função para mostrar a aba correta com base no parâmetro da URL
+        mostrarAba(aba, link);
+    });
+
+    function confirmarAcao(botao, mensagem) {
+        formParaEnviar = botao.form;
+        acaoSelecionada = botao.value;
+
+        document.getElementById("textoModal").innerText =
+            "Deseja realmente " + mensagem;
+
+        document.getElementById("modalConfirmacao").style.display = "flex";
+
+        return false;
+    }
+
+    function fecharModal() {
+        document.getElementById("modalConfirmacao").style.display = "none";
+        formParaEnviar = null;
+        acaoSelecionada = null;
+    }
+
+    document.getElementById("btnConfirmarFinal").addEventListener("click", () => {
+        if (formParaEnviar && acaoSelecionada) {
+
+            const inputAcao = document.createElement("input");
+            inputAcao.type = "hidden";
+            inputAcao.name = "acao";
+            inputAcao.value = acaoSelecionada;
+
+            formParaEnviar.appendChild(inputAcao);
+            formParaEnviar.submit();
+        }
     });
 </script>
