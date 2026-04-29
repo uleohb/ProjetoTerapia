@@ -128,6 +128,18 @@ namespace ProjetoTerapia.Pages
                         $"Pagamento da clínica {clinica.Nome} confirmado com sucesso!";
                 }
 
+                if (acao == "excluir")
+                {
+                    _context.Clinicas.Remove(clinica);
+
+                    TempData["MensagemSucesso"] =
+                        $"Clínica {clinica.Nome} removida com sucesso!";
+
+                    _context.SaveChanges();
+
+                    return RedirectToPage(new { aba = "clinicas" });
+                }
+
                 _context.SaveChanges();
             }
 

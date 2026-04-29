@@ -106,6 +106,7 @@
                     Filtrar
                 </button>
 
+
             </form>
 
             @foreach (var clinica in Model.Clinicas
@@ -138,6 +139,8 @@
                     <form method="post">
                         <input type="hidden" name="id" value="@clinica.Id" />
 
+
+                        @*botão de aprovar clinica depois de ser analisada*@
                         @if (!clinica.Aprovado)
                         {
                             <button type="submit"
@@ -149,6 +152,7 @@
                             </button>
                         }
 
+                        @*botão de confirmar pagamento de clinica*@
                         @if (clinica.Aprovado && !clinica.Pago)
                         {
                             <button type="submit"
@@ -158,6 +162,15 @@
                               Confirmar pagamento
                         </button>
                         }
+
+                        @*botão de exlcuir clinica*@
+                        <button type="submit" 
+                                name="acao"
+                                value="excluir"
+                                onclick='return confirmarAcao(this, "excluir permanentemente esta clínica?")'>
+                            Excluir
+                        </button>
+
                     </form>
 
                 </div>
@@ -586,6 +599,11 @@
         font-weight: 600;
         border: 1px solid #fecaca;
         box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+
+    .card button[value="excluir"] {
+        background: #dc2626;
+        color: white;
     }
 
 </style>

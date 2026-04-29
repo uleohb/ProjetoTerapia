@@ -21,6 +21,18 @@ namespace ProjetoTerapia.Pages
         {
             NovaClinica.Aprovado = false;
 
+            NovaClinica.Telefone = NovaClinica.Telefone //remove caracteres comuns de formatação de telefone
+             .Replace("(", "")
+             .Replace(")", "")
+             .Replace("-", "")
+             .Replace(" ", "")
+             .Replace("+", "");
+
+            if (!NovaClinica.Telefone.StartsWith("55")) //garante que o telefone comece com o código do país (55 para Brasil)
+            {
+                NovaClinica.Telefone = "55" + NovaClinica.Telefone;
+            }
+
             _context.Clinicas.Add(NovaClinica);
             _context.SaveChanges();
 
