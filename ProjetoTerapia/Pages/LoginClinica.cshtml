@@ -1,0 +1,22 @@
+﻿@page
+@model ProjetoTerapia.Pages.LoginClinicaModel
+@{
+
+	<h2>Login da Clinica</h2>
+
+	<form method=" post">
+
+		<input type="email" asp-for="Email" placeholder="Email" required />
+
+		<input type="password" asp-for="Senha" placeholder="Senha" required />
+
+		<button type="submit">Entrar</button>
+
+		</form>
+
+		if(Model.Erro != null)
+		{
+			<p style= "color:red"> @Model.Erro </p>
+	}
+}		
+

@@ -33,6 +33,16 @@
             </div>
 
             <div class="campo">
+                <label>Email</label>
+                <input type="email" asp-for="NovaClinica.Email" required />
+            </div>
+
+            <div class="campo">
+                <label>Senha</label>
+                <input type="password" asp-for="NovaClinica.Senha" required />
+            </div>
+
+            <div class="campo">
                 <label>Descrição profissional</label>
                 <textarea asp-for="NovaClinica.Descricao"
                           required></textarea>
@@ -66,6 +76,7 @@
             <div class="alerta-info">
                 Sua clínica passará por uma análise antes de ser exibida na plataforma.
             </div>
+
 
         </form>
 

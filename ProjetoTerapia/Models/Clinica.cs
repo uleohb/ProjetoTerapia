@@ -18,6 +18,10 @@
 
         public bool Pago { get; set; } = false;
 
+        public string Email { get; set; } = ""; 
+
+        public string Senha { get; set; } = ""; 
+
         // data em que a clínica foi aprovada
         public DateTime? DataAprovacao { get; set; }
 

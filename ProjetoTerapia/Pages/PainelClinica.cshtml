@@ -1,0 +1,21 @@
+﻿@page
+@model ProjetoTerapia.Pages.PainelClinicaModel
+
+@if(Model.Clinica != null)
+{
+	<h2>Minha Conta</h2>
+
+	<p><strong>Nome</strong>: @Model.Clinica.Nome</p>
+	<p><strong>Email</strong>: @Model.Clinica.Email</p>
+	<p><strong>Telefone</strong>: @Model.Clinica.Telefone</p>
+	<p><strong>Valor</strong>: R$ @Model.Clinica.Valor</p>
+   <p><strong>Status</strong>
+	   @(Model.Clinica.Pago ? "Ativo" : "Pendente")
+
+    </p>
+}
+
+else 
+{
+	<p>Erro ao carregar dados da clínica.</p>
+}
