@@ -40,9 +40,14 @@
             <div class="topo-card">
                 <div>
                     <h3>@clinica.Nome</h3>
-                    <span class="selo-aprovado">
-                        ✔ Profissional Verificado
-                    </span>
+                    @if (clinica.Pago)
+                    {
+                        <span class="selo-aprovado">✔ Verificado</span>
+                    }
+                    else
+                    {
+                        <span style="color:gray;">⏳ Em análise</span>
+                    }
                 </div>
 
                 <div class="valor">
@@ -54,19 +59,57 @@
                 @clinica.Descricao
             </p>
 
+            @if (!string.IsNullOrEmpty(clinica.Especialidades))
+            {
+                var lista = clinica.Especialidades.Split(',');
+
+                <div class="lista-especialidades">
+                    @foreach (var esp in lista)
+                    {
+                        <span class="tag-especialidade">@esp</span>
+                    }
+                </div>
+            }
+
             <div class="infos">
                 <p><strong>📍 Endereço:</strong> @clinica.Endereco</p>
-                <p><strong>📞 Contato:</strong> @clinica.Telefone</p>
             </div>
 
-            <a href="https://wa.me/@(clinica.Telefone)"
-               target="_blank"
-               class="btn-whatsapp">
-                Falar no WhatsApp
-            </a>
+            @if (!string.IsNullOrEmpty(clinica.Telefone))
+            {
+                <p><strong>📞 Contato:</strong> @clinica.Telefone</p>
+
+                <a href="https://wa.me/@(clinica.Telefone)"
+                   target="_blank"
+                   class="btn-whatsapp">
+                    Falar no WhatsApp
+                </a>
+            }
+            else
+            {
+                <p style="color:gray;">Contato não informado</p>
+            }
+
+            <div class="redes-sociais">
+
+                @if (!string.IsNullOrEmpty(clinica.Instagram))
+                {
+                    <a href="@clinica.Instagram" target="_blank" class="icon insta">
+                        📸
+                    </a>
+                }
+
+                @if (!string.IsNullOrEmpty(clinica.Site))
+                {
+                    <a href="@clinica.Site" target="_blank" class="icon site">
+                        🌐
+                    </a>
+                }
+
+            </div>
 
         </div>
-    }
+ }
 
     <div class="area-profissional">
         <h3>É profissional ou possui clínica?</h3>
@@ -255,6 +298,63 @@
             .busca-clinica button {
                 width: 100%;
             }
+    }
+
+    .lista-especialidades {
+        margin-top: 10px;
+    }
+
+    .tag-especialidade {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 6px 10px;
+        border-radius: 999px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .redes-sociais {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+}
+
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.icon.insta {
+    background: #fdf2f8;
+}
+
+.icon.site {
+    background: #eff6ff;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+}
+
+    .btn-instagram {
+        display: inline-block;
+        margin-top: 10px;
+        background: #E1306C;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
     }
 
 </style>

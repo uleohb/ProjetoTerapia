@@ -49,6 +49,11 @@
             </div>
 
             <div class="campo">
+                <label>CEP</label>
+                <input type="text" id="cep" asp-for="NovaClinica.CEP" required />
+            </div>
+
+            <div class="campo">
                 <label>Endereço</label>
                 <input type="text"
                        asp-for="NovaClinica.Endereco"
@@ -60,6 +65,62 @@
                 <input type="text"
                        asp-for="NovaClinica.Telefone"
                        required />
+            </div>
+
+            <div class="campo">
+                <label>Instagram</label>
+                <input type="text"
+                       asp-for="NovaClinica.Instagram"
+                       placeholder="@@usuario ou link completo" />
+            </div>
+
+            <div class="campo">
+                <label>Site / Portfólio</label>
+                <input type="text"
+                       asp-for="NovaClinica.Site"
+                       placeholder="https://..." />
+            </div>
+
+            <div class="campo">
+                <label>Registro profissional (CRP, CRM...)</label>
+                <input asp-for="NovaClinica.Documento" />
+            </div>
+
+            <div class="campo">
+                <label>CPF</label>
+                <input type="text" asp-for="NovaClinica.CPF" required />
+            </div>
+
+            <div class="campo">
+                <label>Especialidades</label>
+
+                <label class="checkbox-item">
+                    <input type="checkbox" name="Especialidades" value="Ansiedade" />
+                    <span>Ansiedade</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="Especialidades" value="Depressão" />
+                    <span>Depressão</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="Especialidades" value="Infantil" />
+                    <span>Infantil</span>
+                </label>
+            </div>
+
+            <div class="campo">
+                <label>Tipo de atendimento</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input asp-for="NovaClinica.AtendimentoPresencial" />
+                        <span>Presencial</span>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input asp-for="NovaClinica.AtendimentoOnline" />
+                        <span>Online</span>
+                    </label>
+                </div>
             </div>
 
             <div class="campo">
@@ -200,4 +261,48 @@
         font-size: 14px;
     }
 
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+        }
+
 </style>
+
+@* preenche o endereço com base no CEP *@
+<script>
+    document.getElementById("cep").addEventListener("blur", function () {
+
+        let cep = this.value.replace(/\D/g, '');
+
+        if (cep.length === 8) {
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(res => res.json())
+                .then(data => {
+
+                    if (!data.erro) {
+
+                        document.querySelector("[name='NovaClinica.Endereco']")
+                            .value = data.logradouro + ", " + data.bairro + " - " + data.localidade;
+
+                    }
+
+                });
+        }
+
+    });
+</script>

@@ -22,6 +22,24 @@
 
         public string Senha { get; set; } = ""; 
 
+        public string Especialidades { get; set; } = "";
+
+        public string Documento { get; set; } = ""; // CRP, CRM, etc
+
+        public string CEP { get; set; } = "";
+
+        public bool AtendimentoPresencial { get; set; } = false;
+
+        public bool AtendimentoOnline { get; set; } = false;
+
+        public string Cidade { get; set; } = "";
+
+        public string Instagram { get; set; } = "";
+
+        public string Site { get; set; } = "";
+
+        public string CPF { get; set; } = ""; // para pessoa física
+
         // data em que a clínica foi aprovada
         public DateTime? DataAprovacao { get; set; }
 

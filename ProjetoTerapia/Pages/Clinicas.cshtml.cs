@@ -20,11 +20,21 @@ namespace ProjetoTerapia.Pages
         [BindProperty(SupportsGet = true)]
         public string Busca { get; set; } = "";
 
+        [BindProperty(SupportsGet = true)]
+        public string Perfil { get; set; } = "";
+
         public void OnGet()
         {
-            var query = _context.Clinicas
-                .Where(c => c.Aprovado && c.Pago);
+            var cidadeUsuario = "Osasco";
 
+            var query = _context.Clinicas
+                .Where(c => c.Aprovado && c.Pago)
+                .Where(c =>
+                    (c.AtendimentoPresencial && c.Cidade == cidadeUsuario)
+                    || c.AtendimentoOnline
+                );
+
+            //filtro do teste: busca por nome, descrição ou endereço
             if (!string.IsNullOrEmpty(Busca))
             {
                 query = query.Where(c =>
@@ -33,7 +43,14 @@ namespace ProjetoTerapia.Pages
                     c.Endereco.Contains(Busca));
             }
 
+            //filtro do teste: perfil do profissional
+            if (!string.IsNullOrEmpty(Perfil))
+            {
+                query = query.Where(c => c.Especialidades != null && c.Especialidades.Contains(Perfil));
+            }
+
             Clinicas = query.ToList();
+
         }
     }
 }
