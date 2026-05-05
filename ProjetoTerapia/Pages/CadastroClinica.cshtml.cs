@@ -17,7 +17,10 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public Clinica NovaClinica { get; set; } = new Clinica();
 
-       
+        [BindProperty]
+        public string ConfirmarSenha { get; set; } = "";
+
+
 
         public IActionResult OnPost()
         {
@@ -35,6 +38,20 @@ namespace ProjetoTerapia.Pages
             if (!NovaClinica.Telefone.StartsWith("55")) //garante que o telefone comece com o código do país (55 para Brasil)
             {
                 NovaClinica.Telefone = "55" + NovaClinica.Telefone;
+            }
+
+            // valida senha
+            if (NovaClinica.Senha != ConfirmarSenha)
+            {
+                ModelState.AddModelError("", "As senhas não coincidem.");
+                return Page();
+            }
+
+            // regra de senha forte
+            if (NovaClinica.Senha.Length < 6)
+            {
+                ModelState.AddModelError("", "A senha deve ter pelo menos 6 caracteres.");
+                return Page();
             }
 
             // tratar instagram

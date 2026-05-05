@@ -43,6 +43,11 @@
             </div>
 
             <div class="campo">
+                <label>Confirmar senha</label>
+                <input type="password" asp-for="ConfirmarSenha" required />
+            </div>
+
+            <div class="campo">
                 <label>Descrição profissional</label>
                 <textarea asp-for="NovaClinica.Descricao"
                           required></textarea>
@@ -129,6 +134,8 @@
                        asp-for="NovaClinica.Valor"
                        required />
             </div>
+
+            <div asp-validation-summary="All" style="color:red;"></div>
 
             <button class="btn-cadastrar">
                 Solicitar cadastro
@@ -304,5 +311,16 @@
                 });
         }
 
+    });
+
+     const senha = document.querySelector("[name='NovaClinica.Senha']");
+    const confirmar = document.querySelector("[name='ConfirmarSenha']");
+
+    confirmar.addEventListener("input", function () {
+        if (confirmar.value !== senha.value) {
+            confirmar.style.borderColor = "red";
+        } else {
+            confirmar.style.borderColor = "green";
+        }
     });
 </script>

@@ -1,4 +1,6 @@
-﻿namespace ProjetoTerapia.Models
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace ProjetoTerapia.Models
 {
     public class Clinica
     {
@@ -20,7 +22,10 @@
 
         public string Email { get; set; } = ""; 
 
-        public string Senha { get; set; } = ""; 
+        public string Senha { get; set; } = "";
+
+        [BindProperty]
+        public string ConfirmarSenha { get; set; } = "";
 
         public string Especialidades { get; set; } = "";
 
