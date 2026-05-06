@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace ProjetoTerapia.Models
 {
@@ -24,7 +26,7 @@ namespace ProjetoTerapia.Models
 
         public string Senha { get; set; } = "";
 
-        [BindProperty]
+        [NotMapped]
         public string ConfirmarSenha { get; set; } = "";
 
         public string Especialidades { get; set; } = "";

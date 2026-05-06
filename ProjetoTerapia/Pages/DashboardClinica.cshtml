@@ -1,5 +1,5 @@
 ﻿@page
-@model ProjetoTerapia.Pages.CadastroClinicaModel
+@model ProjetoTerapia.Pages.DashboardClinicaModel
 
 <div class="topo-cadastro">
 
@@ -28,57 +28,57 @@
             <div class="campo">
                 <label>Nome da clínica ou profissional</label>
                 <input type="text"
-                       asp-for="NovaClinica.Nome"
+                       asp-for="Clinica.Nome"
                        required />
             </div>
 
             <div class="campo">
                 <label>Descrição profissional</label>
-                <textarea asp-for="NovaClinica.Descricao"
+                <textarea asp-for="Clinica.Descricao"
                           required></textarea>
             </div>
 
             <div class="campo">
                 <label>CEP</label>
-                <input type="text" id="cep" asp-for="NovaClinica.CEP" required />
+                <input type="text" id="cep" asp-for="Clinica.CEP" required />
             </div>
 
             <div class="campo">
                 <label>Endereço</label>
                 <input type="text"
-                       asp-for="NovaClinica.Endereco"
+                       asp-for="Clinica.Endereco"
                        required />
             </div>
 
             <div class="campo">
                 <label>Telefone / WhatsApp</label>
                 <input type="text"
-                       asp-for="NovaClinica.Telefone"
+                       asp-for="Clinica.Telefone"
                        required />
             </div>
 
             <div class="campo">
                 <label>Instagram</label>
                 <input type="text"
-                       asp-for="NovaClinica.Instagram"
+                       asp-for="Clinica.Instagram"
                        placeholder="@@usuario ou link completo" />
             </div>
 
             <div class="campo">
                 <label>Site / Portfólio</label>
                 <input type="text"
-                       asp-for="NovaClinica.Site"
+                       asp-for="Clinica.Site"
                        placeholder="https://..." />
             </div>
 
             <div class="campo">
                 <label>Registro profissional (CRP, CRM...)</label>
-                <input asp-for="NovaClinica.Documento" />
+                <input asp-for="Clinica.Documento" />
             </div>
 
             <div class="campo">
                 <label>CPF</label>
-                <input type="text" asp-for="NovaClinica.CPF" required />
+                <input type="text" asp-for="Clinica.CPF" required />
             </div>
 
             <div class="campo">
@@ -102,12 +102,12 @@
                 <label>Tipo de atendimento</label>
                 <div class="checkbox-group">
                     <label class="checkbox-item">
-                        <input asp-for="NovaClinica.AtendimentoPresencial" />
+                        <input asp-for="Clinica.AtendimentoPresencial" />
                         <span>Presencial</span>
                     </label>
 
                     <label class="checkbox-item">
-                        <input asp-for="NovaClinica.AtendimentoOnline" />
+                        <input asp-for="Clinica.AtendimentoOnline" />
                         <span>Online</span>
                     </label>
                 </div>
@@ -116,14 +116,19 @@
             <div class="campo">
                 <label>Valor da consulta inicial (R$)</label>
                 <input type="number"
-                       asp-for="NovaClinica.Valor"
+                       asp-for="Clinica.Valor"
                        required />
             </div>
+
+            @if (TempData["Sucesso"] != null)
+            {
+                <div style="color:green;">@TempData["Sucesso"]</div>
+            }
 
             <div asp-validation-summary="All" style="color:red;"></div>
 
             <button class="btn-cadastrar">
-                Solicitar cadastro
+                Salvar perfil
             </button>
 
             <div class="alerta-info">
@@ -288,7 +293,7 @@
 
                     if (!data.erro) {
 
-                        document.querySelector("[name='NovaClinica.Endereco']")
+                        document.querySelector("[name='Clinica.Endereco']")
                             .value = data.logradouro + ", " + data.bairro + " - " + data.localidade;
 
                     }
@@ -296,16 +301,5 @@
                 });
         }
 
-    });
-
-     const senha = document.querySelector("[name='NovaClinica.Senha']");
-    const confirmar = document.querySelector("[name='ConfirmarSenha']");
-
-    confirmar.addEventListener("input", function () {
-        if (confirmar.value !== senha.value) {
-            confirmar.style.borderColor = "red";
-        } else {
-            confirmar.style.borderColor = "green";
-        }
     });
 </script>

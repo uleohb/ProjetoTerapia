@@ -1,0 +1,138 @@
+﻿@page
+@model ProjetoTerapia.Pages.CadastroContaModel
+<div class="container-auth">
+
+    <div class="card-auth">
+
+        <h1>Ponto Saúde</h1>
+
+        <h2>Crie sua conta</h2>
+
+        <p class="sub">
+            Comece agora e conecte-se com pacientes
+        </p>
+
+        <!-- GOOGLE -->
+        <a href="/externallogin?provider=Google" class="btn-google">
+            Entrar com Google
+        </a>
+
+        <div class="divider">
+            <span>ou</span>
+        </div>
+
+        <!-- FORM -->
+        <form method="post">
+
+            <input type="email" asp-for="Email" placeholder="Email" required />
+
+            <input type="password" asp-for="Senha" placeholder="Senha" required />
+
+            <input type="password" asp-for="ConfirmarSenha" placeholder="Confirmar senha" required />
+
+            <button type="submit" class="btn-primary">
+                Criar conta
+            </button>
+
+        </form>
+
+        <p class="link-login">
+            Já tem conta?
+            <a href="/LoginClinica">Entrar</a>
+        </p>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .container-auth {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f8fafc;
+    }
+
+    .card-auth {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+        .card-auth h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .card-auth h2 {
+            margin-bottom: 5px;
+        }
+
+    .sub {
+        color: #64748b;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-google {
+        display: block;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .divider {
+        margin: 15px 0;
+        position: relative;
+    }
+
+        .divider span {
+            background: white;
+            padding: 0 10px;
+            color: #999;
+        }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: #eee;
+            top: 50%;
+            left: 0;
+            z-index: -1;
+        }
+
+    .link-login {
+        margin-top: 15px;
+    }
+
+</style>
