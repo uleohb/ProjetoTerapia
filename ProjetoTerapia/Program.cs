@@ -1,46 +1,84 @@
 ﻿using ProjetoTerapia.Models;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer("Server=localhost;Database=ProjetoTerapiaDB;Trusted_Connection=True;TrustServerCertificate=True"));
+
+// BANCO
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        "Server=localhost;Database=ProjetoTerapiaDB;Trusted_Connection=True;TrustServerCertificate=True"));
+
+
+// SESSION
 builder.Services.AddSession();
+
+
+// AUTH GOOGLE
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:GoogleAuth:ClientId"]!;
+    options.ClientSecret = builder.Configuration["Authentication:GoogleAuth:ClientSecret"]!;
+});
+
+
+// RAZOR
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
 
+// ERROS
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
+
+// MIDDLEWARES
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseSession();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
+
+// PAGES
 app.MapRazorPages();
 
+app.MapControllers();
 
+
+// HOME
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/Teste");
     return Task.CompletedTask;
 });
 
-app.Run();
 
+// WEBHOOK
 app.MapPost("/webhook", async (HttpContext context, AppDbContext db) =>
 {
     using var reader = new StreamReader(context.Request.Body);
+
     var body = await reader.ReadToEndAsync();
 
     Console.WriteLine("Webhook recebido: " + body);
@@ -48,4 +86,6 @@ app.MapPost("/webhook", async (HttpContext context, AppDbContext db) =>
     return Results.Ok();
 });
 
-app.MapControllers(); //webhook 
+
+// RUN
+app.Run();

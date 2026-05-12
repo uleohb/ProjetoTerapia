@@ -5,7 +5,13 @@
 
     <div class="card">
 
-        <h2>Área do Profissional</h2>
+        <img src="/imagem/logo.png" class="logo-login" />
+
+        <p>
+            Conectando pessoas a profissionais
+            da saúde emocional de forma simples,
+            segura e acolhedora.
+        </p>
 
         <p>Entre na sua conta para acessar seu painel</p>
 
@@ -35,7 +41,27 @@
 </div>
 
 <style>
+
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card h1 {
+        font-size: 52px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg,#7c3aed,#9333ea,#06b6d4);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -2px;
+    }
+
     .container {
+        overflow: hidden;
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -57,7 +83,8 @@
         padding: 12px;
         margin: 10px 0;
         border-radius: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
     }
 
     button {
@@ -92,5 +119,35 @@
     .erro {
         color: red;
         margin-top: 10px;
+    }
+
+    .logo-login {
+    width: 120px;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 10px 25px rgba(168,85,247,0.25));
+}
+
+    .container::before {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: rgba(168,85,247,0.15);
+        border-radius: 50%;
+        top: -150px;
+        right: -150px;
+        filter: blur(80px);
+    }
+
+    .container::after {
+        content: '';
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: rgba(34,211,238,0.12);
+        border-radius: 50%;
+        bottom: -150px;
+        left: -150px;
+        filter: blur(80px);
     }
 </style>

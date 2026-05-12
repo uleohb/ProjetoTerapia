@@ -1,1 +1,6 @@
 .vs/
+bin/
+obj/
+appsettings.Development.json
+ProjetoTerapia/bin/
+ProjetoTerapia/obj/
