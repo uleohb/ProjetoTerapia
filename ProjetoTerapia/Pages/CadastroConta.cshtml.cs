@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using System.Linq;
+
 
 namespace ProjetoTerapia.Pages
 {
@@ -54,6 +57,16 @@ namespace ProjetoTerapia.Pages
             HttpContext.Session.SetInt32("ClinicaId", clinica.Id);
 
             return RedirectToPage("/DashboardClinica");
+        }
+
+        public IActionResult OnGetLoginGoogle()
+        {
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = "/"
+            };
+
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
     }
 }
