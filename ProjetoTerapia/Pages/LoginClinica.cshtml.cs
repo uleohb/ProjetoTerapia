@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
@@ -21,7 +23,7 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public string Senha { get; set; } = "";
 
-        public string? Erro { get; set; } = "";  
+        public string? Erro { get; set; } 
 
         public IActionResult OnPost()
         {
@@ -38,6 +40,20 @@ namespace ProjetoTerapia.Pages
 
             return RedirectToPage("/PainelClinica");
         }
+        
+        
+        
+        public IActionResult OnGetLoginGoogle()
+        {
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Page("/PainelClinica")
+            };
+
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
     }
+
 }
 

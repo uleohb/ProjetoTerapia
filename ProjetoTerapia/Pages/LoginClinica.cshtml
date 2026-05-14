@@ -1,40 +1,125 @@
 ﻿@page
 @model ProjetoTerapia.Pages.LoginClinicaModel
 
-<div class="container">
+<div class="container-auth">
 
-    <div class="card">
+    <div class="auth-wrapper">
 
-        <img src="/imagem/logo.png" class="logo-login" />
+        <!-- LADO ESQUERDO -->
+        <div class="side-login">
 
-        <p>
-            Conectando pessoas a profissionais
-            da saúde emocional de forma simples,
-            segura e acolhedora.
-        </p>
+            <div class="gradient-circle circle-1"></div>
+            <div class="gradient-circle circle-2"></div>
 
-        <p>Entre na sua conta para acessar seu painel</p>
+            <div class="content-side">
 
-        <form method="post">
+                <span class="badge-side">
+                    ✨ Plataforma moderna para saúde emocional
+                </span>
 
-            <input type="email" asp-for="Email" placeholder="Email" required />
+                <h1>
+                    Bem-vindo de volta ao AlinhaMente.
+                </h1>
 
-            <input type="password" asp-for="Senha" placeholder="Senha" required />
+                <p>
+                    Acesse sua plataforma e continue conectando
+                    pessoas, transformando vidas e organizando
+                    seus atendimentos com praticidade.
+                </p>
 
-            <button type="submit">Entrar</button>
+                <div class="mini-cards">
 
-        </form>
+                    <div class="mini-card">
+                        <span>🔒</span>
+                        <div>
+                            <strong>Ambiente Seguro</strong>
+                            <small>Proteção e privacidade</small>
+                        </div>
+                    </div>
 
-        @if (Model.Erro != null)
-        {
-            <p class="erro">@Model.Erro</p>
-        }
+                    <div class="mini-card">
+                        <span>📅</span>
+                        <div>
+                            <strong>Gestão Inteligente</strong>
+                            <small>Organize consultas</small>
+                        </div>
+                    </div>
 
-        <div class="divider">ou</div>
+                    <div class="mini-card">
+                        <span>💙</span>
+                        <div>
+                            <strong>Conexões Humanas</strong>
+                            <small>Mais acolhimento</small>
+                        </div>
+                    </div>
 
-        <a href="/CadastroConta" class="btn-secundario">
-            Criar conta
-        </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- LADO DIREITO -->
+        <div class="card-auth">
+
+            <img src="/imagem/logo.png"
+                 class="logo-auth"
+                 alt="Logo AlinhaMente" />
+
+            <h2>Entrar na plataforma</h2>
+
+            <p class="sub">
+                Entre com sua conta profissional para acessar
+                seu painel e seus atendimentos.
+            </p>
+
+            <!-- GOOGLE -->
+            <a href="/LoginClinica?handler=LoginGoogle"
+               class="btn-google">
+
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                     class="google-icon" />
+
+                <span>Continuar com Google</span>
+
+            </a>
+
+            <div class="divider">
+                <span>ou</span>
+            </div>
+
+            @if (Model.Erro != null)
+            {
+                <div class="validation-box">
+                    <p>@Model.Erro</p>
+                </div>
+            }
+
+            <!-- FORM -->
+            <form method="post">
+
+                <input type="email"
+                       asp-for="Email"
+                       placeholder="Email"
+                       required />
+
+                <input type="password"
+                       asp-for="Senha"
+                       placeholder="Senha"
+                       required />
+
+                <button type="submit" class="btn-primary">
+                    Entrar
+                </button>
+
+            </form>
+
+            <p class="link-login">
+                Ainda não possui conta?
+                <a href="/CadastroConta">Criar conta</a>
+            </p>
+
+        </div>
 
     </div>
 
@@ -45,109 +130,289 @@
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
     * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         font-family: 'Poppins', sans-serif;
     }
 
-    .card h1 {
-        font-size: 52px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        background: linear-gradient(90deg,#7c3aed,#9333ea,#06b6d4);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: -2px;
+    body {
+        overflow-x: hidden;
+        background: linear-gradient(135deg,#06121f,#0b1b2b,#10263a);
     }
 
-    .container {
-        overflow: hidden;
-        position: relative;
+    .container-auth {
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background: linear-gradient(135deg,#00c6ff,#009ee3);
+        padding: 40px;
     }
 
-    .card {
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    .auth-wrapper {
+        width: 100%;
+        max-width: 1400px;
+        min-height: 850px;
+        display: flex;
+        overflow: hidden;
+        border-radius: 35px;
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.35);
     }
+
+    .side-login {
+        width: 55%;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 70px;
+        background: linear-gradient( 135deg, #0f172a 0%, #111827 45%, #1e293b 100% );
+    }
+
+    .content-side {
+        position: relative;
+        z-index: 2;
+        max-width: 520px;
+    }
+
+    .badge-side {
+        display: inline-flex;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #cbd5e1;
+        font-size: 14px;
+        margin-bottom: 28px;
+        backdrop-filter: blur(12px);
+    }
+
+    .content-side h1 {
+        font-size: 58px;
+        line-height: 1.05;
+        color: white;
+        font-weight: 700;
+        margin-bottom: 24px;
+        letter-spacing: -2px;
+    }
+
+    .content-side p {
+        color: #cbd5e1;
+        font-size: 18px;
+        line-height: 1.8;
+        margin-bottom: 40px;
+    }
+
+    .mini-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .mini-card {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+    }
+
+        .mini-card span {
+            font-size: 28px;
+        }
+
+        .mini-card strong {
+            display: block;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .mini-card small {
+            color: #94a3b8;
+        }
+
+    .card-auth {
+        background: rgba(255,255,255,0.97);
+        width: 45%;
+        max-width: 520px;
+        margin: auto;
+        border-radius: 30px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    }
+
+    .logo-auth {
+        width: 280px;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .card-auth h2 {
+        font-size: 28px;
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
+
+    .sub {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 28px;
+    }
+
+    .btn-google {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        text-decoration: none;
+        color: #334155;
+        font-weight: 500;
+        transition: 0.25s;
+        margin-bottom: 18px;
+    }
+
+        .btn-google:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+    .google-icon {
+        width: 22px;
+        margin-right: 10px;
+    }
+
+    .divider {
+        position: relative;
+        margin: 25px 0;
+        text-align: center;
+    }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: #e2e8f0;
+            left: 0;
+            top: 50%;
+        }
+
+        .divider span {
+            position: relative;
+            background: white;
+            padding: 0 14px;
+            color: #94a3b8;
+        }
 
     input {
         width: 100%;
-        padding: 12px;
-        margin: 10px 0;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        padding: 16px;
+        margin-bottom: 14px;
+        border-radius: 14px;
+        border: 1px solid #dbeafe;
         background: #f8fafc;
+        font-size: 15px;
+        transition: 0.2s;
+        outline: none;
     }
 
-    button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        background: #009ee3;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-        button:hover {
-            transform: scale(1.02);
+        input:focus {
+            border-color: #7c3aed;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.10);
         }
 
-    .divider {
-        margin: 20px 0;
-        color: #888;
+    .btn-primary {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.25s;
+        margin-top: 5px;
     }
 
-    .btn-secundario {
-        display: block;
-        padding: 10px;
-        border: 1px solid #009ee3;
-        border-radius: 10px;
-        text-decoration: none;
-        color: #009ee3;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(37,99,235,0.25);
+        }
+
+    .link-login {
+        margin-top: 22px;
+        color: #64748b;
     }
 
-    .erro {
-        color: red;
-        margin-top: 10px;
+        .link-login a {
+            color: #7c3aed;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+    .validation-box {
+        margin-bottom: 18px;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.20);
     }
 
-    .logo-login {
-    width: 120px;
-    margin-bottom: 5px;
-    filter: drop-shadow(0 10px 25px rgba(168,85,247,0.25));
-}
+        .validation-box p {
+            color: #dc2626;
+            font-size: 14px;
+            font-weight: 500;
+        }
 
-    .container::before {
-        content: '';
+    .gradient-circle {
         position: absolute;
-        width: 500px;
-        height: 500px;
-        background: rgba(168,85,247,0.15);
         border-radius: 50%;
-        top: -150px;
-        right: -150px;
-        filter: blur(80px);
+        filter: blur(90px);
     }
 
-    .container::after {
-        content: '';
-        position: absolute;
-        width: 400px;
-        height: 400px;
-        background: rgba(34,211,238,0.12);
-        border-radius: 50%;
-        bottom: -150px;
-        left: -150px;
-        filter: blur(80px);
+    .circle-1 {
+        width: 350px;
+        height: 350px;
+        background: rgba(37,99,235,0.25);
+        top: -120px;
+        left: -120px;
     }
+
+    .circle-2 {
+        width: 300px;
+        height: 300px;
+        background: rgba(14,165,233,0.20);
+        bottom: -100px;
+        right: -100px;
+    }
+
+    @@media(max-width: 900px) {
+
+        .side-login {
+            display: none;
+        }
+
+        .card-auth {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .container-auth {
+            padding: 20px;
+        }
+    }
+
 </style>
