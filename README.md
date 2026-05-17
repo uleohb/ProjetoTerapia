@@ -1,6 +1,6 @@
 # ProjetoTerapia
 
-Plataforma web desenvolvida com ASP.NET Core voltada para apoio emocional e saúde mental, permitindo gerenciamento de usuários, autenticação e futuras integrações relacionadas ao acompanhamento terapêutico e bem-estar.
+Plataforma web desenvolvida com ASP.NET Core voltada para apoio emocional e saúde mental, permitindo gerenciamento de usuários, autenticação e futuras integrações relacionadas ao acompanhamento do bem-estar do usuário.
 
 ## Tecnologias utilizadas
 
