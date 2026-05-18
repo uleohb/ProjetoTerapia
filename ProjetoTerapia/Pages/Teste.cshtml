@@ -1,32 +1,60 @@
 ﻿@page
 @model ProjetoTerapia.Pages.TesteModel
 
-<div class="topo-site">
+<div class="hero-home">
 
-    <h1 class="logo">Ponto Saúde</h1>
+    <div class="hero-left">
 
-    <h2 class="frase-impacto">
-        Sua saúde emocional merece atenção
-    </h2>
+        <div class="logo-area">
 
-    <p class="sub-frase">
-        Em 1 minuto, saiba como você está e receba recomendações personalizadas
-    </p>
+            <img src="/imagem/logo.png"
+                 class="logo-img"
+                 alt="Logo" />
 
-    <div class="acoes-iniciais">
+        </div>
 
-        <button type="button" onclick="iniciarTeste()" class="btn-principal">
-            Começar teste gratuito
-        </button>
+        <div class="badge-home">
+            ✨ Plataforma inteligente de saúde emocional
+        </div>
 
-        <a href="/LoginClinica" class="btn-clinica">
-            Sou profissional / clínica
-        </a>
+        <h2 class="frase-impacto">
+            Descubra como está seu
+            <span>bem-estar emocional</span>
+            em apenas 1 minuto.
+        </h2>
 
-        <p class="info-profissional">
-            Profissionais e clínicas podem se cadastrar gratuitamente
-            e começar a receber pacientes.
+        <p class="sub-frase">
+            Faça uma análise rápida, gratuita e confidencial
+            para entender melhor sua saúde emocional
+            e receber recomendações personalizadas.
         </p>
+
+        <div class="acoes-iniciais">
+
+            <button type="button"
+                    onclick="iniciarTeste()"
+                    class="btn-principal">
+
+                Começar teste gratuito
+
+            </button>
+
+            <a href="/LoginClinica"
+               class="btn-clinica">
+
+                Sou profissional / clínica
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="hero-right">
+
+        <img src="/imagem/cerebro-banner.png"
+             class="imagem-cerebro"
+             alt="Cérebro" />
 
     </div>
 
@@ -295,193 +323,72 @@
 <!-- CSS -->
 <style>
 
-    .subtitulo {
-        color: #666;
-        font-size: 18px;
-    }
-
-    .frase-ajuda {
-        font-size: 20px;
-        color: #444;
-    }
-
-    .container-resultado {
-        max-width: 700px;
-        margin: auto;
-    }
-
-    .card-resultado {
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: white;
-        padding: 25px;
-        border-radius: 15px;
-        text-align: center;
-    }
-
-    .card-graficos {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-    }
-
-    .barra-ansiedade {
-        background: orange;
-    }
-
-    .barra-depressao {
-        background: red;
-    }
-
-    .lista-clinicas {
-        max-height: 200px;
-        overflow-y: auto;
-    }
-
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #ddd;
-        border-top: 5px solid #007bff;
-        border-radius: 50%;
-        animation: girar 1s linear infinite;
-        margin: auto;
-    }
-    .progress-bar {
-    background-color: #0d6efd;
-    height: 100%;
-    width: 0%;
-    transition: width 0.5s ease-in-out;
-}
-
-    @@keyframes girar {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     body {
         background: #f8fafc;
+        font-family: "Segoe UI",sans-serif;
+        overflow-x: hidden;
     }
 
-    .topo-site {
-        text-align: center;
-        padding: 60px 20px 30px;
-    }
-
-    .logo {
-        font-size: 42px;
-        font-weight: bold;
-        color: #0f172a;
-        margin-bottom: 20px;
-    }
-
-    .frase-impacto {
-        font-size: 34px;
-        font-weight: bold;
-        color: #1e293b;
-        margin-bottom: 15px;
-    }
-
-    .sub-frase {
-        font-size: 20px;
-        color: #64748b;
-        margin-bottom: 35px;
-    }
-
-    .acoes-iniciais {
-        max-width: 450px;
-        margin: auto;
-    }
-
-    .btn-principal {
-        width: 100%;
-        padding: 16px;
-        background: linear-gradient(135deg, #00c6ff, #009ee3);
-        color: white;
-        border: none;
-        border-radius: 14px;
-        font-size: 17px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-bottom: 15px;
-        transition: 0.2s;
-    }
-
-        .btn-principal:hover {
-            transform: scale(1.02);
-        }
-
-
-    .btn-start {
-        margin-top: 20px;
-        padding: 12px 20px;
-        background: white;
-        color: #009ee3;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .btn-clinica {
-        display: block;
-        width: 100%;
-        padding: 14px;
-        border: 2px solid #009ee3;
-        border-radius: 14px;
-        text-decoration: none;
-        color: #009ee3;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-
-        .btn-clinica:hover {
-            background: #009ee3;
-            color: white;
-        }
+    /* =========================
+       TÍTULO TESTE
+    ========================= */
 
     .titulo-perguntas {
         text-align: center;
         margin-top: 40px;
         margin-bottom: 30px;
+        padding: 0 20px;
     }
 
         .titulo-perguntas h2 {
-            font-size: 32px;
-            color: #1f2937;
+            font-size: clamp(28px,4vw,42px);
+            color: #0f172a;
             margin-bottom: 10px;
         }
 
         .titulo-perguntas p {
-            color: #6b7280;
-            font-size: 16px;
+            color: #64748b;
+            font-size: 18px;
         }
 
+    /* =========================
+       CARD PERGUNTA
+    ========================= */
+
     .card-pergunta {
-        background: white;
-        max-width: 700px;
+        width: calc(100% - 30px);
+        max-width: 760px;
         margin: auto;
-        padding: 40px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        background: white;
+        border-radius: 24px;
+        padding: 45px;
+        box-shadow: 0 15px 35px rgba(0,0,0,.06);
         text-align: center;
     }
 
     .texto-pergunta {
-        font-size: 28px;
-        color: #1e293b;
+        font-size: clamp(24px,3vw,34px);
+        font-weight: 700;
+        color: #0f172a;
         margin-bottom: 35px;
-        font-weight: 600;
+        line-height: 1.4;
     }
+
+    /* =========================
+       OPÇÕES
+    ========================= */
 
     .opcoes-resposta {
         display: flex;
-        gap: 20px;
         justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
     .opcao-radio {
@@ -494,257 +401,558 @@
 
         .opcao-radio span {
             display: inline-block;
-            padding: 18px 40px;
+            min-width: 140px;
+            padding: 18px 30px;
+            border-radius: 16px;
             border: 2px solid #dbeafe;
-            border-radius: 14px;
-            font-size: 18px;
-            font-weight: 600;
             background: #f8fafc;
-            transition: 0.2s;
+            font-size: 18px;
+            font-weight: 700;
+            transition: .2s;
         }
+
+            .opcao-radio span:hover {
+                transform: scale(1.03);
+            }
 
         .opcao-radio input:checked + span {
-            background: #009ee3;
+            background: linear-gradient(135deg,#00c6ff,#009ee3);
             color: white;
-            border-color: #009ee3;
-            transform: scale(1.03);
+            border-color: transparent;
         }
 
-        .opcao-radio span:hover {
-            transform: scale(1.02);
-        }
+    /* =========================
+       BOTÕES
+    ========================= */
 
     .acoes-pergunta {
         display: flex;
         justify-content: center;
         gap: 15px;
-        margin-top: 35px;
-        margin-bottom: 80px;
+        margin: 40px 0 80px;
         flex-wrap: wrap;
     }
 
     .btn-voltar,
     .btn-proximo,
     .btn-finalizar {
-        padding: 14px 28px;
         border: none;
         border-radius: 14px;
+        padding: 15px 28px;
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 700;
         cursor: pointer;
-        transition: 0.2s;
+        transition: .2s;
     }
 
     .btn-voltar {
         background: #e2e8f0;
-        color: #1e293b;
+        color: #0f172a;
     }
-
-        .btn-voltar:hover {
-            transform: scale(1.03);
-        }
 
     .btn-proximo {
-        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        background: linear-gradient(135deg,#00c6ff,#009ee3);
         color: white;
     }
-
-        .btn-proximo:hover {
-            transform: scale(1.03);
-        }
 
     .btn-finalizar {
         background: #16a34a;
         color: white;
     }
 
+        .btn-voltar:hover,
+        .btn-proximo:hover,
         .btn-finalizar:hover {
-            transform: scale(1.03);
+            transform: translateY(-2px);
         }
+
+    /* =========================
+       PROGRESSO
+    ========================= */
+
+    .progress {
+        width: calc(100% - 30px);
+        max-width: 760px;
+        height: 14px;
+        margin: auto;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #e2e8f0;
+    }
+
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg,#00c6ff,#009ee3);
+        transition: .4s;
+    }
+
+    /* =========================
+       RESULTADO
+    ========================= */
+
+    .container-resultado {
+        width: calc(100% - 30px);
+        max-width: 760px;
+        margin: 40px auto 80px;
+    }
 
     .titulo-resultado {
         text-align: center;
-        font-size: 34px;
-        font-weight: bold;
+        font-size: clamp(30px,4vw,46px);
         margin-bottom: 30px;
         color: #0f172a;
+        font-weight: 800;
     }
 
     .card-score {
-        background: linear-gradient(135deg, #00c6ff, #009ee3);
+        background: linear-gradient(135deg,#00c6ff,#009ee3);
         color: white;
-        padding: 35px;
-        border-radius: 20px;
+        padding: 40px;
+        border-radius: 24px;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
     }
 
     .score-label {
         font-size: 18px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .score-valor {
-        font-size: 64px;
-        font-weight: bold;
+        font-size: 72px;
+        font-weight: 800;
         line-height: 1;
         margin-bottom: 15px;
     }
 
     .score-sub {
         font-size: 15px;
-        opacity: 0.95;
+        opacity: .95;
     }
 
-    .badge-nivel {
-        display: inline-block;
-        padding: 8px 18px;
-        border-radius: 999px;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-        .badge-nivel.alto {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .badge-nivel.moderado {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-nivel.baixo {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-    .recomendacao-personalizada {
-        margin-top: 20px;
-        font-size: 17px;
-        color: #475569;
-        line-height: 1.6;
-    }
-
-    .cta-final {
-        margin-top: 30px;
-        background: white;
-        padding: 35px;
-        border-radius: 18px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .btn-especialista {
-        display: inline-block;
-        margin-top: 20px;
-        background: #16a34a;
-        color: white;
-        padding: 16px 28px;
-        border-radius: 14px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 16px;
-        transition: 0.2s;
-    }
-
-        .btn-especialista:hover {
-            transform: scale(1.03);
-        }
+    /* =========================
+       RESULTADO MODAL
+    ========================= */
 
     .bloco-resultado {
         position: fixed;
         inset: 0;
+        background: rgba(248,250,252,.96);
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 40px 20px;
-        box-sizing: border-box;
-        background: rgba(248, 250, 252, 0.95);
+        padding: 20px;
         z-index: 999;
     }
 
     .card-revelar-resultado {
-        background: white;
         width: 100%;
         max-width: 760px;
-        padding: 55px;
-        border-radius: 24px;
+        background: white;
+        border-radius: 28px;
+        padding: 50px;
         text-align: center;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.06);
-        border: 1px solid #f1f5f9;
+        box-shadow: 0 20px 50px rgba(0,0,0,.08);
     }
 
     .icone-resultado {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 30px;
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
         background: #dcfce7;
         color: #16a34a;
-        border-radius: 50%;
-        font-size: 42px;
-        font-weight: bold;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+        margin: 0 auto 25px;
+        font-size: 42px;
+        font-weight: 800;
     }
 
     .card-revelar-resultado h2 {
-        font-size: 42px;
-        font-weight: 700;
+        font-size: clamp(30px,4vw,48px);
         color: #0f172a;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
 
     .card-revelar-resultado p {
-        font-size: 20px;
         color: #475569;
+        font-size: 19px;
         line-height: 1.8;
-        margin-bottom: 35px;
-        max-width: 620px;
-        margin-left: auto;
-        margin-right: auto;
+        margin-bottom: 30px;
     }
 
     .btn-ver-resultado {
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        color: white;
         border: none;
-        padding: 18px 42px;
+        background: linear-gradient(135deg,#16a34a,#22c55e);
+        color: white;
+        padding: 18px 40px;
         border-radius: 16px;
         font-size: 18px;
-        font-weight: bold;
+        font-weight: 700;
         cursor: pointer;
-        transition: 0.2s;
-        box-shadow: 0 10px 25px rgba(34,197,94,0.18);
+        transition: .2s;
     }
 
         .btn-ver-resultado:hover {
-            transform: scale(1.03);
+            transform: translateY(-2px);
         }
 
     .texto-seguro {
         display: block;
-        margin-top: 22px;
-        font-size: 15px;
+        margin-top: 18px;
         color: #64748b;
-        font-weight: 500;
-    }
-
-    body {
-        background: #f8fafc;
-        margin: 0;
-        padding: 0;
-    }
-
-    .info-profissional {
-        margin-top: 12px;
         font-size: 14px;
-        color: #64748b;
-        text-align: center;
     }
 
+    /* =========================
+       SPINNER
+    ========================= */
+
+    .spinner {
+        width: 55px;
+        height: 55px;
+        border: 5px solid #ddd;
+        border-top: 5px solid #009ee3;
+        border-radius: 50%;
+        margin: auto;
+        animation: girar 1s linear infinite;
+    }
+
+    @@keyframes girar {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* =========================
+       RESPONSIVO
+    ========================= */
+
+    @@media(max-width:768px) {
+
+        .topo-site {
+            padding: 40px 18px;
+            min-height: auto;
+        }
+
+        .sub-frase {
+            margin-bottom: 30px;
+        }
+
+        .card-pergunta {
+            padding: 28px 22px;
+            border-radius: 20px;
+        }
+
+        .opcoes-resposta {
+            flex-direction: column;
+        }
+
+        .opcao-radio span {
+            width: 100%;
+        }
+
+        .card-revelar-resultado {
+            padding: 35px 24px;
+        }
+
+            .card-revelar-resultado p {
+                font-size: 16px;
+            }
+
+        .score-valor {
+            font-size: 56px;
+        }
+    }
+
+    /* =========================
+       HERO PREMIUM
+    ========================= */
+
+    .hero-home {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+        padding: 40px 6%;
+        overflow: hidden;
+        background: radial-gradient(circle at top left, rgba(0,198,255,.12), transparent 35%), #f8fafc;
+    }
+
+    /* ESQUERDA */
+
+    .hero-left {
+        flex: 1;
+        max-width: 620px;
+        z-index: 2;
+    }
+
+
+    /* DIREITA */
+
+    .hero-right {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    /* LOGO */
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 28px;
+
+    }
+
+    /* LÂMPADA */
+
+    .logo-img {
+        width: 300px;
+        height:300px;
+        object-fit: contain;
+
+        margin-top: 20px;
+    }
+
+    /* NOME */
+
+    .logo {
+        font-size: clamp(42px, 4vw, 72px);
+        font-weight: 900;
+        line-height: 1;
+        margin: 0;
+        letter-spacing: -3px;
+        color: #2b125d;
+    }
+
+    /* BADGE */
+
+    .badge-home {
+        display: inline-block;
+        background: rgba(0,198,255,.10);
+        color: #009ee3;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 28px;
+    }
+
+    /* TITULO PRINCIPAL */
+
+    .frase-impacto {
+        font-size: clamp(32px, 3.2vw, 53px);
+        font-weight: 900;
+        line-height: 1.07;
+        color: #0f172a;
+        margin-bottom: 28px;
+        letter-spacing: -3px;
+        max-width: 700px;
+    }
+
+        .frase-impacto span {
+            background: linear-gradient(135deg, #5b21b6, #2563eb, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+    /* SUBTEXTO */
+
+    .sub-frase {
+        font-size: 18px;
+        color: #64748b;
+        line-height: 1.8;
+        margin-bottom: 36px;
+        max-width: 560px;
+    }
+
+
+    /* BOTÕES */
+
+    .acoes-iniciais {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: nowrap;
+    }
+
+    /* BOTÃO PRINCIPAL */
+
+    .btn-principal {
+        padding: 15px 26px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#00c6ff,#009ee3);
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s;
+        box-shadow: 0 10px 25px rgba(0,158,227,.20);
+        white-space: nowrap;
+    }
+
+        .btn-principal:hover {
+            transform: translateY(-3px);
+        }
+
+    /* BOTÃO CLÍNICA */
+
+    .btn-clinica {
+        padding: 15px 24px;
+        border-radius: 14px;
+        border: 2px solid #009ee3;
+        background: white;
+        color: #009ee3;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 700;
+        transition: .25s;
+        white-space: nowrap;
+    }
+
+        .btn-clinica:hover {
+            background: #009ee3;
+            color: white;
+        }
+
+    /* CÉREBRO GIGANTE */
+
+    .hero-right {
+        flex: 1.5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .imagem-cerebro {
+        width: 100%;
+        max-width: 780px;
+        height: auto;
+        object-fit: contain;
+        animation: flutuar 5s ease-in-out infinite;
+    }
+
+
+
+    /* ANIMAÇÃO */
+
+    @@keyframes flutuar {
+        0%
+
+    {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-18px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+
+    }
+
+    /* RESPONSIVO */
+
+    @@media(max - width:1100px) {
+        .hero-home
+
+    {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 60px;
+    }
+
+    .hero-left {
+        max-width: 100%;
+    }
+
+    .hero-right {
+        width: 100%;
+    }
+
+    .logo-area {
+        justify-content: center;
+    }
+
+    .acoes-iniciais {
+        justify-content: center;
+    }
+
+    .sub-frase {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .imagem-cerebro {
+        max-width: 650px;
+    }
+
+    }
+
+    @@media(max - width:768px) {
+        .hero-home
+
+    {
+        padding: 40px 20px 60px;
+    }
+
+    .logo-area {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo-img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .logo {
+        font-size: 48px;
+    }
+
+    .logo-sub {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .frase-impacto {
+        font-size: 42px;
+        letter-spacing: -2px;
+    }
+
+    .sub-frase {
+        font-size: 16px;
+    }
+
+    .acoes-iniciais {
+        flex-direction: column;
+    }
+
+    .btn-principal,
+    .btn-clinica {
+        width: 100%;
+    }
+
+    .imagem-cerebro {
+        max-width: 420px;
+    }
+
+    }
 </style>
 
 <!-- JS -->
@@ -752,15 +960,11 @@
     let atual = 0;
     let perguntas;
 
-        function iniciarTeste() {
-        document.querySelector(".topo-site").style.display = "none";
-
-        document.getElementById("revelarResultado").style.display = "none";
+            function iniciarTeste() {
 
         document.getElementById("formTeste").style.display = "block";
         document.getElementById("topoTeste").style.display = "block";
         document.getElementById("barraContainer").style.display = "block";
-
         document.getElementById("tituloPerguntas").style.display = "block";
 
         perguntas = document.querySelectorAll(".pergunta");
@@ -770,7 +974,9 @@
         atualizarBarra();
         mostrarPergunta();
 
-       
+        document.getElementById("perguntas").scrollIntoView({
+            behavior: "smooth"
+        });
     }
 
         function mostrarPergunta() {
@@ -832,7 +1038,7 @@
         document.getElementById("barraContainer").style.display = "none";
         document.getElementById("tituloPerguntas").style.display = "none";
         document.getElementById("loading").style.display = "block";
-        document.querySelector(".topo-site").style.display = "none";
+        document.querySelector(".hero-home").style.display = "none";
 
         window.scrollTo({
             top: 0,

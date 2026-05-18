@@ -12,7 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         "Server=localhost;Database=ProjetoTerapiaDB;Trusted_Connection=True;TrustServerCertificate=True"));
 
 
-// SESSION
+// SESSÃO
 builder.Services.AddSession();
 
 
