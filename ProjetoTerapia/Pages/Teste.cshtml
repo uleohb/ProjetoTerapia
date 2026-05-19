@@ -65,8 +65,26 @@
 <!-- TELA INICIAL -->
 
     <div id="tituloPerguntas" class="titulo-perguntas" style="display:none">
-        <h2>Teste de Bem-Estar Emocional</h2>
-        <p>Responda com sinceridade para uma recomendação mais precisa</p>
+
+        <div class="topo-clinico">
+
+            <img src="/imagem/logo.png"
+                 alt="Logo"
+                 class="logo-topo-teste" />
+
+            <h2>
+                Avaliação de Bem-Estar Emocional
+            </h2>
+
+           
+            <p>
+                Suas respostas ajudam nossa análise a compreender melhor
+                seu momento emocional atual.
+            </p>
+            
+
+        </div>
+
     </div>
 
 <!-- CONTADOR -->
@@ -320,6 +338,11 @@
 
 </div>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <!-- CSS -->
 <style>
 
@@ -330,9 +353,16 @@
     }
 
     body {
-        background: #f8fafc;
-        font-family: "Segoe UI",sans-serif;
-        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container,
+    .container-fluid,
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
     }
 
     /* =========================
@@ -340,22 +370,51 @@
     ========================= */
 
     .titulo-perguntas {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         text-align: center;
-        margin-top: 40px;
-        margin-bottom: 30px;
-        padding: 0 20px;
+        padding: 60px 20px 30px;
     }
 
-        .titulo-perguntas h2 {
-            font-size: clamp(28px,4vw,42px);
-            color: #0f172a;
-            margin-bottom: 10px;
-        }
+    .topo-clinico {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
 
-        .titulo-perguntas p {
-            color: #64748b;
-            font-size: 18px;
-        }
+    .logo-topo-teste {
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
+        margin-bottom: -5px;
+    }
+
+    .topo-clinico h2 {
+        width: 100%;
+        text-align: center;
+        font-size: clamp(38px, 4vw, 58px);
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -2px;
+        line-height: 1.05;
+        margin: 0 auto 16px auto;
+        display: block;
+    }
+
+    .topo-clinico p {
+        color: #64748b;
+        font-size: 18px;
+        line-height: 1.8;
+        max-width: 650px;
+        text-align: center;
+    }
 
     /* =========================
        CARD PERGUNTA
@@ -365,19 +424,22 @@
         width: calc(100% - 30px);
         max-width: 760px;
         margin: auto;
-        background: white;
-        border-radius: 24px;
-        padding: 45px;
-        box-shadow: 0 15px 35px rgba(0,0,0,.06);
-        text-align: center;
+        background: rgba(255,255,255,.82);
+        backdrop-filter: blur(18px);
+        border-radius: 32px;
+        padding: 42px;
+        border: 1px solid rgba(226,232,240,.9);
+        box-shadow: 0 10px 30px rgba(15,23,42,.04), 0 1px 4px rgba(15,23,42,.04);
+        transition: .3s;
     }
 
     .texto-pergunta {
-        font-size: clamp(24px,3vw,34px);
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 35px;
-        line-height: 1.4;
+        font-size: clamp(22px,2.2vw,30px);
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 38px;
+        line-height: 1.6;
+        letter-spacing: -.5px;
     }
 
     /* =========================
@@ -400,25 +462,33 @@
         }
 
         .opcao-radio span {
-            display: inline-block;
-            min-width: 140px;
-            padding: 18px 30px;
-            border-radius: 16px;
-            border: 2px solid #dbeafe;
-            background: #f8fafc;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            padding: 22px 34px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
             font-size: 18px;
             font-weight: 700;
-            transition: .2s;
+            color: #0f172a;
+            transition: .25s;
+            box-shadow: 0 4px 12px rgba(0,0,0,.03);
         }
 
             .opcao-radio span:hover {
-                transform: scale(1.03);
+                transform: translateY(-4px);
+                border-color: #00c6ff;
+                box-shadow: 0 12px 24px rgba(0,198,255,.12);
             }
 
         .opcao-radio input:checked + span {
             background: linear-gradient(135deg,#00c6ff,#009ee3);
             color: white;
             border-color: transparent;
+            box-shadow: 0 12px 24px rgba(0,198,255,.30);
+            transform: scale(1.03);
         }
 
     /* =========================
@@ -473,18 +543,34 @@
     .progress {
         width: calc(100% - 30px);
         max-width: 760px;
-        height: 14px;
+        height: 16px;
         margin: auto;
         border-radius: 999px;
         overflow: hidden;
         background: #e2e8f0;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,.05);
     }
 
     .progress-bar {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg,#00c6ff,#009ee3);
+        border-radius: 999px;
+        background: linear-gradient( 90deg, #00c6ff, #009ee3, #2563eb );
         transition: .4s;
+    }
+
+    #contador {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: white;
+        font-size: 20px;
+        font-weight: 800;
+        color: #009ee3;
+        box-shadow: 0 10px 25px rgba(0,0,0,.06);
     }
 
     /* =========================
@@ -493,7 +579,7 @@
 
     .container-resultado {
         width: calc(100% - 30px);
-        max-width: 760px;
+        max-width: 1100px;
         margin: 40px auto 80px;
     }
 
@@ -620,15 +706,24 @@
         animation: girar 1s linear infinite;
     }
 
-    @@keyframes girar {
-        from {
-            transform: rotate(0deg);
+    /*===========================
+        ANIMAÇÃO
+    ============================ */
+
+    @@keyframes flutuar {
+        0% {
+            transform: translateY(0px);
         }
 
-        to {
-            transform: rotate(360deg);
+        50% {
+            transform: translateY(-18px);
+        }
+
+        100% {
+            transform: translateY(0px);
         }
     }
+
 
     /* =========================
        RESPONSIVO
@@ -669,7 +764,93 @@
         .score-valor {
             font-size: 56px;
         }
+
+        .titulo-perguntas {
+            padding-top: 35px;
+        }
+
+        .logo-topo-teste {
+            width: 170px;
+            height: 170px;
+        }
+
+        .topo-clinico h2 {
+            font-size: 34px;
+            line-height: 1.15;
+        }
+
+        .topo-clinico p {
+            font-size: 16px;
+        }
     }
+    
+
+    /* =========================
+       CTA ESPECIALISTA
+    ========================= */
+
+    .cta-final {
+        margin-top: 40px;
+        background: linear-gradient(135deg,#0f172a,#1e293b);
+        border-radius: 32px;
+        padding: 50px 35px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 25px 60px rgba(15,23,42,.25);
+    }
+
+        .cta-final h3 {
+            font-size: clamp(28px,3vw,40px);
+            margin-bottom: 14px;
+            font-weight: 800;
+        }
+
+        .cta-final p {
+            color: rgba(255,255,255,.75);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+    .btn-especialista {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 18px 34px;
+        border-radius: 18px;
+        background: linear-gradient(135deg,#00c6ff,#2563eb);
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 700;
+        transition: .25s;
+        box-shadow: 0 15px 35px rgba(37,99,235,.35);
+    }
+
+        .btn-especialista:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 45px rgba(37,99,235,.45);
+        }
+
+    .cta-secundario {
+        margin-top: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+        .cta-secundario a {
+            color: rgba(255,255,255,.75);
+            text-decoration: none;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+            .cta-secundario a:hover {
+                color: white;
+            }
 
     /* =========================
        HERO PREMIUM
@@ -682,7 +863,8 @@
         align-items: center;
         justify-content: center;
         gap: 40px;
-        padding: 40px 6%;
+        padding-left: 6%;
+        padding-right: 0;
         overflow: hidden;
         background: radial-gradient(circle at top left, rgba(0,198,255,.12), transparent 35%), #f8fafc;
     }
@@ -693,6 +875,12 @@
         flex: 1;
         max-width: 620px;
         z-index: 2;
+        padding-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
 
@@ -712,18 +900,16 @@
         display: flex;
         align-items: center;
         gap: 18px;
-        margin-bottom: 28px;
-
+        margin-bottom: -20px;
     }
 
     /* LÂMPADA */
 
     .logo-img {
         width: 300px;
-        height:300px;
+        height: 300px;
         object-fit: contain;
-
-        margin-top: 20px;
+        margin-top: -30px;
     }
 
     /* NOME */
@@ -753,7 +939,7 @@
     /* TITULO PRINCIPAL */
 
     .frase-impacto {
-        font-size: clamp(32px, 3.2vw, 53px);
+        font-size: clamp(31px, 3.0vw, 52px);
         font-weight: 900;
         line-height: 1.07;
         color: #0f172a;
@@ -774,7 +960,7 @@
         font-size: 18px;
         color: #64748b;
         line-height: 1.8;
-        margin-bottom: 36px;
+        margin-bottom: 18px;
         max-width: 560px;
     }
 
@@ -786,6 +972,7 @@
         align-items: center;
         gap: 14px;
         flex-wrap: nowrap;
+        margin-top: -8px;
     }
 
     /* BOTÃO PRINCIPAL */
@@ -831,44 +1018,42 @@
     /* CÉREBRO GIGANTE */
 
     .hero-right {
-        flex: 1.5;
+        flex: 2;
         display: flex;
         justify-content: center;
         align-items: center;
+        overflow: hidden;
+        background: transparent;
+        perspective: 1200px;
     }
 
     .imagem-cerebro {
-        width: 100%;
-        max-width: 780px;
-        height: auto;
+        width: 150%;
+        max-width: none;
+        opacity: .88;
         object-fit: contain;
-        animation: flutuar 5s ease-in-out infinite;
+        transform-style: preserve-3d;
+        animation: cerebro3D 8s linear infinite, flutuar 4s ease-in-out infinite;
     }
 
 
 
     /* ANIMAÇÃO */
 
-    @@keyframes flutuar {
-        0%
+    @@keyframes cerebro3D {
 
-    {
-        transform: translateY(0px);
-    }
+        0% {
+            transform: translateX(80px) translateY(20px) rotateY(0deg);
+        }
 
-    50% {
-        transform: translateY(-18px);
-    }
-
-    100% {
-        transform: translateY(0px);
-    }
-
+        100% {
+            transform: translateX(80px) translateY(20px) rotateY(360deg);
+        }
     }
 
     /* RESPONSIVO */
 
-    @@media(max - width:1100px) {
+    @@media(max-width:1100px) {
         .hero-home
 
     {
@@ -877,17 +1062,29 @@
         padding-top: 60px;
     }
 
-    .hero-left {
-        max-width: 100%;
-    }
+        .hero-left {
+            flex: 1;
+            max-width: 620px;
+            z-index: 2;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* CENTRALIZA */
+            justify-content: center;
+            text-align: center; /* CENTRALIZA TEXTO */
+        }
 
     .hero-right {
         width: 100%;
     }
 
-    .logo-area {
-        justify-content: center;
-    }
+        .logo-area {
+            display: flex;
+            justify-content: center; /* CENTRALIZA LOGO */
+            align-items: center;
+            width: 100%;
+            margin-bottom: -20px;
+        }
 
     .acoes-iniciais {
         justify-content: center;
@@ -904,10 +1101,9 @@
 
     }
 
-    @@media(max - width:768px) {
-        .hero-home
-
-    {
+    @@media(max-width:768px) {
+        
+       .hero-home {
         padding: 40px 20px 60px;
     }
 
@@ -916,10 +1112,12 @@
         gap: 10px;
     }
 
-    .logo-img {
-        width: 90px;
-        height: 90px;
-    }
+        .logo-img {
+            width: 380px;
+            height: 380px;
+            object-fit: contain;
+            margin-top: -40px;
+        }
 
     .logo {
         font-size: 48px;
@@ -1040,21 +1238,23 @@
         document.getElementById("loading").style.display = "block";
         document.querySelector(".hero-home").style.display = "none";
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
+           setTimeout(() => {
+		// Simula o tempo de processamento do resultado
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("revelarResultado").style.display = "flex";
+
+        document.getElementById("revelarResultado").scrollIntoView({ 
+            behavior: "smooth",
+            block: "center"
         });
 
-        setTimeout(() => {
+    }, 2000);
 
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("revelarResultado").style.display = "flex";
-
-        }, 2000);
+        
     }
         function enviarFormulario() {
-        document.getElementById("formTeste").submit();
-    }
+          document.getElementById("formTeste").submit();
+        }
 
         function atualizarBarra() {
         let progresso = ((atual + 1) / perguntas.length) * 100;
