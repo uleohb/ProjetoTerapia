@@ -88,7 +88,7 @@
                 <span>ou</span>
             </div>
 
-            @if (Model.Erro != null)
+            @if (!string.IsNullOrWhiteSpace(Model.Erro))
             {
                 <div class="validation-box">
                     <p>@Model.Erro</p>
