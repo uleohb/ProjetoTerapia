@@ -55,5 +55,11 @@ namespace ProjetoTerapia.Models
 
         // vencimento da assinatura anual
         public DateTime? DataVencimento { get; set; }
+
+        public bool PerfilCompleto { get; set; } = false;
+
+        public int Visualizacoes { get; set; }
+
+        public int CliquesWhatsapp { get; set; }
     }
 }

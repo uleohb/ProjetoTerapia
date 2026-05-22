@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoTerapia.Models;
 
@@ -11,9 +12,11 @@ using ProjetoTerapia.Models;
 namespace ProjetoTerapia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521004457_PerfilCompletoClinica")]
+    partial class PerfilCompletoClinica
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,47 +24,6 @@ namespace ProjetoTerapia.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Agendamento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClinicaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataConsulta")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Modalidade")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomePaciente")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TelefonePaciente")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Agendamentos");
-                });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
                 {
@@ -91,9 +53,6 @@ namespace ProjetoTerapia.Migrations
                     b.Property<string>("Cidade")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CliquesWhatsapp")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("DataAprovacao")
                         .HasColumnType("datetime2");
@@ -152,9 +111,6 @@ namespace ProjetoTerapia.Migrations
 
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Visualizacoes")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

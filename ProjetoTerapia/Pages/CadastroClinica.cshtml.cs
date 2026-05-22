@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
-
     public class CadastroClinicaModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -17,44 +18,77 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public Clinica NovaClinica { get; set; } = new Clinica();
 
-        [BindProperty]
-        public string ConfirmarSenha { get; set; } = "";
+        public IActionResult OnGet()
+        {
+            var id = HttpContext.Session.GetString("ClinicaLogada");
 
+            // Se estiver logado, carrega os dados atuais
+            if (id != null)
+            {
+                var clinica = _context.Clinicas
+                    .FirstOrDefault(c => c.Id == int.Parse(id));
 
+                if (clinica != null)
+                {
+                    NovaClinica = clinica;
+                }
+            }
+
+            return Page();
+        }
 
         public IActionResult OnPost()
         {
+            var id = HttpContext.Session.GetString("ClinicaLogada");
 
+            Clinica clinica;
 
-            NovaClinica.Aprovado = false;
-
-            NovaClinica.Telefone = NovaClinica.Telefone //remove caracteres comuns de formatação de telefone
-             .Replace("(", "")
-             .Replace(")", "")
-             .Replace("-", "")
-             .Replace(" ", "")
-             .Replace("+", "");
-
-            if (!NovaClinica.Telefone.StartsWith("55")) //garante que o telefone comece com o código do país (55 para Brasil)
+            // =========================================
+            // EDITAR PERFIL
+            // =========================================
+            if (id != null)
             {
-                NovaClinica.Telefone = "55" + NovaClinica.Telefone;
+                clinica = _context.Clinicas
+                    .FirstOrDefault(c => c.Id == int.Parse(id));
+
+                if (clinica == null)
+                    return RedirectToPage("/LoginClinica");
             }
 
-            // valida senha
-            if (NovaClinica.Senha != ConfirmarSenha)
+            // =========================================
+            // NOVO CADASTRO
+            // =========================================
+            else
             {
-                ModelState.AddModelError("", "As senhas não coincidem.");
-                return Page();
+                clinica = new Clinica();
+
+                _context.Clinicas.Add(clinica);
+
+                clinica.Aprovado = false;
+                clinica.Pago = false;
             }
 
-            // regra de senha forte
-            if (NovaClinica.Senha.Length < 6)
+            // =========================================
+            // TELEFONE
+            // =========================================
+            if (!string.IsNullOrEmpty(NovaClinica.Telefone))
             {
-                ModelState.AddModelError("", "A senha deve ter pelo menos 6 caracteres.");
-                return Page();
+                NovaClinica.Telefone = NovaClinica.Telefone
+                    .Replace("(", "")
+                    .Replace(")", "")
+                    .Replace("-", "")
+                    .Replace(" ", "")
+                    .Replace("+", "");
+
+                if (!NovaClinica.Telefone.StartsWith("55"))
+                {
+                    NovaClinica.Telefone = "55" + NovaClinica.Telefone;
+                }
             }
 
-            // tratar instagram
+            // =========================================
+            // INSTAGRAM
+            // =========================================
             if (!string.IsNullOrEmpty(NovaClinica.Instagram))
             {
                 NovaClinica.Instagram = NovaClinica.Instagram
@@ -63,11 +97,14 @@ namespace ProjetoTerapia.Pages
 
                 if (!NovaClinica.Instagram.StartsWith("http"))
                 {
-                    NovaClinica.Instagram = "https://instagram.com/" + NovaClinica.Instagram;
+                    NovaClinica.Instagram =
+                        "https://instagram.com/" + NovaClinica.Instagram;
                 }
             }
 
-            // 🔹 TRATAR SITE
+            // =========================================
+            // SITE
+            // =========================================
             if (!string.IsNullOrEmpty(NovaClinica.Site))
             {
                 if (!NovaClinica.Site.StartsWith("http"))
@@ -76,32 +113,65 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
-            if (!NovaClinica.AtendimentoOnline && !NovaClinica.AtendimentoPresencial)
+            // =========================================
+            // VALIDAR ATENDIMENTO
+            // =========================================
+            if (!NovaClinica.AtendimentoOnline &&
+                !NovaClinica.AtendimentoPresencial)
             {
-                ModelState.AddModelError("", "Selecione pelo menos um tipo de atendimento.");
+                ModelState.AddModelError(
+                    "",
+                    "Selecione pelo menos um tipo de atendimento."
+                );
+
                 return Page();
             }
 
-            // 🔹 VALIDAR CPF (básico)
-            if (string.IsNullOrEmpty(NovaClinica.CPF) || NovaClinica.CPF.Length < 11)
-            {
-                ModelState.AddModelError("", "CPF inválido.");
-                return Page();
-            }
-
+            // =========================================
+            // ESPECIALIDADES
+            // =========================================
             var especialidades = Request.Form["Especialidades"];
 
-            NovaClinica.Especialidades = string.Join(",", especialidades.ToArray());
+            clinica.Especialidades =
+                string.Join(",", especialidades.ToArray());
 
-            _context.Clinicas.Add(NovaClinica);
+            // =========================================
+            // DADOS
+            // =========================================
+            clinica.Nome = NovaClinica.Nome;
+            clinica.Descricao = NovaClinica.Descricao;
+            clinica.CEP = NovaClinica.CEP;
+            clinica.Endereco = NovaClinica.Endereco;
+            clinica.Telefone = NovaClinica.Telefone;
+            clinica.Email = NovaClinica.Email;
+            clinica.Instagram = NovaClinica.Instagram;
+            clinica.Site = NovaClinica.Site;
+            clinica.Documento = NovaClinica.Documento;
+            clinica.CPF = NovaClinica.CPF;
+            clinica.Valor = NovaClinica.Valor;
+
+            clinica.AtendimentoOnline =
+                NovaClinica.AtendimentoOnline;
+
+            clinica.AtendimentoPresencial =
+                NovaClinica.AtendimentoPresencial;
+
+            clinica.PerfilCompleto = true;
+
             _context.SaveChanges();
 
+            // =========================================
+            // LOGIN AUTOMÁTICO NO PRIMEIRO CADASTRO
+            // =========================================
+            if (id == null)
+            {
+                HttpContext.Session.SetString(
+                    "ClinicaLogada",
+                    clinica.Id.ToString()
+                );
+            }
 
-
-            return RedirectToPage("/PagamentoClinica");
+            return RedirectToPage("/PainelClinica");
         }
-
-
     }
 }
-
