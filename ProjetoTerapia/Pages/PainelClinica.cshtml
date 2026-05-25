@@ -37,7 +37,7 @@
 
     </div>
 
-    @if (!Model.Clinica.PerfilCompleto)
+    @if (Model.Clinica != null && !Model.Clinica.PerfilCompleto)
     {
         <div class="alerta-perfil">
 

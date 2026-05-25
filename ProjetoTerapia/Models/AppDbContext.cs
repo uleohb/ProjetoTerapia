@@ -10,5 +10,9 @@ namespace ProjetoTerapia.Models
             : base(options)
         {
         }
+
+        public DbSet<Consulta> Consultas { get; set; }
+
+        public DbSet<Paciente> Pacientes { get; set; }
     }
 }

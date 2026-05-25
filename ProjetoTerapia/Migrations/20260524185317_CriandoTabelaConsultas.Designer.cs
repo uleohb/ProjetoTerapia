@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoTerapia.Models;
 
@@ -11,9 +12,11 @@ using ProjetoTerapia.Models;
 namespace ProjetoTerapia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260524185317_CriandoTabelaConsultas")]
+    partial class CriandoTabelaConsultas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,8 +175,7 @@ namespace ProjetoTerapia.Migrations
                     b.Property<int>("ClinicaId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DataConsulta")
-                        .IsRequired()
+                    b.Property<DateTime>("DataConsulta")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NomePaciente")
@@ -193,38 +195,6 @@ namespace ProjetoTerapia.Migrations
                     b.HasIndex("ClinicaId");
 
                     b.ToTable("Consultas");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Paciente", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClinicaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Observacoes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Pacientes");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Consulta", b =>

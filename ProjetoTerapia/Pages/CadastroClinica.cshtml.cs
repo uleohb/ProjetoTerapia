@@ -41,7 +41,7 @@ namespace ProjetoTerapia.Pages
         {
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
-            Clinica clinica;
+            Clinica? clinica;
 
             // =========================================
             // EDITAR PERFIL
@@ -52,8 +52,13 @@ namespace ProjetoTerapia.Pages
                     .FirstOrDefault(c => c.Id == int.Parse(id));
 
                 if (clinica == null)
+                {
                     return RedirectToPage("/LoginClinica");
+                }
+
             }
+
+         
 
             // =========================================
             // NOVO CADASTRO

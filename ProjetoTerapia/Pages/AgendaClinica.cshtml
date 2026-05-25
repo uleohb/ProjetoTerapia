@@ -49,7 +49,7 @@
                     </span>
 
                     <h1>
-                        Agenda Clínica
+                        Agenda
                     </h1>
 
                     <p>
@@ -61,9 +61,9 @@
 
             </div>
 
-            <button class="btn-nova-consulta">
+            <a href="/NovaConsulta" class="btn-nova-consulta">
                 Nova Consulta
-            </button>
+            </a>
 
         </div>
 
@@ -72,22 +72,22 @@
 
             <div class="card-resumo">
                 <span>Consultas Hoje</span>
-                <h2>12</h2>
+                <h2>@Model.ConsultasHoje</h2>
             </div>
 
             <div class="card-resumo">
                 <span>Confirmadas</span>
-                <h2>8</h2>
+                <h2>@Model.Confirmadas</h2>
             </div>
 
             <div class="card-resumo">
                 <span>Pendentes</span>
-                <h2>3</h2>
+                <h2>@Model.Pendentes</h2>
             </div>
 
             <div class="card-resumo">
                 <span>Canceladas</span>
-                <h2>1</h2>
+                <h2>@Model.Canceladas</h2>
             </div>
 
         </div>
@@ -104,50 +104,123 @@
 
             </div>
 
-            <div class="consulta-card">
+            @if (Model.Consultas.Any())
+            {
+                @foreach (var consulta in Model.Consultas)
+                {
+                    <div class="consulta-card">
 
-                <div class="usuario">
+                        <div class="usuario">
 
-                    <div class="avatar">
-                        M
+                            <div class="avatar">
+                                @consulta.NomePaciente.Substring(0, 1).ToUpper()
+                            </div>
+
+                            <div>
+
+                                <h4>@consulta.NomePaciente</h4>
+
+                                <span>
+                                    @consulta.TipoAtendimento
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="consulta-hora">
+                            @(consulta.DataConsulta.HasValue
+                                                ? consulta.DataConsulta.Value.ToString("dd/MM/yyyy HH:mm")
+                                                : "-")
+                        </div>
+
+                        <div class="status
+                          @(consulta.Status == "Confirmado" ? "confirmado" :
+                                   consulta.Status == "Pendente" ? "pendente" :
+                                   "cancelado")">
+
+                           @consulta.Status
+
+                        </div>
+
+                        <div class="acoes-consulta">
+
+                            <a href="/EditarConsulta?id=@consulta.Id"
+                               class="btn-acao btn-editar">
+
+                                <i class="fa-solid fa-pen"></i>
+
+                            </a>
+
+                            <form method="post" asp-page-handler="Confirmar">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@consulta.Id" />
+
+                                <button type="submit"
+                                        class="btn-acao btn-confirmar">
+
+                                    <i class="fa-solid fa-check"></i>
+
+                                </button>
+
+                            </form>
+
+                            <form method="post" asp-page-handler="Cancelar">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@consulta.Id" />
+
+                                <button type="submit"
+                                        class="btn-acao btn-cancelar">
+
+                                    <i class="fa-solid fa-ban"></i>
+
+                                </button>
+
+                            </form>
+
+                            <form method="post"
+                                  asp-page-handler="Excluir"
+                                  onsubmit="return confirm('Deseja excluir esta consulta?')">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@consulta.Id" />
+
+                                <button type="submit"
+                                        class="btn-acao btn-excluir">
+
+                                    <i class="fa-solid fa-trash"></i>
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
                     </div>
+                }
+            }
+            else
+            {
+                <div class="consulta-vazia">
 
-                    <div>
+                    <i class="fa-regular fa-calendar-xmark"></i>
 
-                        <h4>Maria Oliveira</h4>
+                    <h3>
+                        Nenhuma consulta cadastrada
+                    </h3>
 
-                        <span>
-                            Atendimento Online
-                        </span>
-
-                    </div>
+                    <p>
+                        Quando novos atendimentos forem criados,
+                        eles aparecerão aqui.
+                    </p>
 
                 </div>
-
-                <div class="consulta-hora">
-                    14:00
-                </div>
-
-                <div class="status confirmado">
-                    Confirmado
-                </div>
-
-            </div>
-
-            <div class="consulta-vazia">
-
-                <i class="fa-regular fa-calendar-xmark"></i>
-
-                <h3>
-                    Nenhuma consulta cadastrada
-                </h3>
-
-                <p>
-                    Quando novos atendimentos forem criados,
-                    eles aparecerão aqui.
-                </p>
-
-            </div>
+            }
 
         </div>
 
@@ -317,20 +390,22 @@
     }
 
     .btn-nova-consulta {
+        text-decoration: none;
         border: none;
-        padding: 16px 24px;
+        padding: 16px 28px;
         border-radius: 18px;
         background: linear-gradient(135deg,#2563eb,#0ea5e9);
         color: white;
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 15px;
+        font-weight: 700;
         cursor: pointer;
-        transition: .2s;
+        transition: .25s;
         box-shadow: 0 12px 30px rgba(37,99,235,.18);
     }
 
         .btn-nova-consulta:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(37,99,235,.25);
         }
 
     /* =========================
@@ -536,5 +611,87 @@
             font-size: 28px;
         }
     }
+
+    .cancelado {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .acoes-consulta {
+        display: flex;
+        gap: 10px;
+    }
+
+    .acoes-consulta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .acoes-consulta form {
+            margin: 0;
+        }
+
+    .btn-acao {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: .25s;
+        font-size: 14px;
+    }
+
+        .btn-acao:hover {
+            transform: translateY(-2px);
+        }
+
+    /* Editar */
+
+    .btn-editar {
+        background: rgba(37,99,235,.10);
+        color: #2563eb;
+    }
+
+        .btn-editar:hover {
+            background: rgba(37,99,235,.18);
+        }
+
+    /* Confirmar */
+
+    .btn-confirmar {
+        background: rgba(14,165,233,.10);
+        color: #0284c7;
+    }
+
+        .btn-confirmar:hover {
+            background: rgba(14,165,233,.18);
+        }
+
+    /* Cancelar */
+
+    .btn-cancelar {
+        background: rgba(148,163,184,.15);
+        color: #64748b;
+    }
+
+        .btn-cancelar:hover {
+            background: rgba(148,163,184,.25);
+        }
+
+    /* Excluir */
+
+    .btn-excluir {
+        background: rgba(239,68,68,.08);
+        color: #dc2626;
+    }
+
+        .btn-excluir:hover {
+            background: rgba(239,68,68,.15);
+        }
 
 </style>
