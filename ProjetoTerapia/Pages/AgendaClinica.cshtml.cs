@@ -23,6 +23,9 @@ namespace ProjetoTerapia.Pages
 
         public int Canceladas { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? Busca { get; set; }
+
         public IActionResult OnGet()
         {
             CarregarAgenda();
@@ -81,8 +84,16 @@ namespace ProjetoTerapia.Pages
 
             int clinicaId = int.Parse(clinicaIdString);
 
-            Consultas = _context.Consultas
-                .Where(x => x.ClinicaId == clinicaId)
+            var consultas = _context.Consultas
+            .Where(x => x.ClinicaId == clinicaId);
+
+            if (!string.IsNullOrWhiteSpace(Busca))
+            {
+                consultas = consultas.Where(x =>
+                    x.NomePaciente.Contains(Busca));
+            }
+
+            Consultas = consultas
                 .OrderBy(x => x.DataConsulta)
                 .ToList();
 

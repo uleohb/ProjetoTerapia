@@ -95,6 +95,20 @@
         <!-- CONSULTAS -->
         <div class="consultas-box">
 
+            <form method="get" class="busca-agenda">
+
+                <input type="text"
+                       name="Busca"
+                       value="@Model.Busca"
+                       placeholder="Buscar paciente..."
+                       class="campo-busca" />
+
+                <button type="submit" class="btn-buscar">
+                    Buscar
+                </button>
+
+            </form>
+
             <div class="titulo-box">
 
                 <div>
@@ -108,96 +122,91 @@
             {
                 @foreach (var consulta in Model.Consultas)
                 {
-                    <div class="consulta-card">
+                    <div class="consulta-card @(consulta.DataConsulta?.Date == DateTime.Today ? "consulta-hoje" : "")">
 
-                        <div class="usuario">
+                        <div class="consulta-esquerda">
 
                             <div class="avatar">
                                 @consulta.NomePaciente.Substring(0, 1).ToUpper()
                             </div>
 
-                            <div>
+                            <div class="dados-paciente">
 
                                 <h4>@consulta.NomePaciente</h4>
 
-                                <span>
-                                    @consulta.TipoAtendimento
-                                </span>
+                                <div class="infos-consulta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        @(consulta.DataConsulta?.ToString("dd/MM/yyyy"))
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        @(consulta.DataConsulta?.ToString("HH:mm"))
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-solid fa-stethoscope"></i>
+                                        @consulta.TipoAtendimento
+                                    </span>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                        <div class="consulta-hora">
-                            @(consulta.DataConsulta.HasValue
-                                                ? consulta.DataConsulta.Value.ToString("dd/MM/yyyy HH:mm")
-                                                : "-")
-                        </div>
+                        <div class="consulta-direita">
 
-                        <div class="status
-                          @(consulta.Status == "Confirmado" ? "confirmado" :
-                                   consulta.Status == "Pendente" ? "pendente" :
-                                   "cancelado")">
+                            <div class="status
+                    @(consulta.Status == "Confirmado" ? "confirmado" :
+                                               consulta.Status == "Pendente" ? "pendente" :
+                                               "cancelado")">
 
-                           @consulta.Status
+                        @consulta.Status
 
-                        </div>
+                            </div>
 
-                        <div class="acoes-consulta">
+                            <div class="acoes-consulta">
 
-                            <a href="/EditarConsulta?id=@consulta.Id"
-                               class="btn-acao btn-editar">
+                                <a href="/EditarConsulta?id=@consulta.Id"
+                                   class="btn-acao btn-editar">
 
-                                <i class="fa-solid fa-pen"></i>
+                                    <i class="fa-solid fa-pen"></i>
 
-                            </a>
+                                </a>
 
-                            <form method="post" asp-page-handler="Confirmar">
+                                <form method="post" asp-page-handler="Confirmar">
+                                    <input type="hidden" name="id" value="@consulta.Id" />
+                                    <button type="submit" class="btn-acao btn-confirmar">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
 
-                                <input type="hidden"
-                                       name="id"
-                                       value="@consulta.Id" />
+                                <form method="post" asp-page-handler="Cancelar">
+                                    <input type="hidden" name="id" value="@consulta.Id" />
+                                    <button type="submit" class="btn-acao btn-cancelar">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                </form>
 
-                                <button type="submit"
-                                        class="btn-acao btn-confirmar">
+                                <form method="post"
+                                      asp-page-handler="Excluir"
+                                      onsubmit="return confirm('Deseja excluir esta consulta?')">
 
-                                    <i class="fa-solid fa-check"></i>
+                                    <input type="hidden" name="id" value="@consulta.Id" />
 
-                                </button>
+                                    <button type="submit"
+                                            class="btn-acao btn-excluir">
 
-                            </form>
+                                        <i class="fa-solid fa-trash"></i>
 
-                            <form method="post" asp-page-handler="Cancelar">
+                                    </button>
 
-                                <input type="hidden"
-                                       name="id"
-                                       value="@consulta.Id" />
+                                </form>
 
-                                <button type="submit"
-                                        class="btn-acao btn-cancelar">
-
-                                    <i class="fa-solid fa-ban"></i>
-
-                                </button>
-
-                            </form>
-
-                            <form method="post"
-                                  asp-page-handler="Excluir"
-                                  onsubmit="return confirm('Deseja excluir esta consulta?')">
-
-                                <input type="hidden"
-                                       name="id"
-                                       value="@consulta.Id" />
-
-                                <button type="submit"
-                                        class="btn-acao btn-excluir">
-
-                                    <i class="fa-solid fa-trash"></i>
-
-                                </button>
-
-                            </form>
+                            </div>
 
                         </div>
 
@@ -239,8 +248,8 @@
 
     body {
         margin: 0;
-        background: #f1f5f9;
         font-family: 'Segoe UI', sans-serif;
+        background: radial-gradient( circle at top right, rgba(37,99,235,.05), transparent 25% ), radial-gradient( circle at bottom left, rgba(14,165,233,.04), transparent 30% ), #f8fafc;
     }
 
     .agenda-layout {
@@ -309,12 +318,13 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        padding: 16px 18px;
-        border-radius: 18px;
+        padding: 15px 18px;
+        border-radius: 16px;
         text-decoration: none;
         color: #475569;
         font-weight: 600;
         transition: .25s;
+        position: relative;
     }
 
         .menu-item i {
@@ -322,15 +332,15 @@
         }
 
         .menu-item:hover {
-            background: rgba(37,99,235,.06);
+            background: rgba(37,99,235,.05);
             color: #2563eb;
-            transform: translateX(3px);
+            transform: translateX(4px);
         }
 
         .menu-item.ativo {
-            background: linear-gradient( 135deg, #2563eb, #0ea5e9 );
+            background: linear-gradient( 135deg, #2563eb, #3b82f6 );
             color: white;
-            box-shadow: 0 12px 25px rgba(37,99,235,.18);
+            box-shadow: 0 8px 20px rgba(37,99,235,.18);
         }
 
     /* =========================
@@ -358,35 +368,39 @@
     .titulo-agenda {
         display: flex;
         flex-direction: column;
+        gap: 10px;
     }
 
     .badge-agenda {
         display: inline-flex;
         width: fit-content;
-        padding: 8px 16px;
+        padding: 8px 14px;
         border-radius: 999px;
-        background: rgba(37,99,235,.08);
-        color: #2563eb;
-        font-size: 13px;
+        background: rgba(37,99,235,.06);
+        color: #3b82f6;
+        font-size: 11px;
         font-weight: 700;
-        margin-bottom: 14px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        border: 1px solid rgba(37,99,235,.08);
     }
 
     .topo-agenda h1 {
-        margin: 0 0 10px;
-        font-size: 34px;
-        line-height: 1.1;
+        margin: 0;
+        font-size: 38px;
         font-weight: 700;
-        letter-spacing: -.8px;
+        letter-spacing: -1px;
         color: #0f172a;
+        line-height: 1.1;
     }
 
     .topo-agenda p {
         margin: 0;
         color: #64748b;
         font-size: 15px;
-        line-height: 1.7;
-        max-width: 620px;
+        line-height: 1.8;
+        max-width: 650px;
+        font-weight: 400;
     }
 
     .btn-nova-consulta {
@@ -420,7 +434,8 @@
     }
 
     .card-resumo {
-        background: rgba(255,255,255,.92);
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(12px);
         border: 1px solid #e2e8f0;
         border-radius: 24px;
         padding: 26px;
@@ -594,14 +609,36 @@
         }
 
         .sidebar {
-            width: auto;
-            border-right: none;
-            border-bottom: 1px solid #e2e8f0;
+            width: 270px;
+            padding: 32px 24px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient( 180deg, rgba(255,255,255,.92) 0%, rgba(248,250,252,.96) 100% );
+            border-right: 1px solid rgba(226,232,240,.7);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 40px rgba(15,23,42,.04);
         }
 
         .agenda-content {
-            padding: 25px;
+            flex: 1;
+            padding: 45px;
+            position: relative;
         }
+
+            .agenda-content::before {
+                content: "";
+                position: absolute;
+                top: 50px;
+                right: 50px;
+                width: 300px;
+                height: 300px;
+                background: rgba(37,99,235,.05);
+                border-radius: 50%;
+                filter: blur(100px);
+                z-index: 0;
+            }
 
         .logo-agenda {
             width: 220px;
@@ -693,5 +730,93 @@
         .btn-excluir:hover {
             background: rgba(239,68,68,.15);
         }
+
+    .consulta-esquerda {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .dados-paciente h4 {
+        margin: 0 0 10px;
+        font-size: 17px;
+        color: #0f172a;
+    }
+
+    .infos-consulta {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+        .infos-consulta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .consulta-direita {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .consulta-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+    }
+
+    @@media(max - width:900px) {
+        .consulta-card
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .consulta-direita {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+ }
+
+    .consulta-hoje {
+        border-left: 5px solid #2563eb;
+        background: #ffffff;
+    }
+
+    .busca-agenda {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .campo-busca {
+        flex: 1;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 1px solid #dbe2ea;
+        font-size: 14px;
+        outline: none;
+    }
+
+        .campo-busca:focus {
+            border-color: #2563eb;
+        }
+
+    .btn-buscar {
+        border: none;
+        background: #2563eb;
+        color: white;
+        padding: 14px 24px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 600;
+    }
 
 </style>
