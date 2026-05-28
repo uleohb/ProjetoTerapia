@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjetoTerapia.Pages
 {
@@ -25,6 +26,8 @@ namespace ProjetoTerapia.Pages
 
         [BindProperty(SupportsGet = true)]
         public string? Busca { get; set; }
+
+        public Clinica Clinica { get; set; } = new();
 
         public IActionResult OnGet()
         {

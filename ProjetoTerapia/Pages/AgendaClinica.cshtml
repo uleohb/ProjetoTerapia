@@ -25,7 +25,7 @@
                 Pacientes
             </a>
 
-            <a href="/CadastroClinica" class="menu-item">
+            <a href="/PerfilClinica" class="menu-item">
                 <i class="fa-regular fa-id-card"></i>
                 Perfil
             </a>
@@ -91,6 +91,8 @@
             </div>
 
         </div>
+
+       
 
         <!-- CONSULTAS -->
         <div class="consultas-box">
@@ -243,13 +245,13 @@
 <style>
 
     /* =========================
-           BASE
-        ========================== */
+       BASE
+    ========================= */
 
     body {
         margin: 0;
         font-family: 'Segoe UI', sans-serif;
-        background: radial-gradient( circle at top right, rgba(37,99,235,.05), transparent 25% ), radial-gradient( circle at bottom left, rgba(14,165,233,.04), transparent 30% ), #f8fafc;
+        background: radial-gradient(circle at top right, rgba(37,99,235,.05), transparent 25%), radial-gradient(circle at bottom left, rgba(14,165,233,.04), transparent 30%), #f8fafc;
     }
 
     .agenda-layout {
@@ -259,21 +261,20 @@
 
     /* =========================
        SIDEBAR
-    ========================== */
+    ========================= */
 
     .sidebar {
         width: 270px;
         padding: 32px 24px;
         position: relative;
         overflow: hidden;
-        background: linear-gradient( 180deg, #ffffff 0%, #f8fbff 100% );
+        background: linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
         border-right: 1px solid #e2e8f0;
         display: flex;
         flex-direction: column;
         box-shadow: 0 0 30px rgba(15,23,42,.03);
     }
 
-        /* efeito suave */
         .sidebar::before {
             content: "";
             position: absolute;
@@ -324,7 +325,6 @@
         color: #475569;
         font-weight: 600;
         transition: .25s;
-        position: relative;
     }
 
         .menu-item i {
@@ -338,14 +338,14 @@
         }
 
         .menu-item.ativo {
-            background: linear-gradient( 135deg, #2563eb, #3b82f6 );
+            background: linear-gradient(135deg,#2563eb,#06b6d4);
             color: white;
             box-shadow: 0 8px 20px rgba(37,99,235,.18);
         }
 
     /* =========================
-           CONTEÚDO
-        ========================== */
+       CONTEÚDO
+    ========================= */
 
     .agenda-content {
         flex: 1;
@@ -353,8 +353,8 @@
     }
 
     /* =========================
-           TOPO
-        ========================== */
+       TOPO
+    ========================= */
 
     .topo-agenda {
         display: flex;
@@ -387,21 +387,23 @@
 
     .topo-agenda h1 {
         margin: 0;
-        font-size: 38px;
+        font-size: 34px;
         font-weight: 700;
         letter-spacing: -1px;
         color: #0f172a;
-        line-height: 1.1;
     }
 
     .topo-agenda p {
         margin: 0;
         color: #64748b;
         font-size: 15px;
-        line-height: 1.8;
+        line-height: 1.7;
         max-width: 650px;
-        font-weight: 400;
     }
+
+    /* =========================
+       BOTÃO
+    ========================= */
 
     .btn-nova-consulta {
         text-decoration: none;
@@ -423,8 +425,8 @@
         }
 
     /* =========================
-           CARDS RESUMO
-        ========================== */
+       RESUMO
+    ========================= */
 
     .grid-resumo {
         display: grid;
@@ -434,17 +436,17 @@
     }
 
     .card-resumo {
-        background: rgba(255,255,255,.96);
-        backdrop-filter: blur(12px);
-        border: 1px solid #e2e8f0;
+        background: rgba(255,255,255,.75);
+        backdrop-filter: blur(18px);
         border-radius: 24px;
         padding: 26px;
+        border: 1px solid rgba(255,255,255,.4);
         box-shadow: 0 10px 30px rgba(15,23,42,.04);
-        transition: .2s;
+        transition: .25s;
     }
 
         .card-resumo:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
         }
 
         .card-resumo span {
@@ -459,8 +461,103 @@
         }
 
     /* =========================
-           CONSULTAS
-        ========================== */
+       PERFIL PÚBLICO
+    ========================= */
+
+    .perfil-publico-box {
+        margin-bottom: 35px;
+        padding: 30px;
+        border-radius: 30px;
+        background: rgba(255,255,255,.85);
+        backdrop-filter: blur(18px);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(15,23,42,.04);
+    }
+
+    .perfil-publico-topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .badge-publico {
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(37,99,235,.08);
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-publico {
+        padding: 12px 18px;
+        border-radius: 16px;
+        font-weight: 700;
+    }
+
+        .status-publico.aprovado {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+    .perfil-publico-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .perfil-esquerda {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .avatar-publico {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#2563eb,#06b6d4);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .descricao-publica {
+        margin-top: 12px;
+        color: #64748b;
+        line-height: 1.7;
+        max-width: 600px;
+    }
+
+    .perfil-direita {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .mini-info {
+        padding: 14px 18px;
+        border-radius: 16px;
+        background: #f8fafc;
+        color: #334155;
+        font-weight: 600;
+    }
+
+        .mini-info.destaque {
+            background: linear-gradient(135deg,#2563eb,#06b6d4);
+            color: white;
+        }
+
+    /* =========================
+       CONSULTAS
+    ========================= */
 
     .consultas-box {
         background: rgba(255,255,255,.95);
@@ -468,326 +565,6 @@
         padding: 30px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 10px 30px rgba(15,23,42,.04);
-    }
-
-    .titulo-box {
-        margin-bottom: 25px;
-    }
-
-        .titulo-box h3 {
-            margin: 0 0 8px;
-            font-size: 24px;
-            color: #0f172a;
-        }
-
-        .titulo-box p {
-            margin: 0;
-            color: #64748b;
-            font-size: 14px;
-        }
-
-    /* =========================
-           CONSULTA CARD
-        ========================== */
-
-    .consulta-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        padding: 22px;
-        margin-bottom: 16px;
-        border-radius: 24px;
-        background: #f8fafc;
-        border: 1px solid #eef2f7;
-        transition: .2s;
-    }
-
-        .consulta-card:hover {
-            background: white;
-            box-shadow: 0 10px 25px rgba(15,23,42,.05);
-        }
-
-    .usuario {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .avatar {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background: linear-gradient(135deg,#2563eb,#0ea5e9);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 15px;
-        box-shadow: 0 8px 18px rgba(37,99,235,.18);
-    }
-
-    .usuario h4 {
-        margin: 0 0 6px;
-        font-size: 16px;
-        color: #0f172a;
-    }
-
-    .usuario span {
-        color: #64748b;
-        font-size: 14px;
-    }
-
-    .consulta-hora {
-        font-size: 15px;
-        font-weight: 700;
-        color: #0f172a;
-    }
-
-    /* =========================
-           STATUS
-        ========================== */
-
-    .status {
-        padding: 10px 18px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .confirmado {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .pendente {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    /* =========================
-           VAZIO
-        ========================== */
-
-    .consulta-vazia {
-        background: rgba(255,255,255,.92);
-        border: 1px solid rgba(226,232,240,.8);
-        border-radius: 30px;
-        padding: 60px 30px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(15,23,42,.05);
-    }
-
-        .consulta-vazia i {
-            font-size: 42px;
-            color: #94a3b8;
-            margin-bottom: 20px;
-        }
-
-        .consulta-vazia h3 {
-            margin: 0 0 12px;
-            font-size: 24px;
-            color: #0f172a;
-        }
-
-        .consulta-vazia p {
-            margin: 0;
-            color: #64748b;
-            line-height: 1.7;
-        }
-
-    /* =========================
-           RESPONSIVO
-        ========================== */
-
-    @@media(max-width:900px) {
-
-        .agenda-layout {
-            flex-direction: column;
-        }
-
-        .sidebar {
-            width: 270px;
-            padding: 32px 24px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient( 180deg, rgba(255,255,255,.92) 0%, rgba(248,250,252,.96) 100% );
-            border-right: 1px solid rgba(226,232,240,.7);
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(14px);
-            box-shadow: 0 10px 40px rgba(15,23,42,.04);
-        }
-
-        .agenda-content {
-            flex: 1;
-            padding: 45px;
-            position: relative;
-        }
-
-            .agenda-content::before {
-                content: "";
-                position: absolute;
-                top: 50px;
-                right: 50px;
-                width: 300px;
-                height: 300px;
-                background: rgba(37,99,235,.05);
-                border-radius: 50%;
-                filter: blur(100px);
-                z-index: 0;
-            }
-
-        .logo-agenda {
-            width: 220px;
-        }
-
-        .topo-agenda h1 {
-            font-size: 28px;
-        }
-    }
-
-    .cancelado {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .acoes-consulta {
-        display: flex;
-        gap: 10px;
-    }
-
-    .acoes-consulta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-        .acoes-consulta form {
-            margin: 0;
-        }
-
-    .btn-acao {
-        width: 42px;
-        height: 42px;
-        border: none;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        text-decoration: none;
-        transition: .25s;
-        font-size: 14px;
-    }
-
-        .btn-acao:hover {
-            transform: translateY(-2px);
-        }
-
-    /* Editar */
-
-    .btn-editar {
-        background: rgba(37,99,235,.10);
-        color: #2563eb;
-    }
-
-        .btn-editar:hover {
-            background: rgba(37,99,235,.18);
-        }
-
-    /* Confirmar */
-
-    .btn-confirmar {
-        background: rgba(14,165,233,.10);
-        color: #0284c7;
-    }
-
-        .btn-confirmar:hover {
-            background: rgba(14,165,233,.18);
-        }
-
-    /* Cancelar */
-
-    .btn-cancelar {
-        background: rgba(148,163,184,.15);
-        color: #64748b;
-    }
-
-        .btn-cancelar:hover {
-            background: rgba(148,163,184,.25);
-        }
-
-    /* Excluir */
-
-    .btn-excluir {
-        background: rgba(239,68,68,.08);
-        color: #dc2626;
-    }
-
-        .btn-excluir:hover {
-            background: rgba(239,68,68,.15);
-        }
-
-    .consulta-esquerda {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .dados-paciente h4 {
-        margin: 0 0 10px;
-        font-size: 17px;
-        color: #0f172a;
-    }
-
-    .infos-consulta {
-        display: flex;
-        gap: 18px;
-        flex-wrap: wrap;
-    }
-
-        .infos-consulta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-    .consulta-direita {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .consulta-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 25px;
-    }
-
-    @@media(max - width:900px) {
-        .consulta-card
-
-    {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .consulta-direita {
-        width: 100%;
-        justify-content: space-between;
-    }
-
- }
-
-    .consulta-hoje {
-        border-left: 5px solid #2563eb;
-        background: #ffffff;
     }
 
     .busca-agenda {
@@ -817,6 +594,221 @@
         border-radius: 14px;
         cursor: pointer;
         font-weight: 600;
+    }
+
+    .consulta-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+        flex-wrap: wrap;
+        padding: 22px;
+        margin-bottom: 16px;
+        border-radius: 24px;
+        background: #f8fafc;
+        border: 1px solid #eef2f7;
+        transition: .25s;
+    }
+
+        .consulta-card:hover {
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(15,23,42,.08);
+        }
+
+    .consulta-hoje {
+        border-left: 5px solid #2563eb;
+        background: white;
+    }
+
+    .consulta-esquerda {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#2563eb,#0ea5e9);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        box-shadow: 0 8px 18px rgba(37,99,235,.18);
+    }
+
+    .dados-paciente h4 {
+        margin: 0 0 10px;
+        color: #0f172a;
+    }
+
+    .infos-consulta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+        .infos-consulta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .consulta-direita {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .confirmado {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .pendente {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .cancelado {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* =========================
+       AÇÕES
+    ========================= */
+
+    .acoes-consulta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .acoes-consulta form {
+            margin: 0;
+        }
+
+    .btn-acao {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: .25s;
+        font-size: 14px;
+    }
+
+        .btn-acao:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-editar {
+        background: rgba(37,99,235,.10);
+        color: #2563eb;
+    }
+
+    .btn-confirmar {
+        background: rgba(14,165,233,.10);
+        color: #0284c7;
+    }
+
+    .btn-cancelar {
+        background: rgba(148,163,184,.15);
+        color: #64748b;
+    }
+
+    .btn-excluir {
+        background: rgba(239,68,68,.08);
+        color: #dc2626;
+    }
+
+    /* =========================
+       VAZIO
+    ========================= */
+
+    .consulta-vazia {
+        text-align: center;
+        padding: 60px 30px;
+    }
+
+        .consulta-vazia i {
+            font-size: 42px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+    /* =========================
+       RESPONSIVO
+    ========================= */
+
+    @@media (max-width: 900px) {
+
+        .agenda-layout {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .agenda-content {
+            padding: 25px;
+        }
+
+        .topo-agenda {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .consulta-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .consulta-direita {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .perfil-publico-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .perfil-esquerda {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .busca-agenda {
+            flex-direction: column;
+        }
+
+        .btn-buscar {
+            width: 100%;
+        }
     }
 
 </style>
