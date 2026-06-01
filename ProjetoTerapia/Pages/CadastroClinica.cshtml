@@ -416,21 +416,18 @@
     }
 
     .avatar-clinica {
-        width: 80px;
-        height: 80px;
+        position: relative;
+        width: 90px;
+        height: 90px;
         border-radius: 50%;
-        background: linear-gradient( 135deg, #00c2ff, #00a3ff );
-        color: white;
+        background: linear-gradient(135deg,#2563eb,#0ea5e9);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 28px;
+        color: white;
+        font-size: 34px;
         font-weight: 700;
-    }
-
-    .avatar-clinica {
-        position: relative;
-        
+        flex-shrink: 0;
     }
 
         .avatar-clinica img {
@@ -442,8 +439,8 @@
 
     .editar-avatar {
         position: absolute;
-        bottom: 0;
-        right: 0;
+        bottom: -2px;
+        right: -2px;
         width: 38px;
         height: 38px;
         border-radius: 50%;
@@ -545,19 +542,7 @@
             font-size: 18px;
         }
 
-    .avatar-clinica {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        background: linear-gradient(135deg,#2563eb,#0ea5e9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 34px;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
+   
 
     @@media(max-width:900px) {
 
@@ -647,20 +632,7 @@
                 });
         }
 
-    });
-
-     const senha = document.querySelector("[name='NovaClinica.Senha']");
-    const confirmar = document.querySelector("[name='ConfirmarSenha']");
-
-    confirmar.addEventListener("input", function () {
-        if (confirmar.value !== senha.value) {
-            confirmar.style.borderColor = "red";
-        } else {
-            confirmar.style.borderColor = "green";
-        }
-    });
-
-        
+    });    
 
     document.getElementById("foto-upload")
     .addEventListener("change", function(e) {
@@ -670,9 +642,13 @@
         if (!file)
             return;
 
+            console.log("arquivo selecionado:", file.name);
+
         const reader = new FileReader();
 
         reader.onload = function(ev) {
+
+            console.log("imagem carregada");
 
             let avatar = document.querySelector(".avatar-clinica img");
 
