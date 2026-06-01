@@ -61,5 +61,7 @@ namespace ProjetoTerapia.Models
         public int Visualizacoes { get; set; }
 
         public int CliquesWhatsapp { get; set; }
+
+        public string FotoPerfil { get; set; } = "";
     }
 }

@@ -3,20 +3,33 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace ProjetoTerapia.Pages
 {
     public class CadastroClinicaModel : PageModel
     {
+
         private readonly AppDbContext _context;
 
-        public CadastroClinicaModel(AppDbContext context)
+        private readonly IWebHostEnvironment _environment;
+
+        public CadastroClinicaModel(
+            AppDbContext context,
+            IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         [BindProperty]
         public Clinica NovaClinica { get; set; } = new Clinica();
+
+
+        // Propriedade para upload de foto (opcional)
+        [BindProperty]
+        public IFormFile? FotoUpload { get; set; } 
 
         public IActionResult OnGet()
         {
@@ -162,6 +175,45 @@ namespace ProjetoTerapia.Pages
                 NovaClinica.AtendimentoPresencial;
 
             clinica.PerfilCompleto = true;
+
+            // =========================================
+            // FOTO DE PERFIL
+            // =========================================
+
+            if (FotoUpload != null)
+            {
+                // cria pasta uploads se não existir
+                var pastaUploads = Path.Combine(
+                    _environment.WebRootPath,
+                    "uploads"
+                );
+
+                if (!Directory.Exists(pastaUploads))
+                {
+                    Directory.CreateDirectory(pastaUploads);
+                }
+
+                // nome único da imagem
+                var nomeArquivo =
+                    Guid.NewGuid().ToString()
+                    + Path.GetExtension(FotoUpload.FileName);
+
+                var caminhoArquivo = Path.Combine(
+                    pastaUploads,
+                    nomeArquivo
+                );
+
+                // salva arquivo
+                using (var stream = new FileStream(
+                    caminhoArquivo,
+                    FileMode.Create))
+                {
+                    FotoUpload.CopyTo(stream);
+                }
+
+                // salva no banco
+                clinica.FotoPerfil = "/uploads/" + nomeArquivo;
+            }
 
             _context.SaveChanges();
 

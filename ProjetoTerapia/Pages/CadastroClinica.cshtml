@@ -30,9 +30,22 @@
         <div class="perfil-card">
 
             <div class="avatar-clinica">
-                @(string.IsNullOrEmpty(Model.NovaClinica.Nome)
-                                ? "A"
-                                : Model.NovaClinica.Nome.Substring(0, 1).ToUpper())
+
+                @if (!string.IsNullOrEmpty(Model.NovaClinica.FotoPerfil))
+                {
+                    <img src="@Model.NovaClinica.FotoPerfil" />
+                }
+                else
+                {
+                    @(string.IsNullOrEmpty(Model.NovaClinica.Nome)
+                                    ? "A"
+                                    : Model.NovaClinica.Nome.Substring(0, 1).ToUpper())
+                                }
+
+                <label for="foto-upload" class="editar-avatar">
+                    <i class="fa-solid fa-pen"></i>
+                </label>
+
             </div>
 
             <div class="perfil-info">
@@ -95,7 +108,13 @@
             Preencha suas informações para análise e aprovação da plataforma.
         </p>
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
+
+            <input type="file"
+                   id="foto-upload"
+                   name="FotoUpload"
+                   accept="image/*"
+                   style="display:none;" />
 
             <div class="campo">
                 <label>Nome da clínica ou profissional</label>
@@ -409,6 +428,41 @@
         font-weight: 700;
     }
 
+    .avatar-clinica {
+        position: relative;
+        
+    }
+
+        .avatar-clinica img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+    .editar-avatar {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 8px 18px rgba(0,0,0,.18);
+        z-index: 10;
+        transition: .25s;
+    }
+
+        .editar-avatar:hover {
+            transform: scale(1.12);
+        }
+
     .btn-logo {
         border: none;
         padding: 12px 18px;
@@ -528,6 +582,47 @@
         font-weight: 700;
     }
 
+    @@media(max-width:768px) {
+
+        .topo-perfil h1 {
+            font-size: 32px;
+        }
+
+        .topo-perfil p {
+            font-size: 15px;
+            padding: 0 15px;
+        }
+
+        .perfil-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .avatar-clinica {
+            width: 75px;
+            height: 75px;
+            font-size: 28px;
+        }
+
+        .card-cadastro {
+            padding: 20px;
+        }
+
+        .campo input,
+        .campo textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .stats-card {
+            gap: 15px;
+        }
+
+        .btn-cadastrar {
+            font-size: 16px;
+        }
+    }
+
 </style>
 
 @* preenche o endereço com base no CEP *@
@@ -564,4 +659,37 @@
             confirmar.style.borderColor = "green";
         }
     });
+
+        
+
+    document.getElementById("foto-upload")
+    .addEventListener("change", function(e) {
+
+        const file = e.target.files[0];
+
+        if (!file)
+            return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(ev) {
+
+            let avatar = document.querySelector(".avatar-clinica img");
+
+            if (avatar) {
+                avatar.src = ev.target.result;
+            }
+            else {
+
+                document.querySelector(".avatar-clinica").innerHTML =
+                    `<img src="${ev.target.result}" />
+                     <label for="foto-upload" class="editar-avatar">
+                        <i class="fa-solid fa-pen"></i>
+                     </label>`;
+            }
+        };
+
+        reader.readAsDataURL(file);
+    });
+
 </script>
