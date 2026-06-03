@@ -37,10 +37,10 @@
                 }
                 else
                 {
-                    @(string.IsNullOrEmpty(Model.NovaClinica.Nome)
+                 @(string.IsNullOrEmpty(Model.NovaClinica.Nome)
                                     ? "A"
                                     : Model.NovaClinica.Nome.Substring(0, 1).ToUpper())
-                                }
+                }
 
                 <label for="foto-upload" class="editar-avatar">
                     <i class="fa-solid fa-pen"></i>
@@ -102,6 +102,13 @@
 
     <div class="card-cadastro">
 
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alerta-sucesso">
+                @TempData["Sucesso"]
+            </div>
+        }
+
         <h3>Cadastro Profissional</h3>
 
         <p class="subtexto">
@@ -125,8 +132,12 @@
 
             <div class="campo">
                 <label>Descrição profissional</label>
+
                 <textarea asp-for="NovaClinica.Descricao"
+                          maxlength="1000"
                           required></textarea>
+
+                <small>Máximo de 1000 caracteres</small>
             </div>
 
             <div class="campo">
@@ -149,14 +160,20 @@
             </div>
 
             <div class="campo">
-                <label>Instagram</label>
+                <label>
+                    Instagram
+                    <span class="opcional">(opcional)</span>
+                </label>
                 <input type="text"
                        asp-for="NovaClinica.Instagram"
                        placeholder="@@usuario ou link completo" />
             </div>
 
             <div class="campo">
-                <label>Site / Portfólio</label>
+                <label>
+                    Site/Portifólio
+                    <span class="opcional">(opcional)</span>
+                </label>
                 <input type="text"
                        asp-for="NovaClinica.Site"
                        placeholder="https://..." />
@@ -176,15 +193,24 @@
                 <label>Especialidades</label>
 
                 <label class="checkbox-item">
-                    <input type="checkbox" name="Especialidades" value="Ansiedade" />
+                    <input type="checkbox"
+                           name="Especialidades"
+                           value="Ansiedade"
+                           @(Model.EspecialidadesSelecionadas.Contains("Ansiedade") ? "checked" : "") />
                     <span>Ansiedade</span>
                 </label>
                 <label class="checkbox-item">
-                    <input type="checkbox" name="Especialidades" value="Depressão" />
+                    <input type="checkbox"
+                           name="Especialidades"
+                           value="Depressão"
+                           @(Model.EspecialidadesSelecionadas.Contains("Depressão") ? "checked" : "") />
                     <span>Depressão</span>
                 </label>
                 <label class="checkbox-item">
-                    <input type="checkbox" name="Especialidades" value="Infantil" />
+                    <input type="checkbox"
+                           name="Especialidades"
+                           value="Infantil"
+                           @(Model.EspecialidadesSelecionadas.Contains("Infantil") ? "checked" : "") />
                     <span>Infantil</span>
                 </label>
             </div>
@@ -606,6 +632,38 @@
         .btn-cadastrar {
             font-size: 16px;
         }
+    }
+
+    .alerta-sucesso {
+        background: #dcfce7;
+        color: #166534;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        animation: fadeOut 5s forwards;
+    }
+
+    @@keyframes fadeOut {
+        0%
+
+    {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+
+    }
+
+    .opcional {
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 400;
     }
 
 </style>

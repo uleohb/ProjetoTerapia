@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace ProjetoTerapia.Pages
 {
@@ -19,20 +20,29 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnGet(int? id)
         {
-            // TEMPORÁRIO:
-            // se vier ID pega pelo ID
-            // senão pega o primeiro
+            if (id.HasValue)
+            {
+                Clinica = _context.Clinicas
+                    .FirstOrDefault(c => c.Id == id.Value)!;
+            }
+            else
+            {
+                var clinicaLogada =
+                    HttpContext.Session.GetString("ClinicaLogada");
 
-            Clinica = id.HasValue
-                ? _context.Clinicas.FirstOrDefault(c => c.Id == id.Value)
-                : _context.Clinicas.FirstOrDefault();
+                if (clinicaLogada != null)
+                {
+                    Clinica = _context.Clinicas
+                        .FirstOrDefault(c =>
+                            c.Id == int.Parse(clinicaLogada))!;
+                }
+            }
 
             if (Clinica == null)
             {
-                return RedirectToPage("/Clinicas");
+                return NotFound();
             }
 
-            // transforma especialidades em lista
             if (!string.IsNullOrEmpty(Clinica.Especialidades))
             {
                 ListaEspecialidades = Clinica.Especialidades

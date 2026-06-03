@@ -26,16 +26,17 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public Clinica NovaClinica { get; set; } = new Clinica();
 
+        public List<string> EspecialidadesSelecionadas { get; set; } = new();
+
 
         // Propriedade para upload de foto (opcional)
         [BindProperty]
-        public IFormFile? FotoUpload { get; set; } 
+        public IFormFile? FotoUpload { get; set; }
 
         public IActionResult OnGet()
         {
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
-            // Se estiver logado, carrega os dados atuais
             if (id != null)
             {
                 var clinica = _context.Clinicas
@@ -44,6 +45,16 @@ namespace ProjetoTerapia.Pages
                 if (clinica != null)
                 {
                     NovaClinica = clinica;
+
+                    if (!string.IsNullOrEmpty(clinica.Especialidades))
+                    {
+                        EspecialidadesSelecionadas =
+                            clinica.Especialidades.Split(',').ToList();
+                    }
+
+                    Console.WriteLine(NovaClinica.Nome);
+                    Console.WriteLine(NovaClinica.CEP);
+                    Console.WriteLine(NovaClinica.Documento);
                 }
             }
 
@@ -162,8 +173,8 @@ namespace ProjetoTerapia.Pages
             clinica.Endereco = NovaClinica.Endereco;
             clinica.Telefone = NovaClinica.Telefone;
             clinica.Email = NovaClinica.Email;
-            clinica.Instagram = NovaClinica.Instagram;
-            clinica.Site = NovaClinica.Site;
+            clinica.Instagram = NovaClinica.Instagram ?? "";
+            clinica.Site = NovaClinica.Site ?? "";
             clinica.Documento = NovaClinica.Documento;
             clinica.CPF = NovaClinica.CPF;
             clinica.Valor = NovaClinica.Valor;
@@ -215,7 +226,13 @@ namespace ProjetoTerapia.Pages
                 clinica.FotoPerfil = "/uploads/" + nomeArquivo;
             }
 
+            Console.WriteLine($"Documento: {clinica.Documento}");
+
+            Console.WriteLine($"ID DA CLINICA: {clinica.Id}");
+
             _context.SaveChanges();
+
+            Console.WriteLine($"SALVOU ID: {clinica.Id}");
 
             // =========================================
             // LOGIN AUTOMÁTICO NO PRIMEIRO CADASTRO
@@ -228,7 +245,9 @@ namespace ProjetoTerapia.Pages
                 );
             }
 
-            return RedirectToPage("/PainelClinica");
+            TempData["Sucesso"] = "Perfil enviado para análise com sucesso!";
+
+            return RedirectToPage("/CadastroClinica");
         }
     }
 }

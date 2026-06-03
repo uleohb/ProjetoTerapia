@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace ProjetoTerapia.Models
@@ -10,6 +11,7 @@ namespace ProjetoTerapia.Models
 
         public string Nome { get; set; } = "";
 
+        [StringLength(1000)]
         public string Descricao { get; set; } = "";
 
         public decimal Valor { get; set; }
@@ -41,9 +43,9 @@ namespace ProjetoTerapia.Models
 
         public string Cidade { get; set; } = "";
 
-        public string Instagram { get; set; } = "";
+        public string? Instagram { get; set; }
 
-        public string Site { get; set; } = "";
+        public string? Site { get; set; } 
 
         public string CPF { get; set; } = ""; // para pessoa física
 
@@ -62,6 +64,6 @@ namespace ProjetoTerapia.Models
 
         public int CliquesWhatsapp { get; set; }
 
-        public string FotoPerfil { get; set; } = "";
+        public string? FotoPerfil { get; set; } 
     }
 }

@@ -12,9 +12,19 @@
         <div class="hero-content">
 
             <div class="avatar-perfil">
-                @(string.IsNullOrEmpty(Model.Clinica.Nome)
-                                ? "C"
-                                : Model.Clinica.Nome.Substring(0, 1).ToUpper())
+
+                @if (!string.IsNullOrEmpty(Model.Clinica.FotoPerfil))
+                {
+                    <img src="@Model.Clinica.FotoPerfil"
+                    style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+                }
+                else
+                {
+                    @(string.IsNullOrEmpty(Model.Clinica.Nome)
+                                    ? "C"
+                                    : Model.Clinica.Nome.Substring(0, 1).ToUpper())
+                }
+
             </div>
 
             <div class="hero-info">
@@ -50,7 +60,7 @@
                 </div>
 
                 <p class="descricao-hero">
-                    @Model.Clinica.Descricao
+                    (@Model.Clinica.Descricao.Length ?? 0) caracteres
                 </p>
 
             </div>
@@ -335,6 +345,8 @@
         max-width: 620px;
         font-size: 14px;
         font-weight: 400;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     /* CONTEÚDO */
@@ -390,9 +402,13 @@
 
     .texto-sobre,
     .info-texto {
-        color: #64748b;
-        line-height: 1.8;
-        font-size: 15px;
+        color: #475569;
+        line-height: 1.7;
+        max-width: 620px;
+        font-size: 14px;
+        font-weight: 400;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     /* SIDE */
