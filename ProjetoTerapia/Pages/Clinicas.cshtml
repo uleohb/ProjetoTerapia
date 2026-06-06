@@ -75,36 +75,23 @@
                 <p><strong>📍 Endereço:</strong> @clinica.Endereco</p>
             </div>
 
-            @if (!string.IsNullOrEmpty(clinica.Telefone))
-            {
-                <p><strong>📞 Contato:</strong> @clinica.Telefone</p>
-
-                <a href="https://wa.me/@(clinica.Telefone)"
-                   target="_blank"
-                   class="btn-whatsapp">
-                    Falar no WhatsApp
-                </a>
-            }
-            else
-            {
-                <p style="color:gray;">Contato não informado</p>
-            }
+            <div class="redes-sociais">
+                Instagram   WhatsApp
+            </div>
 
             <div class="redes-sociais">
 
-                @if (!string.IsNullOrEmpty(clinica.Instagram))
-                {
-                    <a href="@clinica.Instagram" target="_blank" class="icon insta">
-                        📸
-                    </a>
-                }
+                <a href="@clinica.Instagram"
+                   target="_blank"
+                   class="icon">
+                    <img src="/imagem/instagram.png" width="28" />
+                </a>
 
-                @if (!string.IsNullOrEmpty(clinica.Site))
-                {
-                    <a href="@clinica.Site" target="_blank" class="icon site">
-                        🌐
-                    </a>
-                }
+                <a href="https://wa.me/@(clinica.Telefone)"
+                   target="_blank"
+                   class="icon">
+                    <img src="/imagem/whatsapp.png" width="28" />
+                </a>
 
             </div>
 
@@ -316,23 +303,25 @@
         font-weight: 600;
     }
 
-    .redes-sociais {
-    margin-top: 15px;
-    display: flex;
-    gap: 12px;
-}
 
-.icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 20px;
-    text-decoration: none;
-    transition: 0.2s;
-}
+    /* REDES SOCIAIS */
+
+    .redes-sociais {
+        margin-top: 15px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: #f8fafc;
+        transition: .2s;
+    }
 
 .icon.insta {
     background: #fdf2f8;
@@ -342,9 +331,9 @@
     background: #eff6ff;
 }
 
-.icon:hover {
-    transform: scale(1.1);
-}
+        .icon:hover {
+            transform: scale(1.08);
+        }
 
     .btn-instagram {
         display: inline-block;
@@ -356,5 +345,31 @@
         text-decoration: none;
         font-weight: bold;
     }
+
+    .whatsapp {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .insta {
+        background: #fdf2f8;
+        color: #E1306C;
+    }
+
+    .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 24px;
+        transition: .2s;
+    }
+
+        .icon:hover {
+            transform: scale(1.08);
+        }
 
 </style>

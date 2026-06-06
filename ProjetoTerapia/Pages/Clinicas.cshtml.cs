@@ -38,6 +38,7 @@ namespace ProjetoTerapia.Pages
                     Cidade = "Osasco",
                     Telefone = "5513955485528",
                     Documento = "CRM 72377 SP",
+                    Instagram = "https://www.instagram.com/dralucilahiromi/",
                     Especialidades = "Ansiedade,Depressão,Terapia",
                     AtendimentoOnline = true,
                     AtendimentoPresencial = true,
