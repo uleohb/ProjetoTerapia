@@ -27,6 +27,28 @@ namespace ProjetoTerapia.Pages
         {
             var cidadeUsuario = "Osasco";
 
+            if (!_context.Clinicas.Any(c => c.Nome.Contains("Hiromi")))
+            {
+                _context.Clinicas.Add(new Clinica
+                {
+                    Nome = "Clínica Hiromi",
+                    Descricao = "Atendimento médico humanizado com foco em saúde emocional e qualidade de vida.",
+                    Valor = 250,
+                    Endereco = "Av. Demerval Pereira Leite, 224 - Boca da Barra - Itanhaém/SP",
+                    Cidade = "Osasco",
+                    Telefone = "5513955485528",
+                    Documento = "CRM 72377 SP",
+                    Especialidades = "Ansiedade,Depressão,Terapia",
+                    AtendimentoOnline = true,
+                    AtendimentoPresencial = true,
+                    Aprovado = true,
+                    Pago = true,
+                    PerfilCompleto = true
+                });
+
+                _context.SaveChanges();
+            }
+
             var query = _context.Clinicas
                 .Where(c => c.Aprovado && c.Pago)
                 .Where(c =>
@@ -49,7 +71,9 @@ namespace ProjetoTerapia.Pages
                 query = query.Where(c => c.Especialidades != null && c.Especialidades.Contains(Perfil));
             }
 
-            Clinicas = query.ToList();
+            Clinicas = query
+             .OrderByDescending(c => c.Nome.Contains("Hiromi"))
+             .ToList();
 
         }
     }

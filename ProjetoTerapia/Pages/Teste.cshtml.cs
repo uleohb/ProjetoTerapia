@@ -16,11 +16,11 @@ namespace ProjetoTerapia.Pages
 
         public string Nivel { get; set; } = "";
 
-        public int ScoreFinal { get; set; }
+        public double ScoreFinal { get; set; }
 
-        public int PorcentagemAnsiedade { get; set; }
+        public double PorcentagemAnsiedade { get; set; }
 
-        public int PorcentagemDepressao { get; set; }
+        public double PorcentagemDepressao { get; set; }
 
         public string Mensagem { get; set; } = "";
 
@@ -64,27 +64,30 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
-            PorcentagemAnsiedade = (ansiedade * 100) / maxAnsiedade;
-            PorcentagemDepressao = (depressao * 100) / maxDepressao;
+            PorcentagemAnsiedade =
+                Math.Round((ansiedade * 100.0) / maxAnsiedade, 1);
 
-            ScoreFinal = (PorcentagemAnsiedade + PorcentagemDepressao) / 2;
+            PorcentagemDepressao =
+                Math.Round((depressao * 100.0) / maxDepressao, 1);
+
+            ScoreFinal = Math.Round((PorcentagemAnsiedade + PorcentagemDepressao) / 2.0, 1);
 
             // NÍVEL ALTO
-            if (ScoreFinal >= 70)
+            if (ScoreFinal >= 60)
             {
                 Nivel = "Alto";
 
-                Mensagem = "Seu perfil emocional apresenta sinais importantes que merecem atenção imediata.";
+                Mensagem = "Seu resultado sugere sinais importantes de sofrimento emocional.";
 
                 Recomendacao = "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
             }
 
             // NÍVEL MODERADO
-            else if (ScoreFinal >= 40)
+            else if (ScoreFinal >= 25)
             {
                 Nivel = "Moderado";
 
-                Mensagem = "Seu resultado mostra sinais de alerta que indicam a necessidade de maior atenção emocional.";
+                Mensagem = "Alguns sinais emocionais merecem atenção.";
 
                 Recomendacao = "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
             }
@@ -94,7 +97,7 @@ namespace ProjetoTerapia.Pages
             {
                 Nivel = "Baixo";
 
-                Mensagem = "Seu resultado indica um bom equilíbrio emocional no momento.";
+                Mensagem = "Seu resultado indica poucos sinais de sofrimento emocional no momento.";
 
                 Recomendacao = "Continue mantendo hábitos saudáveis, autocuidado e acompanhamento preventivo para preservar seu bem-estar.";
             }

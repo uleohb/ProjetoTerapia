@@ -51,10 +51,6 @@ namespace ProjetoTerapia.Pages
                         EspecialidadesSelecionadas =
                             clinica.Especialidades.Split(',').ToList();
                     }
-
-                    Console.WriteLine(NovaClinica.Nome);
-                    Console.WriteLine(NovaClinica.CEP);
-                    Console.WriteLine(NovaClinica.Documento);
                 }
             }
 
@@ -226,17 +222,21 @@ namespace ProjetoTerapia.Pages
                 clinica.FotoPerfil = "/uploads/" + nomeArquivo;
             }
 
-            Console.WriteLine($"Documento: {clinica.Documento}");
-
-            Console.WriteLine($"ID DA CLINICA: {clinica.Id}");
+            Console.WriteLine("ANTES DE SALVAR");
+            Console.WriteLine($"Nome: {clinica.Nome}");
+            Console.WriteLine($"Descricao: {clinica.Descricao}");
+            Console.WriteLine($"Telefone: {clinica.Telefone}");
+            Console.WriteLine($"PerfilCompleto: {clinica.PerfilCompleto}");
 
             _context.SaveChanges();
 
-            Console.WriteLine($"SALVOU ID: {clinica.Id}");
+            Console.WriteLine("DEPOIS DE SALVAR");
+            Console.WriteLine($"ID DA CLINICA: {clinica.Id}");
 
             // =========================================
             // LOGIN AUTOMÁTICO NO PRIMEIRO CADASTRO
             // =========================================
+
             if (id == null)
             {
                 HttpContext.Session.SetString(

@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using ProjetoTerapia.Models;
-using Microsoft.AspNetCore.Http;
 using System.Linq;
 
 namespace ProjetoTerapia.Pages
@@ -31,5 +32,7 @@ namespace ProjetoTerapia.Pages
 
             return Page();
         }
+
+       
     }
 }

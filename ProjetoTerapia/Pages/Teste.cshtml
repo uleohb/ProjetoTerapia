@@ -196,11 +196,11 @@
             <div class="card-score">
 
                 <p class="score-label">
-                    Seu nível de atenção emocional
+                    Indicador de atenção emocional
                 </p>
 
                 <div class="score-valor">
-                    @(Model.PorcentagemAnsiedade + Model.PorcentagemDepressao)%
+                    @Model.ScoreFinal%
                 </div>
 
                 <p class="score-sub">
@@ -215,22 +215,12 @@
 
                 <span class="badge-nivel
                     @(Model.Nivel == "Alto" ? "alto" :
-                                        Model.Nivel == "Moderado" ? "moderado" : "baixo")">
+                                                  Model.Nivel == "Moderado" ? "moderado" : "baixo")">
 
-                    @(Model.Nivel == "Alto" ? "🔴 Alto" :
+                    @(Model.Nivel == "Alto" ? "🔴 Recomendamos acompanhamento" :
                                     Model.Nivel == "Moderado" ? "🟡 Moderado" : "🟢 Leve")
 
             </span>
-
-                <h3 class="mt-4">
-                    @Model.Mensagem
-                </h3>
-
-                <p class="recomendacao-personalizada">
-                    Identificamos sinais importantes no seu bem-estar emocional.
-                    Com acompanhamento adequado, é possível melhorar sua qualidade
-                    de vida e recuperar seu equilíbrio emocional.
-                </p>
 
             </div>
 
@@ -239,7 +229,7 @@
 
                 <div class="grafico-item">
 
-                    <h4>Ansiedade Emocional</h4>
+                    <h4>Sinais de Ansiedade</h4>
 
                     <p>
                         Seu nível está em
@@ -256,7 +246,7 @@
 
                 <div class="grafico-item">
 
-                    <h4>Saúde Emocional</h4>
+                    <h4>Sinais de Depressão</h4>
 
                     <p>
                         Seu nível está em
@@ -277,18 +267,12 @@
             <div class="card-recomendacao">
 
                 <h3>
-                    Nossa recomendação para você
+                    Você não precisa lidar com isso sozinho
                 </h3>
 
                 <p>
-                    Com base nas suas respostas, recomendamos:
+                    Nossa plataforma possui profissionais preparados para ajudar você a compreender melhor o que está sentindo e encontrar o tratamento mais adequado.
                 </p>
-
-                <ul class="lista-recomendacao">
-                    <li>Terapia individual com especialista</li>
-                    <li>Avaliação inicial do seu bem-estar emocional</li>
-                    <li>Orientação profissional personalizada para seu momento atual</li>
-                </ul>
 
             </div>
 
@@ -1267,5 +1251,23 @@
             behavior: "smooth"
         });
     }
+
+        window.addEventListener("load", function () {
+
+        const resultado = document.getElementById("resultadoFinal");
+
+        if (resultado) {
+
+            setTimeout(() => {
+
+                resultado.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }, 300);
+        }
+
+    });
 
 </script>

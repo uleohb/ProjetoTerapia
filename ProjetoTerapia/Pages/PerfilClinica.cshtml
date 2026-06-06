@@ -3,6 +3,12 @@
 
 <div class="perfil-page">
 
+    <div class="voltar-container">
+        <a href="javascript:history.back()" class="btn-voltar">
+            ← Voltar
+        </a>
+    </div>
+
     <!-- HERO -->
 
     <div class="hero-perfil">
@@ -60,7 +66,7 @@
                 </div>
 
                 <p class="descricao-hero">
-                    (@Model.Clinica.Descricao.Length ?? 0) caracteres
+                    @(Model.Clinica.Descricao?.Length ?? 0) caracteres
                 </p>
 
             </div>
@@ -530,6 +536,21 @@
         .hero-info h1 {
             font-size: 32px;
         }
+    }
+
+    .voltar-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 25px;
+    }
+
+    .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: 600;
     }
 
 </style>
