@@ -25,7 +25,7 @@ namespace ProjetoTerapia.Pages
 
         public void OnGet()
         {
-            var cidadeUsuario = "Osasco";
+            var cidadeUsuario = "Itanhaém/SP";
 
             if (!_context.Clinicas.Any(c => c.Nome.Contains("Hiromi")))
             {
