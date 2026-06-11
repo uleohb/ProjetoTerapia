@@ -126,6 +126,13 @@
                         @(clinica.Pago ? "💰 Pago" : "💸 Não pago")
                     </p>
 
+                    @if (clinica.ClinicaAlteracaoPendente)
+                    {
+                        <p style="color:#f59e0b;font-weight:bold;">
+                            🔄 Alterações aguardando aprovação
+                        </p>
+                    }
+
                     @if (clinica.DataAprovacao != null)
                     {
                         <p>📅 Aprovado em: @clinica.DataAprovacao.Value.ToString("dd/MM/yyyy")</p>
@@ -149,6 +156,16 @@
                                     onclick='return confirmarAcao(this, "aprovar esta clínica?")'>
                                 Aprovar
 
+                            </button>
+                        }
+
+                        @if (clinica.ClinicaAlteracaoPendente)
+                        {
+                            <button type="submit"
+                                    name="acao"
+                                    value="aprovarAlteracao"
+                                    onclick='return confirmarAcao(this, "aprovar as alterações desta clínica?")'>
+                                Aprovar Alterações
                             </button>
                         }
 

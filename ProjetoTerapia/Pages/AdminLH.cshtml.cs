@@ -110,6 +110,14 @@ namespace ProjetoTerapia.Pages
                         $"Clínica {clinica.Nome} aprovada com sucesso!";
                 }
 
+                if (acao == "aprovarAlteracao")
+                {
+                    clinica.ClinicaAlteracaoPendente = false;
+
+                    TempData["MensagemSucesso"] =
+                        $"Alterações da clínica {clinica.Nome} aprovadas com sucesso!";
+                }
+
                 if (acao == "pagar")
                 {
                     if (!clinica.Aprovado)

@@ -213,14 +213,16 @@
             <!-- CARD PRINCIPAL PREMIUM -->
             <div class="card-resultado-premium">
 
-                <span class="badge-nivel
-                    @(Model.Nivel == "Alto" ? "alto" :
-                                                  Model.Nivel == "Moderado" ? "moderado" : "baixo")">
+                <span class="badge-nivel">
 
-                    @(Model.Nivel == "Alto" ? "🔴 Recomendamos acompanhamento" :
-                                    Model.Nivel == "Moderado" ? "🟡 Moderado" : "🟢 Leve")
+                @(Model.Nivel == "Muito Alto" ? "🔴 Muito Alto" :
+                                    Model.Nivel == "Alto" ? "🟠 Alto" :
+                                    Model.Nivel == "Moderado" ? "🟡 Moderado" :
+                                    Model.Nivel == "Levemente Moderado" ? "🟢 Levemente Moderado" :
+                                    "🔵 Leve")
 
             </span>
+
 
             </div>
 
@@ -246,7 +248,9 @@
 
                 <div class="grafico-item">
 
-                    <h4>Sinais de Depressão</h4>
+                    <h3 style="margin-top:35px;">
+                        Sinais de Depressão
+                    </h3>
 
                     <p>
                         Seu nível está em
@@ -266,9 +270,9 @@
             <!-- RECOMENDAÇÃO -->
             <div class="card-recomendacao">
 
-                <h3>
-                    Você não precisa lidar com isso sozinho
-                </h3>
+                <div style="margin-top:40px;">
+                    <h2>Você não precisa lidar com isso sozinho</h2>
+                </div>
 
                 <p>
                     Nossa plataforma possui profissionais preparados para ajudar você a compreender melhor o que está sentindo e encontrar o tratamento mais adequado.
@@ -1171,6 +1175,9 @@
 
         document.getElementById("finalizar").style.display =
             (atual === perguntas.length - 1) ? "inline" : "none";
+
+        document.querySelector(".btn-proximo").style.display =
+            (atual === perguntas.length - 1) ? "none" : "inline";
 
         document.getElementById("btnVoltar").style.display =
             (atual === 0) ? "none" : "inline";

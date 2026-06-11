@@ -85,7 +85,9 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage("/LoginClinica");
 
             var clinica = _context.Clinicas
-                .FirstOrDefault(c => c.Email == email);
+               .FirstOrDefault(c =>
+                c.Email != null &&
+                c.Email.ToLower() == email.ToLower());
 
             // SE NÃO EXISTIR CRIA
             if (clinica == null)

@@ -116,10 +116,17 @@
 				<div class="icone-card">
                  <i class="fa-solid fa-wallet"></i>
                 </div>
-                 
+
                 <h3>Plano</h3>
 
-                <p>R$ @Model.Clinica.Valor</p>
+                @if (Model.Clinica.Pago)
+                {
+                    <p>@Model.Clinica.NomePlano</p>
+                }
+                else
+                {
+                    <p>Nenhum plano ativo</p>
+                }
 
             </div>
 

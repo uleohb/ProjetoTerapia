@@ -72,8 +72,18 @@ namespace ProjetoTerapia.Pages
 
             ScoreFinal = Math.Round((PorcentagemAnsiedade + PorcentagemDepressao) / 2.0, 1);
 
-            // NÍVEL ALTO
-            if (ScoreFinal >= 60)
+            // MUITO ALTO
+            if (ScoreFinal >= 80)
+            {
+                Nivel = "Muito Alto";
+
+                Mensagem = "Seu resultado indica sinais emocionais intensos que merecem atenção prioritária.";
+
+                Recomendacao = "Recomendamos buscar apoio profissional o quanto antes para avaliar sua situação e iniciar um acompanhamento adequado.";
+            }
+
+            // ALTO
+            else if (ScoreFinal >= 60)
             {
                 Nivel = "Alto";
 
@@ -82,8 +92,8 @@ namespace ProjetoTerapia.Pages
                 Recomendacao = "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
             }
 
-            // NÍVEL MODERADO
-            else if (ScoreFinal >= 25)
+            // MODERADO
+            else if (ScoreFinal >= 40)
             {
                 Nivel = "Moderado";
 
@@ -92,10 +102,20 @@ namespace ProjetoTerapia.Pages
                 Recomendacao = "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
             }
 
-            // NÍVEL BAIXO
+            // LEVEMENTE MODERADO
+            else if (ScoreFinal >= 25)
+            {
+                Nivel = "Levemente Moderado";
+
+                Mensagem = "Seu resultado demonstra sinais leves de atenção emocional.";
+
+                Recomendacao = "Pequenas mudanças na rotina e o suporte adequado podem ajudar a preservar seu equilíbrio emocional.";
+            }
+
+            // LEVE
             else
             {
-                Nivel = "Baixo";
+                Nivel = "Leve";
 
                 Mensagem = "Seu resultado indica poucos sinais de sofrimento emocional no momento.";
 

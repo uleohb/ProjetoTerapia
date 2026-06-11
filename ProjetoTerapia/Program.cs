@@ -13,7 +13,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 // SESSÃO
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 
 // AUTH GOOGLE

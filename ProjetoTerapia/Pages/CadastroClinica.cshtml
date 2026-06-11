@@ -1,6 +1,12 @@
 ﻿@page
 @model ProjetoTerapia.Pages.CadastroClinicaModel
 
+<div style="margin-bottom:20px;">
+    <a href="/PainelClinica" class="btn-voltar">
+        ← Voltar ao Painel
+    </a>
+</div>
+
 <div class="topo-perfil">
 
     <img src="/imagem/logo.png"
@@ -98,6 +104,8 @@
 
 </div>
 
+
+
 <div class="container-cadastro">
 
     <div class="card-cadastro">
@@ -106,6 +114,13 @@
         {
             <div class="alerta-sucesso">
                 @TempData["Sucesso"]
+            </div>
+        }
+
+        @if (Model.NovaClinica.ClinicaAlteracaoPendente)
+        {
+            <div class="alerta-info">
+                Você possui alterações aguardando aprovação da equipe.
             </div>
         }
 
@@ -240,7 +255,11 @@
             <div asp-validation-summary="All" style="color:red;"></div>
 
             <button class="btn-cadastrar">
-                Enviar para Análise
+
+                @(Model.NovaClinica.PerfilCompleto
+                                ? "Salvar Alterações"
+                                : "Enviar para Análise")
+
             </button>
 
             <div class="alerta-info">
@@ -665,6 +684,20 @@
         font-size: 12px;
         font-weight: 400;
     }
+
+    .btn-voltar {
+        display: inline-block;
+        padding: 10px 18px;
+        background: #eff6ff;
+        color: #2563eb;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+        .btn-voltar:hover {
+            background: #dbeafe;
+        }
 
 </style>
 

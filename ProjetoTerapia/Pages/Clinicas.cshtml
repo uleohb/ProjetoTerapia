@@ -50,9 +50,7 @@
                     }
                 </div>
 
-                <div class="valor">
-                    R$ @clinica.Valor
-                </div>
+                
             </div>
 
             <p class="descricao">
@@ -76,22 +74,36 @@
             </div>
 
             <div class="redes-sociais">
-                Instagram   WhatsApp
-            </div>
 
-            <div class="redes-sociais">
+               
+                <div style="text-align:center;">
+                    <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
+                      
+                    </div>
 
-                <a href="@clinica.Instagram"
-                   target="_blank"
-                   class="icon">
-                    <img src="/imagem/instagram.png" width="28" />
-                </a>
+                    <a href="https://www.instagram.com/dralucilahiromi/"
+                       target="_blank"
+                       class="icon">
+                        <img src="/imagem/instagram.png"
+                            
+                             style="width:44px;height:44px;" />
+                    </a>
+                </div>
 
-                <a href="https://wa.me/@(clinica.Telefone)"
-                   target="_blank"
-                   class="icon">
-                    <img src="/imagem/whatsapp.png" width="28" />
-                </a>
+                <div style="text-align:center;">
+                    <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
+                       
+                    </div>
+
+                    <a href="https://wa.me/@(clinica.Telefone)"
+                       target="_blank"
+                       class="icon"
+                       style="position:relative; top:4px;">
+                        <img src="/imagem/whatsapp.png"
+                             alt="WhatsApp"
+                             style="width:63px;height:63px;border:1px;" />
+                    </a>
+                </div>
 
             </div>
 
@@ -149,10 +161,7 @@
     }
 
     .topo-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+        display: block;
     }
 
     .topo-card h3 {
@@ -309,67 +318,42 @@
     .redes-sociais {
         margin-top: 15px;
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: 25px;
     }
+
+    .redes-sociais img {
+       width: 48px;
+       height: 48px;
+       object-fit: contain;
+       transition: .2s;
+    }
+
+            .redes-sociais img:hover {
+                transform: scale(1.10);
+            }
 
     .icon {
-        display: inline-flex;
+        text-decoration: none;
+        display: flex;
         align-items: center;
         justify-content: center;
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        background: #f8fafc;
-        transition: .2s;
+    } 
+
+    @@media (max-width: 768px) {
+        .topo-card
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-.icon.insta {
-    background: #fdf2f8;
-}
-
-.icon.site {
-    background: #eff6ff;
-}
-
-        .icon:hover {
-            transform: scale(1.08);
-        }
-
-    .btn-instagram {
-        display: inline-block;
+    .valor {
         margin-top: 10px;
-        background: #E1306C;
-        color: white;
-        padding: 10px 16px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: bold;
+        font-size: 28px;
+   
     }
-
-    .whatsapp {
-        background: #dcfce7;
-        color: #16a34a;
+    
     }
-
-    .insta {
-        background: #fdf2f8;
-        color: #E1306C;
-    }
-
-    .icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-size: 24px;
-        transition: .2s;
-    }
-
-        .icon:hover {
-            transform: scale(1.08);
-        }
 
 </style>

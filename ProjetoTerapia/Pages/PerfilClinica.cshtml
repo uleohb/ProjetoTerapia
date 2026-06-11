@@ -65,10 +65,6 @@
 
                 </div>
 
-                <p class="descricao-hero">
-                    @(Model.Clinica.Descricao?.Length ?? 0) caracteres
-                </p>
-
             </div>
 
         </div>
@@ -158,9 +154,9 @@
                 {
                     <a href="https://wa.me/@(Model.Clinica.Telefone)"
                        target="_blank"
-                       class="btn-whatsapp">
+                       class="rede whatsapp">
 
-                        Falar no WhatsApp
+                        <i class="fa-brands fa-whatsapp"></i>
 
                     </a>
                 }
@@ -181,7 +177,7 @@
                            target="_blank"
                            class="rede insta">
 
-                            Instagram
+                            <i class="fa-brands fa-instagram"></i>
 
                         </a>
                     }
@@ -192,7 +188,7 @@
                            target="_blank"
                            class="rede site">
 
-                            Site
+                            <i class="fa-solid fa-globe"></i>
 
                         </a>
                     }
@@ -460,6 +456,26 @@
 
         .btn-whatsapp:hover,
         .btn-editar:hover {
+            transform: translateY(-3px);
+        }
+
+    .whatsapp {
+        background: #ecfdf5;
+        color: #16a34a;
+    }
+
+    .rede {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        transition: .25s;
+    }
+
+        .rede:hover {
             transform: translateY(-3px);
         }
 

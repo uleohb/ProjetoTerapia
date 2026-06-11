@@ -22,6 +22,8 @@ namespace ProjetoTerapia.Models
 
         public bool Aprovado { get; set; } = false;
 
+        public bool ClinicaAlteracaoPendente { get; set; } = false;
+
         public bool Pago { get; set; } = false;
 
         public string Email { get; set; } = ""; 
@@ -51,6 +53,10 @@ namespace ProjetoTerapia.Models
 
         // data em que a clínica foi aprovada
         public DateTime? DataAprovacao { get; set; }
+
+        public string? NomePlano { get; set; }
+
+        public decimal? ValorPlano { get; set; }
 
         // data em que o pagamento foi confirmado
         public DateTime? DataPagamento { get; set; }

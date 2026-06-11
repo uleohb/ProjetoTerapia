@@ -54,6 +54,9 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
+            Console.WriteLine($"CLINICA CARREGADA: {NovaClinica.Id}");
+            Console.WriteLine($"EMAIL: {NovaClinica.Email}");
+
             return Page();
         }
 
@@ -166,9 +169,9 @@ namespace ProjetoTerapia.Pages
             clinica.Nome = NovaClinica.Nome;
             clinica.Descricao = NovaClinica.Descricao;
             clinica.CEP = NovaClinica.CEP;
+            clinica.Cidade = NovaClinica.Cidade;
             clinica.Endereco = NovaClinica.Endereco;
             clinica.Telefone = NovaClinica.Telefone;
-            clinica.Email = NovaClinica.Email;
             clinica.Instagram = NovaClinica.Instagram ?? "";
             clinica.Site = NovaClinica.Site ?? "";
             clinica.Documento = NovaClinica.Documento;
@@ -182,6 +185,11 @@ namespace ProjetoTerapia.Pages
                 NovaClinica.AtendimentoPresencial;
 
             clinica.PerfilCompleto = true;
+
+            if (clinica.Aprovado)
+            {
+                clinica.ClinicaAlteracaoPendente = true;
+            }
 
             // =========================================
             // FOTO DE PERFIL
@@ -227,6 +235,8 @@ namespace ProjetoTerapia.Pages
             Console.WriteLine($"Descricao: {clinica.Descricao}");
             Console.WriteLine($"Telefone: {clinica.Telefone}");
             Console.WriteLine($"PerfilCompleto: {clinica.PerfilCompleto}");
+            Console.WriteLine($"SALVANDO ID: {clinica.Id}");
+            Console.WriteLine($"EMAIL: {clinica.Email}");
 
             _context.SaveChanges();
 
