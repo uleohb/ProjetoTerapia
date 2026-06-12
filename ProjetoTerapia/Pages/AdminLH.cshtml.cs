@@ -104,6 +104,7 @@ namespace ProjetoTerapia.Pages
                 if (acao == "aprovar")
                 {
                     clinica.Aprovado = true;
+                    clinica.Pago = false;
                     clinica.DataAprovacao = DateTime.Now;
 
                     TempData["MensagemSucesso"] =

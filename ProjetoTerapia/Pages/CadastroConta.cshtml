@@ -148,27 +148,30 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Poppins',sans-serif;
     }
 
     body {
+        margin: 0;
         overflow-y: auto;
         overflow-x: hidden;
+        background: #06121f;
     }
 
     .container-auth {
         min-height: 100vh;
         display: flex;
+        height: auto;
         justify-content: center;
         align-items: center;
         padding: 40px;
-        background: linear-gradient(135deg,#06121f,#0b1b2b,#10263a);
+        background: linear-gradient( 135deg, #06121f, #0b1b2b, #10263a );
     }
 
 
     .auth-wrapper {
         width: 100%;
-        max-width: 1450px;
+        max-width: 1400px;
         min-height: auto;
         display: flex;
         overflow: hidden;
@@ -347,6 +350,8 @@
     .side-image {
         width: 55%;
         position: relative;
+        display: flex;
+        align-items: center;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -356,7 +361,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient( 90deg, rgba(15,23,42,0.15), rgba(15,23,42,0.45) );
+            background: linear-gradient( 90deg, rgba(15,23,42,0.05), rgba(15,23,42,0.20) );
+            z-index: 1;
         }
 
 @@keyframes float {
@@ -433,6 +439,67 @@
         .btn-google {
             padding: 15px;
         }
+    }
+
+    .content-side {
+        position: relative;
+        z-index: 2;
+        padding: 60px;
+        color: white;
+    }
+
+    .badge-side {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.2);
+        font-size: 13px;
+        margin-bottom: 25px;
+    }
+
+    .content-side h1 {
+        font-size: 58px;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        color: white;
+    }
+
+    .content-side p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: rgba(255,255,255,.85);
+        margin-bottom: 40px;
+    }
+
+    .cards-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .preview-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(255,255,255,.08);
+        backdrop-filter: blur(10px);
+    }
+
+        .preview-card strong {
+            display: block;
+            color: white;
+        }
+
+        .preview-card span {
+            color: rgba(255,255,255,.75);
+            font-size: 14px;
+        }
+
+    .icon-card {
+        font-size: 28px;
     }
 
 </style>

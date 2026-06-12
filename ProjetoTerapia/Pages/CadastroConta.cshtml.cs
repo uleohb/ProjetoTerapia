@@ -28,19 +28,19 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
-            // valida senha
             if (Senha != ConfirmarSenha)
             {
                 ModelState.AddModelError("", "As senhas não coincidem.");
                 return Page();
             }
 
-            // valida se já existe
+
             if (_context.Clinicas.Any(c => c.Email == Email))
             {
                 ModelState.AddModelError("", "Email já cadastrado.");
                 return Page();
             }
+
 
             var clinica = new Clinica
             {
@@ -50,13 +50,19 @@ namespace ProjetoTerapia.Pages
                 Pago = false
             };
 
+
             _context.Clinicas.Add(clinica);
             _context.SaveChanges();
 
-            // cria sessão
-            HttpContext.Session.SetInt32("ClinicaId", clinica.Id);
 
-            return RedirectToPage("/DashboardClinica");
+            // cria login da clínica
+            HttpContext.Session.SetString(
+                "ClinicaLogada",
+                clinica.Id.ToString()
+            );
+
+
+            return RedirectToPage("/PainelClinica");
         }
 
         public IActionResult OnGetLoginGoogle()

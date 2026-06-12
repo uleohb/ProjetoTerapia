@@ -1,6 +1,75 @@
 ﻿@page
 @model ProjetoTerapia.Pages.PainelClinicaModel
 
+@if (Model.Clinica != null)
+{
+
+    @if (!Model.Clinica.Aprovado)
+    {
+
+        <div class="alert-pendente">
+
+            <h2>
+                ⏳ Cadastro em análise
+            </h2>
+
+            <p>
+                Sua clínica está aguardando aprovação.
+                Assim que for aprovada você poderá ativar seu plano.
+            </p>
+
+        </div>
+
+    }
+
+
+    @if (Model.Clinica.Aprovado && !Model.Clinica.Pago)
+    {
+
+        <div class="alert-pagamento">
+
+            <div>
+
+                <h2>
+                    🎉 Sua clínica foi aprovada!
+                </h2>
+
+                <p>
+                    Seu perfil já está liberado.
+                    Ative seu plano para começar a receber pacientes.
+                </p>
+
+            </div>
+
+
+            <a href="/PagamentoClinica" class="btn-ativar">
+                💳 Ativar plano
+            </a>
+
+        </div>
+
+    }
+
+
+    @if (Model.Clinica.Pago)
+    {
+
+        <div class="alert-ok">
+
+            <h2>
+                ✅ Plano ativo
+            </h2>
+
+            <p>
+                Sua clínica está pronta para receber pacientes.
+            </p>
+
+        </div>
+
+    }
+
+}
+
 <div class="painel-container">
 
     <!-- BG -->
@@ -637,6 +706,70 @@
         .titulo-secao p {
             margin: 0;
             color: #64748b;
+        }
+
+    /*ícone de alerta de pagamento*/
+
+    .alert-pagamento {
+        margin: 25px;
+        padding: 25px;
+        border-radius: 20px;
+        background: linear-gradient(135deg,#7c3aed,#2563eb);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .btn-ativar {
+        background: white;
+        color: #2563eb;
+        padding: 14px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .alert-pendente {
+        position: relative;
+        z-index: 2;
+        margin: 25px;
+        padding: 30px;
+        border-radius: 28px;
+        background: linear-gradient(135deg,#fff7ed,#fffbeb);
+        border: 1px solid #fed7aa;
+        color: #7c2d12;
+        box-shadow: 0 10px 25px rgba(15,23,42,0.04);
+    }
+
+
+        .alert-pendente h2 {
+            margin-bottom: 10px;
+        }
+
+
+        .alert-pendente p {
+            margin: 0;
+            line-height: 1.7;
+        }
+
+
+    .alert-ok {
+        position: relative;
+        z-index: 2;
+        margin: 25px;
+        padding: 30px;
+        border-radius: 28px;
+        background: #dcfce7;
+        border: 1px solid #86efac;
+        color: #166534;
+        box-shadow: 0 10px 25px rgba(15,23,42,0.04);
+    }
+
+
+        .alert-ok h2 {
+            margin-bottom: 10px;
         }
 
 </style>

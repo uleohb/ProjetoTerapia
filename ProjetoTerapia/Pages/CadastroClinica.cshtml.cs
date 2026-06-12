@@ -240,6 +240,7 @@ namespace ProjetoTerapia.Pages
 
             _context.SaveChanges();
 
+
             Console.WriteLine("DEPOIS DE SALVAR");
             Console.WriteLine($"ID DA CLINICA: {clinica.Id}");
 
