@@ -1,6 +1,8 @@
 ﻿@page
 @model ProjetoTerapia.Pages.CadastroClinicaModel
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+
 <div style="margin-bottom:20px;">
     <a href="/PainelClinica" class="btn-voltar">
         ← Voltar ao Painel
@@ -134,9 +136,77 @@
 
             <input type="file"
                    id="foto-upload"
-                   name="FotoUpload"
                    accept="image/*"
                    style="display:none;" />
+
+            <input type="hidden"
+                   id="fotoFinal"
+                   name="FotoFinal" />
+
+            <div id="editor-foto" class="modal-foto">
+
+                <div class="box-editor">
+
+                    <h3>Ajustar foto</h3>
+
+                    <div class="area-crop">
+
+                        <img id="imagem-preview" />
+
+                    </div>
+
+
+                    <div class="controles-foto">
+
+                        <input type="range"
+                               id="zoom-foto"
+                               min="1"
+                               max="3"
+                               step="0.1"
+                               value="1" />
+
+                    </div>
+
+
+                    <div class="acoes-foto">
+
+                        <button type="button"
+                                id="cancelar-foto">
+                            Cancelar
+                        </button>
+
+
+                        <button type="button"
+                                id="salvar-foto">
+                            Usar foto
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="modalFoto" class="modal-foto">
+
+                <div class="modal-conteudo">
+
+                    <h3>Ajuste sua foto</h3>
+
+                    <div class="area-crop">
+                        <img id="imagemCrop" />
+                    </div>
+
+
+                    <button type="button"
+                            id="confirmarFoto"
+                            class="btn-cadastrar">
+                        Usar esta foto
+                    </button>
+
+                </div>
+
+            </div>
 
             <div class="campo">
                 <label>Nome da clínica ou profissional</label>
@@ -247,10 +317,16 @@
 
             <div class="campo">
                 <label>Valor da consulta inicial (R$)</label>
-                <input type="number"
+
+                <input type="text"
                        asp-for="NovaClinica.Valor"
+                       id="valorConsulta"
+                       inputmode="decimal"
                        required />
+
             </div>
+
+           
 
             <div asp-validation-summary="All" style="color:red;"></div>
 
@@ -587,8 +663,6 @@
             font-size: 18px;
         }
 
-   
-
     @@media(max-width:900px) {
 
         .perfil-dashboard {
@@ -699,65 +773,339 @@
             background: #dbeafe;
         }
 
-</style>
+    .modal-foto {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
 
-@* preenche o endereço com base no CEP *@
-<script>
-    document.getElementById("cep").addEventListener("blur", function () {
 
-        let cep = this.value.replace(/\D/g, '');
+    .modal-conteudo {
+        background: white;
+        padding: 30px;
+        border-radius: 25px;
+        width: 450px;
+        max-width: 90%;
+        text-align: center;
+    }
 
-        if (cep.length === 8) {
 
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(res => res.json())
-                .then(data => {
+    .area-crop {
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
 
-                    if (!data.erro) {
 
-                        document.querySelector("[name='NovaClinica.Endereco']")
-                            .value = data.logradouro + ", " + data.bairro + " - " + data.localidade;
-
-                    }
-
-                });
+        .area-crop img {
+            max-width: 100%;
         }
 
-    });    
+    .modal-foto {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.65);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
 
-    document.getElementById("foto-upload")
-    .addEventListener("change", function(e) {
 
-        const file = e.target.files[0];
+    .box-editor {
+        background: white;
+        width: 420px;
+        padding: 30px;
+        border-radius: 25px;
+        text-align: center;
+    }
 
-        if (!file)
-            return;
 
-            console.log("arquivo selecionado:", file.name);
+    .area-crop {
+        width: 260px;
+        height: 260px;
+        overflow: hidden;
+        border-radius: 50%;
+        margin: 20px auto;
+        background: #eee;
+    }
 
-        const reader = new FileReader();
 
-        reader.onload = function(ev) {
+        .area-crop img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1);
+        }
 
-            console.log("imagem carregada");
 
-            let avatar = document.querySelector(".avatar-clinica img");
+    .controles-foto input {
+        width: 100%;
+    }
 
-            if (avatar) {
-                avatar.src = ev.target.result;
-            }
-            else {
+
+    .acoes-foto {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+
+        .acoes-foto button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+
+    #salvar-foto {
+        background: #2563eb;
+        color: white;
+    }
+
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+        // =====================
+        // CEP
+        // =====================
+
+        const cep = document.getElementById("cep");
+
+        if(cep){
+
+            cep.addEventListener("blur", function(){
+
+                let valor = this.value.replace(/\D/g,'');
+
+                if(valor.length === 8){
+
+                    fetch(`https://viacep.com.br/ws/${valor}/json/`)
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if(!data.erro){
+
+                            document.querySelector("[name='NovaClinica.Endereco']")
+                            .value =
+                            data.logradouro + ", " +
+                            data.bairro + " - " +
+                            data.localidade;
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+
+        // =====================
+        // FOTO CROP
+        // =====================
+
+
+        let cropper = null;
+
+
+        const inputFoto = document.getElementById("foto-upload");
+        const imagemCrop = document.getElementById("imagemCrop");
+        const modal = document.getElementById("modalFoto");
+        const confirmar = document.getElementById("confirmarFoto");
+
+
+        if(inputFoto){
+
+
+            inputFoto.addEventListener("change", function(e){
+
+
+                let arquivo = e.target.files[0];
+
+
+                if(!arquivo)
+                    return;
+
+
+
+                let reader = new FileReader();
+
+
+                reader.onload = function(event){
+
+
+                    imagemCrop.src = event.target.result;
+
+
+                    modal.style.display = "flex";
+
+
+                    if(cropper)
+                        cropper.destroy();
+
+
+
+                    cropper = new Cropper(imagemCrop, {
+
+
+                        aspectRatio:1,
+
+                        viewMode:1,
+
+                        dragMode:"move",
+
+                        autoCropArea:1,
+
+                        zoomable:true,
+
+                        rotatable:true,
+
+                        scalable:true
+
+
+                    });
+
+
+                }
+
+
+
+                reader.readAsDataURL(arquivo);
+
+
+
+            });
+
+
+        }
+
+
+
+        if(confirmar){
+
+
+            confirmar.addEventListener("click", function(){
+
+
+
+                if(!cropper)
+                    return;
+
+
+
+                let canvas = cropper.getCroppedCanvas({
+
+                    width:500,
+                    height:500
+
+                });
+
+
+
+                let imagem = canvas.toDataURL("image/jpeg");
+
+
+
+                document.getElementById("fotoFinal").value = imagem;
+
+
 
                 document.querySelector(".avatar-clinica").innerHTML =
-                    `<img src="${ev.target.result}" />
-                     <label for="foto-upload" class="editar-avatar">
-                        <i class="fa-solid fa-pen"></i>
-                     </label>`;
-            }
-        };
 
-        reader.readAsDataURL(file);
+                `
+                <img src="${imagem}" />
+
+                <label for="foto-upload" class="editar-avatar">
+                    <i class="fa-solid fa-pen"></i>
+                </label>
+                `;
+
+
+
+                modal.style.display="none";
+
+
+            });
+
+
+        }
+
+
+
+
+        // =====================
+        // VALOR DINHEIRO
+        // =====================
+
+
+        const valorInput = document.getElementById("valorConsulta");
+
+
+        if(valorInput){
+
+
+            valorInput.addEventListener("input", function(){
+
+
+                let valor = this.value.replace(/\D/g,'');
+
+
+
+                if(!valor){
+
+                    this.value="";
+                    return;
+
+                }
+
+
+
+                valor = (valor / 100).toFixed(2);
+
+
+                valor = valor.replace(".",",");
+
+
+
+                valor = valor.replace(
+                    /\B(?=(\d{3})+(?!\d))/g,
+                    "."
+                );
+
+
+
+                this.value = valor;
+
+
+
+            });
+
+
+        }
+
+
+
     });
+
 
 </script>
 
