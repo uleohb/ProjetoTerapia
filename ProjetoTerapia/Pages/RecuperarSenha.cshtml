@@ -1,0 +1,256 @@
+﻿@page
+@model ProjetoTerapia.Pages.RecuperarSenhaModel
+
+
+<div class="recuperacao-container">
+
+
+    <div class="recuperacao-card">
+
+
+        <img src="/imagem/logo.png"
+             class="logo-empresa" />
+
+
+        <div class="icone-seguranca">
+            🔒
+        </div>
+
+
+        <h1>
+            Recuperar senha
+        </h1>
+
+
+        <p>
+            Esqueceu sua senha?
+            Informe o email cadastrado e enviaremos um código
+            seguro para redefinir seu acesso.
+        </p>
+
+
+
+        <form method="post">
+
+
+            <div class="campo">
+
+
+                <label>
+                    Email profissional
+                </label>
+
+
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="email@exemplo.com"
+                       required />
+
+
+            </div>
+
+
+
+            <button class="btn-recuperar"
+                    type="submit">
+
+
+                Enviar código
+
+
+            </button>
+
+
+        </form>
+
+
+
+        @if (Model.Mensagem != null)
+        {
+
+            <div class="mensagem">
+
+                @Model.Mensagem
+
+            </div>
+
+        }
+
+
+
+        <a asp-page="/LoginClinica"
+           class="voltar-login">
+
+            ← Voltar para login
+
+        </a>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+<style>
+
+
+    body {
+        background: radial-gradient(circle at top, rgba(14,165,233,.15), transparent 40%), #f8fafc;
+    }
+
+
+
+    .recuperacao-container {
+        min-height: 90vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+
+
+
+    .recuperacao-card {
+        width: 430px;
+        background: white;
+        padding: 45px 40px;
+        border-radius: 28px;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(15,23,42,.12);
+        border: 1px solid #e2e8f0;
+    }
+
+
+
+    .logo-empresa {
+        width: 190px;
+        margin-bottom: 20px;
+    }
+
+
+
+    .icone-seguranca {
+        width: 55px;
+        height: 55px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        border-radius: 50%;
+        font-size: 25px;
+        margin-bottom: 15px;
+    }
+
+
+
+
+    h1 {
+        color: #0f172a;
+        margin-bottom: 12px;
+    }
+
+
+
+
+    .recuperacao-card p {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+
+
+
+    .campo {
+        text-align: left;
+        margin-bottom: 20px;
+    }
+
+
+
+
+        .campo label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+
+
+
+        .campo input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 15px;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            outline: none;
+            font-size: 15px;
+        }
+
+
+
+
+            .campo input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 4px rgba(37,99,235,.1);
+            }
+
+
+
+
+    .btn-recuperar {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#2563eb,#0ea5e9);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+
+
+        .btn-recuperar:hover {
+            transform: translateY(-2px);
+        }
+
+
+
+
+    .mensagem {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 14px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 14px;
+    }
+
+
+
+
+    .voltar-login {
+        display: block;
+        margin-top: 25px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+
+
+        .voltar-login:hover {
+            text-decoration: underline;
+        }
+
+</style>

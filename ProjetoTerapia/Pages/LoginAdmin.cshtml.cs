@@ -16,7 +16,7 @@ namespace ProjetoTerapia.Pages
         public string? Usuario { get; set; }
 
         [BindProperty]
-        public string? Senha { get; set; }
+        public string? SenhaHash { get; set; }
 
         public bool Erro { get; set; }
 
@@ -25,7 +25,7 @@ namespace ProjetoTerapia.Pages
             var usuarioCorreto = _config["AdminSettings:Usuario"];
             var senhaCorreta = _config["AdminSettings:Senha"];
 
-            if (Usuario == usuarioCorreto && Senha == senhaCorreta)
+            if (Usuario == usuarioCorreto && SenhaHash == senhaCorreta)
             {
                 HttpContext.Session.SetString("AdminLogado", "true");
                 return RedirectToPage("/AdminLH");

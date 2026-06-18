@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
 using System.Linq;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ProjetoTerapia.Pages
 {
@@ -35,10 +37,11 @@ namespace ProjetoTerapia.Pages
         // LOGIN NORMAL
         public IActionResult OnPost()
         {
-            var clinica = _context.Clinicas
-                .FirstOrDefault(c =>
-                    c.Email == Email &&
-                    c.Senha == Senha);
+
+            var clinica =
+                _context.Clinicas
+                .FirstOrDefault(c => c.Email == Email);
+
 
             if (clinica == null)
             {
@@ -46,10 +49,43 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
+
+            if (string.IsNullOrEmpty(clinica.SenhaHash))
+            {
+                Erro = "Essa conta foi criada pelo Google. Entre usando Google.";
+                return Page();
+            }
+
+
+            var partes = clinica.SenhaHash.Split(".");
+
+
+            var salt = Convert.FromBase64String(partes[0]);
+
+
+            var hash = Convert.ToBase64String(
+                KeyDerivation.Pbkdf2(
+                    password: Senha,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 256 / 8
+                )
+            );
+
+
+            if (hash != partes[1])
+            {
+                Erro = "Email ou senha inválidos";
+                return Page();
+            }
+
+
             HttpContext.Session.SetString(
                 "ClinicaLogada",
                 clinica.Id.ToString()
             );
+
 
             return RedirectToPage("/PainelClinica");
         }
@@ -78,40 +114,55 @@ namespace ProjetoTerapia.Pages
             if (!result.Succeeded)
                 return RedirectToPage("/LoginClinica");
 
+
             var email = result.Principal?
                 .FindFirst(ClaimTypes.Email)?.Value;
+
 
             if (email == null)
                 return RedirectToPage("/LoginClinica");
 
-            var clinica = _context.Clinicas
-               .FirstOrDefault(c =>
-                c.Email != null &&
-                c.Email.ToLower() == email.ToLower());
 
-            // SE NÃO EXISTIR CRIA
+
+            var clinica =
+                _context.Clinicas
+                .FirstOrDefault(c =>
+                    c.Email.ToLower() == email.ToLower());
+
+
+
+            // se não existe cria uma conta Google
             if (clinica == null)
             {
+
                 clinica = new Clinica
                 {
                     Nome = result.Principal?
                         .FindFirst(ClaimTypes.Name)?.Value ?? "",
 
                     Email = email,
-                    Senha = "",
-                    Pago = false
+
+                    SenhaHash = "",
+
+                    Pago = false,
+
+                    Aprovado = false
                 };
+
 
                 _context.Clinicas.Add(clinica);
 
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
             }
 
-            // SALVA SESSÃO
+
+
             HttpContext.Session.SetString(
                 "ClinicaLogada",
                 clinica.Id.ToString()
             );
+
 
             return RedirectToPage("/PainelClinica");
         }

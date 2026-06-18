@@ -2,9 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using ProjetoTerapia.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddScoped<EmailService>();
 
 // BANCO
 builder.Services.AddDbContext<AppDbContext>(options =>

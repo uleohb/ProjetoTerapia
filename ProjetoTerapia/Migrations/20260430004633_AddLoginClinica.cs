@@ -18,7 +18,7 @@ namespace ProjetoTerapia.Migrations
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
-                name: "Senha",
+                name: "SenhaHash",
                 table: "Clinicas",
                 type: "nvarchar(max)",
                 nullable: false,
@@ -33,7 +33,7 @@ namespace ProjetoTerapia.Migrations
                 table: "Clinicas");
 
             migrationBuilder.DropColumn(
-                name: "Senha",
+                name: "SenhaHash",
                 table: "Clinicas");
         }
     }

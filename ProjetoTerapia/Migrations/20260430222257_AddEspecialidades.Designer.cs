@@ -68,7 +68,7 @@ namespace ProjetoTerapia.Migrations
                     b.Property<bool>("Pago")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Senha")
+                    b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

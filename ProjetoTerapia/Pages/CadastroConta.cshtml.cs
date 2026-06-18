@@ -4,6 +4,8 @@ using ProjetoTerapia.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.Linq;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 
 namespace ProjetoTerapia.Pages
@@ -42,11 +44,28 @@ namespace ProjetoTerapia.Pages
             }
 
 
+            var salt = RandomNumberGenerator.GetBytes(128 / 8);
+
+
+            var hash = Convert.ToBase64String(
+                KeyDerivation.Pbkdf2(
+                    password: Senha,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 256 / 8
+                )
+            );
+
+
             var clinica = new Clinica
             {
                 Email = Email,
-                Senha = Senha,
+
+                SenhaHash = Convert.ToBase64String(salt) + "." + hash,
+
                 Aprovado = false,
+
                 Pago = false
             };
 

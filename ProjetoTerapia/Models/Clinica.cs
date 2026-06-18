@@ -26,8 +26,11 @@ namespace ProjetoTerapia.Models
 
         public bool Pago { get; set; } = false;
 
-        public string Email { get; set; } = ""; 
+        public string Email { get; set; } = "";
 
+        public string SenhaHash { get; set; } = "";
+
+        [NotMapped]
         public string Senha { get; set; } = "";
 
         [NotMapped]
