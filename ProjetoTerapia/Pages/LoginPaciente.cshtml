@@ -1,5 +1,5 @@
 ﻿@page
-@model ProjetoTerapia.Pages.CadastroPacienteModel
+@model ProjetoTerapia.Pages.LoginPacienteModel
 
 <div class="container-auth">
 
@@ -10,16 +10,16 @@
             <div class="content-side">
 
                 <span class="badge-side">
-                    Plataforma para cuidado emocional
+                    Área do paciente
                 </span>
 
                 <h1>
-                    Comece sua jornada de cuidado com a sua mente.
+                    Bem-vindo de volta ao seu espaço de cuidado.
                 </h1>
 
                 <p>
-                    Encontre profissionais, acompanhe seus sentimentos
-                    e registre sua evolução em um espaço seguro e acolhedor.
+                    Acesse sua conta para continuar acompanhando sua jornada emocional,
+                    registrar seus sentimentos e encontrar profissionais na plataforma.
                 </p>
 
                 <div class="cards-preview">
@@ -27,24 +27,24 @@
                     <div class="preview-card">
                         <div class="icon-card">01</div>
                         <div>
-                            <strong>Profissionais qualificados</strong>
-                            <span>Encontre especialistas alinhados ao que você precisa.</span>
+                            <strong>Continue sua jornada</strong>
+                            <span>Acompanhe sua evolução emocional dentro da plataforma.</span>
                         </div>
                     </div>
 
                     <div class="preview-card">
                         <div class="icon-card">02</div>
                         <div>
-                            <strong>Acompanhamento emocional</strong>
-                            <span>Registre seus dias, sentimentos e evolução pessoal.</span>
+                            <strong>Acesse seu histórico</strong>
+                            <span>Visualize seus registros, testes e anotações pessoais.</span>
                         </div>
                     </div>
 
                     <div class="preview-card">
                         <div class="icon-card">03</div>
                         <div>
-                            <strong>Ambiente seguro</strong>
-                            <span>Suas informações ficam protegidas dentro da plataforma.</span>
+                            <strong>Encontre apoio profissional</strong>
+                            <span>Conecte-se com profissionais de saúde emocional.</span>
                         </div>
                     </div>
 
@@ -60,20 +60,19 @@
                  class="logo-auth"
                  alt="Logo AlinhaMente" />
 
-            <h2>Cadastro do Paciente</h2>
+            <h2>Login do Paciente</h2>
 
             <p class="sub">
-                Crie sua conta para acessar sua área pessoal
-                e acompanhar sua jornada emocional.
+                Entre na sua conta para acessar sua área pessoal.
             </p>
 
-            <a href="/CadastroPaciente?handler=LoginGoogle"
+            <a href="/LoginPaciente?handler=LoginGoogle"
                class="btn-google">
 
                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
                      class="google-icon" />
 
-                <span>Continuar com Google</span>
+                <span>Entrar com Google</span>
 
             </a>
 
@@ -82,10 +81,6 @@
             </div>
 
             <form method="post">
-
-                <input asp-for="Nome"
-                       placeholder="Nome completo"
-                       required />
 
                 <input asp-for="Email"
                        type="email"
@@ -97,13 +92,8 @@
                        placeholder="Senha"
                        required />
 
-                <input asp-for="ConfirmarSenha"
-                       type="password"
-                       placeholder="Confirmar senha"
-                       required />
-
                 <button type="submit" class="btn-primary">
-                    Criar conta
+                    Entrar
                 </button>
 
             </form>
@@ -116,8 +106,8 @@
             }
 
             <p class="link-login">
-                Já tem conta?
-                <a href="/LoginPaciente">Entrar</a>
+                Ainda não tem conta?
+                <a href="/CadastroPaciente">Criar conta</a>
             </p>
 
         </div>
@@ -159,7 +149,7 @@
         border-radius: 35px;
         background: rgba(255,255,255,0.04);
         backdrop-filter: blur(10px);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.28);
     }
 
     .side-info {
@@ -174,13 +164,13 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at top left, rgba(14,165,233,.18), transparent 35%);
+            background: radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 35%);
         }
 
     .content-side {
         position: relative;
         z-index: 2;
-        padding: 70px;
+        padding: 55px;
         color: white;
     }
 
@@ -195,9 +185,9 @@
     }
 
     .content-side h1 {
-        font-size: 58px;
-        line-height: 1.1;
-        margin-bottom: 28px;
+        font-size: 48px;
+        line-height: 1.12;
+        margin-bottom: 24px;
         color: white;
         letter-spacing: -1px;
     }
@@ -205,7 +195,7 @@
     .content-side p {
         font-size: 18px;
         line-height: 1.8;
-        color: rgba(255,255,255,.85);
+        color: rgba(255,255,255,.86);
         margin-bottom: 42px;
         max-width: 720px;
     }
@@ -219,8 +209,8 @@
     .preview-card {
         display: flex;
         align-items: center;
-        gap: 18px;
-        padding: 20px;
+        gap: 16px;
+        padding: 16px;
         border-radius: 18px;
         background: rgba(255,255,255,.08);
         backdrop-filter: blur(10px);
@@ -268,7 +258,7 @@
     }
 
     .card-auth h2 {
-        font-size: 28px;
+        font-size: 26px;
         color: #0f172a;
         margin-bottom: 10px;
     }
@@ -277,102 +267,7 @@
         color: #64748b;
         font-size: 15px;
         line-height: 1.6;
-        margin-bottom: 28px;
-    }
-
-    form {
-        margin-top: 10px;
-    }
-
-    input {
-        width: 100%;
-        padding: 16px;
-        margin-bottom: 14px;
-        border-radius: 14px;
-        border: 1px solid #dbeafe;
-        background: #f8fafc;
-        font-size: 15px;
-        outline: none;
-    }
-
-        input:focus {
-            border-color: #7c3aed;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(124,58,237,0.10);
-        }
-
-    .btn-primary {
-        width: 100%;
-        padding: 16px;
-        border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #14b8a6, #0ea5e9);
-        color: white;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.25s;
-        margin-top: 5px;
-    }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(124,58,237,0.25);
-        }
-
-    .link-login {
-        margin-top: 22px;
-        color: #64748b;
-        font-size: 15px;
-    }
-
-        .link-login a {
-            color: #7c3aed;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-    .validation-box {
-        margin-top: 18px;
-        background: #eff6ff;
-        color: #1e40af;
-        padding: 14px;
-        border-radius: 12px;
-        font-size: 14px;
-    }
-
-    @@media(max-width: 900px) {
-
-        .container-auth {
-            padding: 12px;
-            align-items: flex-start;
-        }
-
-        .auth-wrapper {
-            display: block;
-            min-height: auto;
-            border-radius: 24px;
-        }
-
-        .side-info {
-            display: none;
-        }
-
-        .card-auth {
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            border-radius: 24px;
-            padding: 28px 22px;
-        }
-
-        .logo-auth {
-            width: 210px;
-        }
-
-        .card-auth h2 {
-            font-size: 24px;
-        }
+        margin-bottom: 24px;
     }
 
     .btn-google {
@@ -424,5 +319,100 @@
             color: #94a3b8;
             font-size: 14px;
         }
+
+    form {
+        margin-top: 10px;
+    }
+
+    input {
+        width: 100%;
+        padding: 16px;
+        margin-bottom: 14px;
+        border-radius: 14px;
+        border: 1px solid #dbeafe;
+        background: #f8fafc;
+        font-size: 15px;
+        outline: none;
+    }
+
+        input:focus {
+            border-color: #0ea5e9;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+        }
+
+    .btn-primary {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.25s;
+        margin-top: 5px;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(14,165,233,0.25);
+        }
+
+    .link-login {
+        margin-top: 22px;
+        color: #64748b;
+        font-size: 15px;
+    }
+
+        .link-login a {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+    .validation-box {
+        margin-top: 18px;
+        background: #eff6ff;
+        color: #1e40af;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+
+    @@media(max-width: 900px) {
+
+        .container-auth {
+            padding: 12px;
+            align-items: flex-start;
+        }
+
+        .auth-wrapper {
+            display: block;
+            min-height: auto;
+            border-radius: 24px;
+        }
+
+        .side-info {
+            display: none;
+        }
+
+        .card-auth {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            border-radius: 24px;
+            padding: 28px 22px;
+        }
+
+        .logo-auth {
+            width: 210px;
+        }
+
+        .card-auth h2 {
+            font-size: 24px;
+        }
+    }
 
 </style>

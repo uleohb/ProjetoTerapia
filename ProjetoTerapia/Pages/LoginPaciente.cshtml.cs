@@ -6,31 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
 using System.Security.Claims;
-using System.Security.Cryptography;
-
 
 namespace ProjetoTerapia.Pages
 {
-    public class CadastroPacienteModel : PageModel
+    public class LoginPacienteModel : PageModel
     {
         private readonly AppDbContext _context;
 
-        public CadastroPacienteModel(AppDbContext context)
+        public LoginPacienteModel(AppDbContext context)
         {
             _context = context;
         }
-
-        [BindProperty]
-        public string Nome { get; set; } = "";
 
         [BindProperty]
         public string Email { get; set; } = "";
 
         [BindProperty]
         public string Senha { get; set; } = "";
-
-        [BindProperty]
-        public string ConfirmarSenha { get; set; } = "";
 
         public string Mensagem { get; set; } = "";
 
@@ -42,34 +34,55 @@ namespace ProjetoTerapia.Pages
         {
             var emailNormalizado = Email.Trim().ToLower();
 
-            if (Senha != ConfirmarSenha)
+            var existeComoProfissional = _context.Clinicas
+                .Any(x => x.Email.ToLower() == emailNormalizado);
+
+            if (existeComoProfissional)
             {
-                Mensagem = "As senhas não coincidem.";
+                Mensagem = "Este email está vinculado a uma conta profissional. Acesse pela área do profissional.";
                 return Page();
             }
 
-            if (_context.Pacientes.Any(x => x.Email.ToLower() == emailNormalizado))
+            var paciente = _context.Pacientes
+                .FirstOrDefault(x => x.Email.ToLower() == emailNormalizado);
+
+            if (paciente == null)
             {
-                Mensagem = "Já existe uma conta de paciente com este email.";
+                Mensagem = "Não encontramos uma conta de paciente com este email.";
                 return Page();
             }
 
-            if (_context.Clinicas.Any(x => x.Email.ToLower() == emailNormalizado))
+            if (string.IsNullOrEmpty(paciente.SenhaHash))
             {
-                Mensagem = "Este email já está vinculado a uma conta profissional. Use outro email para criar uma conta de paciente.";
+                Mensagem = "Esta conta foi criada pelo Google. Use o botão Entrar com Google.";
                 return Page();
             }
 
-            var paciente = new ProjetoTerapia.Models.Paciente
-            {
-                Nome = Nome.Trim(),
-                Email = emailNormalizado,
-                SenhaHash = GerarHashSenha(Senha),
-                DataCadastro = DateTime.Now
-            };
+            var partes = paciente.SenhaHash.Split(".");
 
-            _context.Pacientes.Add(paciente);
-            _context.SaveChanges();
+            if (partes.Length != 2)
+            {
+                Mensagem = "Não foi possível validar sua senha. Tente redefinir sua senha.";
+                return Page();
+            }
+
+            var salt = Convert.FromBase64String(partes[0]);
+
+            var hash = Convert.ToBase64String(
+                KeyDerivation.Pbkdf2(
+                    password: Senha,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 32
+                )
+            );
+
+            if (hash != partes[1])
+            {
+                Mensagem = "Email ou senha inválidos.";
+                return Page();
+            }
 
             HttpContext.Session.SetString(
                 "PacienteLogado",
@@ -84,7 +97,7 @@ namespace ProjetoTerapia.Pages
             var properties = new AuthenticationProperties
             {
                 RedirectUri = Url.Page(
-                    "/CadastroPaciente",
+                    "/LoginPaciente",
                     pageHandler: "GoogleResponse")
             };
 
@@ -102,14 +115,11 @@ namespace ProjetoTerapia.Pages
 
             if (!result.Succeeded)
             {
-                return RedirectToPage("/CadastroPaciente");
+                return RedirectToPage("/LoginPaciente");
             }
 
             var email = result.Principal?
                 .FindFirst(ClaimTypes.Email)?.Value;
-
-            var nome = result.Principal?
-                .FindFirst(ClaimTypes.Name)?.Value;
 
             if (string.IsNullOrEmpty(email))
             {
@@ -124,7 +134,7 @@ namespace ProjetoTerapia.Pages
 
             if (existeComoProfissional)
             {
-                Mensagem = "Este email já está vinculado a uma conta profissional. Use outro email para criar uma conta de paciente.";
+                Mensagem = "Este email está vinculado a uma conta profissional. Acesse pela área do profissional.";
                 return Page();
             }
 
@@ -133,16 +143,8 @@ namespace ProjetoTerapia.Pages
 
             if (paciente == null)
             {
-                paciente = new ProjetoTerapia.Models.Paciente
-               {
-                    Nome = nome ?? "",
-                    Email = emailNormalizado,
-                    SenhaHash = "",
-                    DataCadastro = DateTime.Now
-               };
-
-                _context.Pacientes.Add(paciente);
-                await _context.SaveChangesAsync();
+                Mensagem = "Não encontramos uma conta de paciente com este Google. Crie sua conta primeiro.";
+                return Page();
             }
 
             HttpContext.Session.SetString(
@@ -153,21 +155,10 @@ namespace ProjetoTerapia.Pages
             return RedirectToPage("/Teste");
         }
 
-        private string GerarHashSenha(string senha)
+        public IActionResult OnGetSair()
         {
-            var salt = RandomNumberGenerator.GetBytes(16);
-
-            var hash = Convert.ToBase64String(
-                KeyDerivation.Pbkdf2(
-                    password: senha,
-                    salt: salt,
-                    prf: KeyDerivationPrf.HMACSHA256,
-                    iterationCount: 100000,
-                    numBytesRequested: 32
-                )
-            );
-
-            return Convert.ToBase64String(salt) + "." + hash;
+            HttpContext.Session.Remove("PacienteLogado");
+            return RedirectToPage("/Teste");
         }
     }
 }
