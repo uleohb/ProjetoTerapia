@@ -1,0 +1,149 @@
+﻿@page
+@model ProjetoTerapia.Pages.RecuperarSenhaPacienteModel
+
+<div class="recuperacao-container">
+
+    <div class="recuperacao-card">
+
+        <img src="/imagem/logo.png"
+             class="logo-auth"
+             alt="Logo AlinhaMente" />
+
+        <h1>Recuperar senha</h1>
+
+        <p>
+            Informe seu email de paciente para receber um link seguro de redefinição de senha.
+        </p>
+
+        <form method="post">
+
+            <div class="campo">
+                <label>Email</label>
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="Digite seu email"
+                       required />
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Enviar link de recuperação
+            </button>
+
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.Mensagem))
+        {
+            <div class="mensagem">
+                @Model.Mensagem
+            </div>
+        }
+
+        <a href="/LoginPaciente" class="voltar">
+            Voltar para login
+        </a>
+
+    </div>
+
+</div>
+
+<style>
+    body {
+        margin: 0;
+        background: linear-gradient(135deg,#ecfeff,#f8fafc,#eef2ff);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .recuperacao-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .recuperacao-card {
+        width: 100%;
+        max-width: 520px;
+        background: white;
+        padding: 42px;
+        border-radius: 30px;
+        box-shadow: 0 25px 60px rgba(15,23,42,.12);
+        text-align: center;
+    }
+
+    .logo-auth {
+        width: 240px;
+        max-width: 100%;
+        margin-bottom: 18px;
+    }
+
+    h1 {
+        color: #0f172a;
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    p {
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 28px;
+    }
+
+    .campo {
+        text-align: left;
+        margin-bottom: 20px;
+    }
+
+        .campo label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            background: #f8fafc;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+            .campo input:focus {
+                border-color: #0ea5e9;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(14,165,233,.12);
+            }
+
+    .btn-primary {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .mensagem {
+        margin-top: 20px;
+        background: #eff6ff;
+        color: #1e40af;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+
+    .voltar {
+        display: block;
+        margin-top: 22px;
+        color: #0ea5e9;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>

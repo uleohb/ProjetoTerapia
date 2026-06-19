@@ -96,6 +96,10 @@
                     Entrar
                 </button>
 
+                <p class="forgot-password">
+                    <a href="/RecuperarSenhaPaciente">Esqueci minha senha</a>
+                </p>
+
             </form>
 
             @if (!string.IsNullOrEmpty(Model.Mensagem))
@@ -414,5 +418,21 @@
             font-size: 24px;
         }
     }
+
+    .forgot-password {
+        margin-top: 16px;
+        text-align: center;
+    }
+
+        .forgot-password a {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+            .forgot-password a:hover {
+                text-decoration: underline;
+            }
 
 </style>

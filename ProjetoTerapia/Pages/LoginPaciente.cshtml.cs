@@ -89,7 +89,7 @@ namespace ProjetoTerapia.Pages
                 paciente.Id.ToString()
             );
 
-            return RedirectToPage("/Teste");
+            return RedirectToPage("/HomePaciente");
         }
 
         public IActionResult OnGetLoginGoogle()
@@ -152,7 +152,7 @@ namespace ProjetoTerapia.Pages
                 paciente.Id.ToString()
             );
 
-            return RedirectToPage("/Teste");
+            return RedirectToPage("/HomePaciente");
         }
 
         public IActionResult OnGetSair()
