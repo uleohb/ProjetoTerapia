@@ -1,359 +1,801 @@
 ﻿@page
 @model ProjetoTerapia.Pages.ClinicasModel
+@using System.Linq
 
-<form method="get" class="busca-clinica">
+<div class="clinicas-page">
 
-    <input type="text"
-           name="busca"
-           value="@Model.Busca"
-           placeholder="Buscar profissional, especialidade ou região..." />
+    <header class="header-clinicas">
 
-    <button type="submit">
-        Buscar
-    </button>
+        <a href="/Teste" class="logo-header">
+            <img src="/imagem/logo.png" alt="AlinhaMente" />
+        </a>
 
-</form>
+        <div class="header-actions">
 
-<div class="topo-clinicas">
+            <a href="/Teste" class="header-link">
+                Fazer teste emocional
+            </a>
 
-    <h1>Profissionais Recomendados</h1>
-
-    <p>
-        Encontre profissionais e clínicas preparados para cuidar da sua saúde emocional
-    </p>
-
-</div>
-
-<div class="container-clinicas">
-
-    @if (!Model.Clinicas.Any())
-    {
-        <div class="alerta-vazio">
-            Nenhum profissional cadastrado no momento.
-        </div>
-    }
-
-    @foreach (var clinica in Model.Clinicas)
-    {
-        <div class="card-clinica">
-
-            <div class="topo-card">
-                <div>
-                    <h3>@clinica.Nome</h3>
-                    @if (clinica.Pago)
-                    {
-                        <span class="selo-aprovado">✔ Verificado</span>
-                    }
-                    else
-                    {
-                        <span style="color:gray;">⏳ Em análise</span>
-                    }
-                </div>
-
-                
-            </div>
-
-            <p class="descricao">
-                @clinica.Descricao
-            </p>
-
-            @if (!string.IsNullOrEmpty(clinica.Especialidades))
+            @if (Model.PacienteLogado)
             {
-                var lista = clinica.Especialidades.Split(',');
-
-                <div class="lista-especialidades">
-                    @foreach (var esp in lista)
-                    {
-                        <span class="tag-especialidade">@esp</span>
-                    }
-                </div>
+                <a href="/HomePaciente" class="header-button">
+                    Minha área
+                </a>
+            }
+            else
+            {
+                <a href="/LoginPaciente" class="header-button">
+                    Entrar como paciente
+                </a>
             }
 
-            <div class="infos">
-                <p><strong>📍 Endereço:</strong> @clinica.Endereco</p>
+        </div>
+
+    </header>
+
+    <section class="hero-clinicas">
+
+        <span class="badge">
+            Profissionais disponíveis
+        </span>
+
+        <h1>
+            Encontre apoio profissional para sua saúde emocional
+        </h1>
+
+        <p>
+            Conheça profissionais e clínicas preparados para acompanhar você
+            com cuidado, responsabilidade e acolhimento.
+        </p>
+
+        <form method="get" class="busca-clinica">
+
+            <input type="text"
+                   name="busca"
+                   value="@Model.Busca"
+                   placeholder="Buscar por profissional, especialidade, cidade ou região..." />
+
+            <select name="perfil">
+                <option value="">Todas as especialidades</option>
+                <option value="Ansiedade">Ansiedade</option>
+                <option value="Depressão">Depressão</option>
+                <option value="Autoestima">Autoestima</option>
+                <option value="Relacionamentos">Relacionamentos</option>
+                <option value="Terapia">Terapia</option>
+            </select>
+
+            <button type="submit">
+                Buscar profissionais
+            </button>
+
+        </form>
+
+    </section>
+
+    <main class="container-clinicas">
+
+        <div class="resultado-info">
+
+            <div>
+                <span>Resultado</span>
+
+                <h2>
+                    @Model.Clinicas.Count profissional(is) encontrado(s)
+                </h2>
             </div>
 
-            <div class="redes-sociais">
-
-               
-                <div style="text-align:center;">
-                    <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
-                      
-                    </div>
-
-                    <a href="https://www.instagram.com/dralucilahiromi/"
-                       target="_blank"
-                       class="icon">
-                        <img src="/imagem/instagram.png"
-                            
-                             style="width:44px;height:44px;" />
-                    </a>
-                </div>
-
-                <div style="text-align:center;">
-                    <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
-                       
-                    </div>
-
-                    <a href="https://wa.me/@(clinica.Telefone)"
-                       target="_blank"
-                       class="icon"
-                       style="position:relative; top:4px;">
-                        <img src="/imagem/whatsapp.png"
-                             alt="WhatsApp"
-                             style="width:63px;height:63px;border:1px;" />
-                    </a>
-                </div>
-
-            </div>
+            <p>
+                Escolha um profissional e entre em contato para iniciar sua jornada de cuidado.
+            </p>
 
         </div>
- }
 
-    <div class="area-profissional">
-        <h3>É profissional ou possui clínica?</h3>
-        <p>Cadastre-se e receba pacientes qualificados</p>
+        @if (!Model.Clinicas.Any())
+        {
+            <div class="alerta-vazio">
+                <h3>Nenhum profissional encontrado</h3>
 
-        <a href="/CadastroConta" class="btn-cadastro">
-            Quero cadastrar minha clínica
-        </a>
-    </div>
+                <p>
+                    No momento não encontramos profissionais com esses filtros.
+                    Tente buscar por outra especialidade ou região.
+                </p>
+            </div>
+        }
+
+        <div class="grid-clinicas">
+
+            @foreach (var clinica in Model.Clinicas)
+            {
+                var whatsapp = new string((clinica.Telefone ?? "").Where(char.IsDigit).ToArray());
+
+                var instagram = clinica.Instagram ?? "";
+
+                if (!string.IsNullOrWhiteSpace(instagram) && !instagram.StartsWith("http"))
+                {
+                    instagram = "https://instagram.com/" + instagram.Replace("@", "");
+                }
+
+                var site = clinica.Site ?? "";
+
+                if (!string.IsNullOrWhiteSpace(site) && !site.StartsWith("http"))
+                {
+                    site = "https://" + site;
+                }
+
+                var inicial = string.IsNullOrWhiteSpace(clinica.Nome)
+                ? "A"
+                : clinica.Nome.Trim().Substring(0, 1).ToUpper();
+
+                <article class="card-clinica">
+
+                    <div class="card-header">
+
+                        @if (!string.IsNullOrWhiteSpace(clinica.FotoPerfil))
+                        {
+                            <div class="avatar-clinica imagem">
+                                <img src="@clinica.FotoPerfil" alt="@clinica.Nome" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="avatar-clinica">
+                                @inicial
+                            </div>
+                        }
+
+                    <div>
+                        <h3>@clinica.Nome</h3>
+
+                        <span class="selo-verificado">
+                            Profissional verificado
+                        </span>
+                    </div>
+
+                </div>
+
+                <p class="descricao">
+                    @(string.IsNullOrWhiteSpace(clinica.Descricao)
+                                        ? "Profissional disponível para atendimento na plataforma AlinhaMente."
+                                        : clinica.Descricao)
+                </p>
+
+                @if (!string.IsNullOrEmpty(clinica.Especialidades))
+                    {
+                        var lista = clinica.Especialidades.Split(',');
+
+                        <div class="lista-especialidades">
+                            @foreach (var esp in lista)
+                            {
+                                <span class="tag-especialidade">
+                                    @esp.Trim()
+                                </span>
+                            }
+                        </div>
+                    }
+
+                    <div class="detalhes-clinica">
+
+                        @if (!string.IsNullOrWhiteSpace(clinica.Cidade))
+                        {
+                            <div class="detalhe-item">
+                                <span>Cidade</span>
+                                <strong>@clinica.Cidade</strong>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(clinica.Endereco))
+                        {
+                            <div class="detalhe-item">
+                                <span>Endereço</span>
+                                <strong>@clinica.Endereco</strong>
+                            </div>
+                        }
+
+                        <div class="detalhe-item">
+                            <span>Atendimento</span>
+
+                            <strong>
+                                @if (clinica.AtendimentoOnline && clinica.AtendimentoPresencial)
+                                {
+                                    <text>Online e presencial</text>
+                                }
+                                else if (clinica.AtendimentoOnline)
+                                {
+                                    <text>Online</text>
+                                }
+                                else if (clinica.AtendimentoPresencial)
+                                {
+                                    <text>Presencial</text>
+                                }
+                                else
+                                {
+                                    <text>A consultar</text>
+                                }
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="acoes-card">
+
+                        <div class="acoes-card">
+
+                            @if (!string.IsNullOrWhiteSpace(whatsapp))
+                            {
+                                <a href="https://wa.me/@whatsapp"
+                                   target="_blank"
+                                   class="btn-whatsapp">
+                                    <img src="/imagem/whatsapp.png" alt="WhatsApp" class="icone-rede" />
+                                    <span>Conversar pelo WhatsApp</span>
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(instagram))
+                            {
+                                <a href="@instagram"
+                                   target="_blank"
+                                   class="btn-secundario">
+                                    <img src="/imagem/instagram.png" alt="Instagram" class="icone-rede" />
+                                    <span>Instagram</span>
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(site))
+                            {
+                                <a href="@site"
+                                   target="_blank"
+                                   class="btn-secundario">
+                                    <span>Site</span>
+                                </a>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </article>
+            }
+
+        </div>
+
+        @if (!Model.PacienteLogado)
+        {
+            <section class="cta-paciente">
+
+                <div>
+                    <span>Área do paciente</span>
+
+                    <h2>
+                        Quer acompanhar sua evolução emocional?
+                    </h2>
+
+                    <p>
+                        Crie uma conta gratuita para registrar seus sentimentos,
+                        salvar sua jornada e acessar sua área pessoal dentro da plataforma.
+                    </p>
+                </div>
+
+                <div class="cta-actions">
+
+                    <a href="/CadastroPaciente" class="btn-criar-conta">
+                        Criar conta gratuita
+                    </a>
+
+                    <a href="/LoginPaciente" class="btn-login">
+                        Já tenho conta
+                    </a>
+
+                </div>
+
+            </section>
+        }
+
+        <section class="area-profissional">
+
+            <div>
+                <span>Para profissionais</span>
+
+                <h3>
+                    É profissional ou possui clínica?
+                </h3>
+
+                <p>
+                    Cadastre-se na plataforma e aumente sua visibilidade para pacientes
+                    que buscam apoio emocional.
+                </p>
+            </div>
+
+            <a href="/CadastroConta" class="btn-cadastro">
+                Cadastrar minha clínica
+            </a>
+
+        </section>
+
+    </main>
 
 </div>
 
 <style>
 
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
     body {
         background: #f8fafc;
-    }
-
-    .topo-clinicas {
-        text-align: center;
-        padding: 60px 20px 30px;
-    }
-
-    .topo-clinicas h1 {
-        font-size: 38px;
-        font-weight: bold;
         color: #0f172a;
-        margin-bottom: 15px;
     }
 
-    .topo-clinicas p {
-        font-size: 18px;
+    .clinicas-page {
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, rgba(20,184,166,.12), transparent 32%), linear-gradient(135deg,#ecfeff,#f8fafc,#eef2ff);
+        padding-bottom: 60px;
+    }
+
+    .header-clinicas {
+        max-width: 1180px;
+        margin: auto;
+        padding: 24px 24px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .logo-header {
+        display: inline-block;
+        text-decoration: none;
+        background: transparent;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+        .logo-header img {
+            width: 220px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .header-link {
+        color: #0f766e;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .header-button {
+        padding: 13px 18px;
+        border-radius: 16px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        text-decoration: none;
+        font-weight: 800;
+        box-shadow: 0 14px 30px rgba(14,165,233,.18);
+    }
+
+    .hero-clinicas {
+        max-width: 1180px;
+        margin: auto;
+        padding: 55px 24px 35px;
+        text-align: center;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 9px 16px;
+        border-radius: 999px;
+        background: #ccfbf1;
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 22px;
+    }
+
+    .hero-clinicas h1 {
+        font-size: 46px;
+        line-height: 1.12;
+        letter-spacing: -1px;
+        max-width: 900px;
+        margin: 0 auto 18px;
+        color: #0f172a;
+    }
+
+    .hero-clinicas p {
         color: #64748b;
-        max-width: 700px;
+        font-size: 18px;
+        line-height: 1.7;
+        max-width: 760px;
         margin: auto;
     }
+
+    .busca-clinica {
+        margin: 36px auto 0;
+        display: grid;
+        grid-template-columns: 1.4fr .8fr auto;
+        gap: 14px;
+        background: white;
+        padding: 16px;
+        border-radius: 24px;
+        box-shadow: 0 20px 55px rgba(15,23,42,.08);
+        border: 1px solid #e2e8f0;
+    }
+
+        .busca-clinica input,
+        .busca-clinica select {
+            width: 100%;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 15px;
+            outline: none;
+            color: #334155;
+            background: #f8fafc;
+        }
+
+            .busca-clinica input:focus,
+            .busca-clinica select:focus {
+                border-color: #0ea5e9;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+            }
+
+        .busca-clinica button {
+            border: none;
+            border-radius: 16px;
+            padding: 0 24px;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
     .container-clinicas {
-        max-width: 900px;
+        max-width: 1180px;
         margin: auto;
-        padding: 20px;
+        padding: 24px;
+    }
+
+    .resultado-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: end;
+        margin-bottom: 24px;
+    }
+
+        .resultado-info span,
+        .cta-paciente span,
+        .area-profissional span {
+            color: #0ea5e9;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .resultado-info h2 {
+            font-size: 26px;
+            margin-top: 6px;
+        }
+
+        .resultado-info p {
+            color: #64748b;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+
+    .grid-clinicas {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
     }
 
     .card-clinica {
-        background: white;
-        border-radius: 18px;
+        background: rgba(255,255,255,.96);
+        border-radius: 28px;
         padding: 28px;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        box-shadow: 0 20px 50px rgba(15,23,42,.08);
+        border: 1px solid #e2e8f0;
+        transition: .25s;
     }
 
-    .topo-card {
-        display: block;
+        .card-clinica:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 70px rgba(15,23,42,.12);
+        }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
     }
 
-    .topo-card h3 {
-        margin: 0;
+    .avatar-clinica {
+        width: 58px;
+        height: 58px;
+        border-radius: 20px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        font-weight: 800;
         font-size: 24px;
-        color: #111827;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
     }
 
-    .selo-aprovado {
+        .avatar-clinica.imagem {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .avatar-clinica img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .card-header h3 {
+        font-size: 22px;
+        color: #0f172a;
+        margin-bottom: 7px;
+    }
+
+    .selo-verificado {
         display: inline-block;
-        margin-top: 8px;
         background: #dcfce7;
         color: #166534;
-        padding: 6px 12px;
+        padding: 5px 10px;
         border-radius: 999px;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .valor {
-        font-size: 22px;
-        font-weight: bold;
-        color: #009ee3;
+        font-size: 12px;
+        font-weight: 800;
     }
 
     .descricao {
         color: #475569;
-        font-size: 16px;
-        margin-bottom: 20px;
-        line-height: 1.6;
-    }
-
-    .infos p {
-        margin-bottom: 10px;
-        color: #334155;
-    }
-
-    .btn-whatsapp {
-        display: inline-block;
-        margin-top: 20px;
-        background: #25D366;
-        color: white;
-        padding: 14px 22px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-
-    .btn-whatsapp:hover {
-        transform: scale(1.02);
-    }
-
-    .area-profissional {
-        margin-top: 50px;
-        background: white;
-        padding: 35px;
-        border-radius: 18px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .btn-cadastro {
-        display: inline-block;
-        margin-top: 20px;
-        background: #009ee3;
-        color: white;
-        padding: 14px 24px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .alerta-vazio {
-        background: white;
-        padding: 25px;
-        border-radius: 14px;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .busca-clinica {
-        max-width: 900px;
-        margin: 30px auto 10px;
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        background: white;
-        padding: 18px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-        .busca-clinica input {
-            flex: 1;
-            border: 1px solid #dbeafe;
-            border-radius: 14px;
-            padding: 16px 18px;
-            font-size: 16px;
-            outline: none;
-            transition: 0.2s;
-        }
-
-            .busca-clinica input:focus {
-                border-color: #009ee3;
-                box-shadow: 0 0 0 4px rgba(0, 158, 227, 0.08);
-            }
-
-        .busca-clinica button {
-            padding: 16px 28px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #00c6ff, #009ee3);
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-            .busca-clinica button:hover {
-                transform: scale(1.03);
-            }
-
-    @@media (max-width: 768px) {
-        .busca-clinica {
-            flex-direction: column;
-        }
-
-            .busca-clinica button {
-                width: 100%;
-            }
+        font-size: 15px;
+        line-height: 1.7;
+        margin-bottom: 18px;
     }
 
     .lista-especialidades {
-        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
     }
 
     .tag-especialidade {
         display: inline-block;
         background: #e0f2fe;
         color: #0369a1;
-        padding: 6px 10px;
+        padding: 7px 11px;
         border-radius: 999px;
-        margin-right: 6px;
-        margin-bottom: 6px;
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 12px;
+        font-weight: 700;
     }
 
+    .detalhes-clinica {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 22px;
+    }
 
-    /* REDES SOCIAIS */
+    .detalhe-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 14px;
+    }
 
-    .redes-sociais {
-        margin-top: 15px;
+        .detalhe-item span {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .detalhe-item strong {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+    .acoes-card {
         display: flex;
-        align-items: center;
-        gap: 25px;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
-    .redes-sociais img {
-       width: 48px;
-       height: 48px;
-       object-fit: contain;
-       transition: .2s;
-    }
-
-            .redes-sociais img:hover {
-                transform: scale(1.10);
-            }
-
-    .icon {
+    .btn-whatsapp,
+    .btn-secundario {
+        flex: 1;
+        min-width: 160px;
         text-decoration: none;
+        padding: 14px 16px;
+        border-radius: 16px;
+        font-weight: 700;
+        transition: .25s;
         display: flex;
         align-items: center;
         justify-content: center;
-    } 
+        gap: 8px;
+        text-align: center;
+    }
 
-    @@media (max-width: 768px) {
-        .topo-card
+    .btn-whatsapp {
+        background: #22c55e;
+        color: white;
+    }
 
-    {
+    .btn-secundario {
+        background: white;
+        color: #0ea5e9;
+        border: 1px solid #dbeafe;
+    }
+
+    .icone-rede {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+        .btn-whatsapp:hover,
+        .btn-secundario:hover {
+            transform: translateY(-2px);
+        }
+
+    .alerta-vazio {
+        background: white;
+        padding: 32px;
+        border-radius: 24px;
+        text-align: center;
+        margin-bottom: 30px;
+        border: 1px dashed #cbd5e1;
+    }
+
+        .alerta-vazio h3 {
+            margin-bottom: 8px;
+        }
+
+        .alerta-vazio p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+    .cta-paciente,
+    .area-profissional {
+        margin-top: 36px;
+        background: white;
+        border-radius: 28px;
+        padding: 34px;
+        box-shadow: 0 20px 50px rgba(15,23,42,.08);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 26px;
+    }
+
+        .cta-paciente h2,
+        .area-profissional h3 {
+            font-size: 28px;
+            margin: 8px 0 10px;
+        }
+
+        .cta-paciente p,
+        .area-profissional p {
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 680px;
+        }
+
+    .cta-actions {
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        gap: 12px;
+        min-width: 230px;
     }
 
-    .valor {
-        margin-top: 10px;
-        font-size: 28px;
-   
+    .btn-criar-conta,
+    .btn-login,
+    .btn-cadastro {
+        text-align: center;
+        text-decoration: none;
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-weight: 800;
+        white-space: nowrap;
     }
-    
+
+    .btn-criar-conta,
+    .btn-cadastro {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+    }
+
+    .btn-login {
+        background: #f8fafc;
+        color: #0ea5e9;
+        border: 1px solid #dbeafe;
+    }
+
+    @@media(max-width: 900px) {
+
+        .header-clinicas {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .logo-header {
+            width: 100%;
+        }
+
+            .logo-header img {
+                width: 190px;
+                margin: auto;
+            }
+
+        .header-actions {
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .header-link,
+        .header-button {
+            text-align: center;
+        }
+
+        .hero-clinicas h1 {
+            font-size: 34px;
+        }
+
+        .busca-clinica {
+            grid-template-columns: 1fr;
+        }
+
+            .busca-clinica button {
+                padding: 16px;
+            }
+
+        .resultado-info,
+        .cta-paciente,
+        .area-profissional {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .grid-clinicas {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-actions {
+            width: 100%;
+        }
+
+        .btn-criar-conta,
+        .btn-login,
+        .btn-cadastro {
+            width: 100%;
+        }
     }
 
 </style>

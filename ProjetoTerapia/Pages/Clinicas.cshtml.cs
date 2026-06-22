@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
@@ -23,34 +21,44 @@ namespace ProjetoTerapia.Pages
         [BindProperty(SupportsGet = true)]
         public string Perfil { get; set; } = "";
 
+        public bool PacienteLogado { get; set; }
+
         public void OnGet()
         {
-            var cidadeUsuario = "Osasco";
+            PacienteLogado = !string.IsNullOrEmpty(
+                HttpContext.Session.GetString("PacienteLogado")
+            );
 
             var query = _context.Clinicas
-                .Where(c => c.Aprovado && c.Pago)
-                .Where(c =>
-                    (c.AtendimentoPresencial && c.Cidade == cidadeUsuario)
-                    || c.AtendimentoOnline
-                );
+                .Where(c => c.Aprovado && c.Pago);
 
-            //filtro do teste: busca por nome, descrição ou endereço
-            if (!string.IsNullOrEmpty(Busca))
+            if (!string.IsNullOrWhiteSpace(Busca))
             {
+                var buscaNormalizada = Busca.Trim();
+
                 query = query.Where(c =>
-                    c.Nome.Contains(Busca) ||
-                    c.Descricao.Contains(Busca) ||
-                    c.Endereco.Contains(Busca));
+                    c.Nome.Contains(buscaNormalizada) ||
+                    c.Descricao.Contains(buscaNormalizada) ||
+                    c.Endereco.Contains(buscaNormalizada) ||
+                    c.Cidade.Contains(buscaNormalizada) ||
+                    c.Especialidades.Contains(buscaNormalizada)
+                );
             }
 
-            //filtro do teste: perfil do profissional
-            if (!string.IsNullOrEmpty(Perfil))
+            if (!string.IsNullOrWhiteSpace(Perfil))
             {
-                query = query.Where(c => c.Especialidades != null && c.Especialidades.Contains(Perfil));
+                var perfilNormalizado = Perfil.Trim();
+
+                query = query.Where(c =>
+                    c.Especialidades != null &&
+                    c.Especialidades.Contains(perfilNormalizado)
+                );
             }
 
-            Clinicas = query.ToList();
-
+            Clinicas = query
+                .OrderByDescending(c => c.AtendimentoOnline)
+                .ThenBy(c => c.Nome)
+                .ToList();
         }
     }
 }
