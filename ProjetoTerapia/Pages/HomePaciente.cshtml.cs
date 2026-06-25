@@ -14,7 +14,6 @@ namespace ProjetoTerapia.Pages
         }
 
         public ProjetoTerapia.Models.Paciente? Paciente { get; set; }
-
         public List<RegistroHumor> Registros { get; set; } = new();
 
         [BindProperty]
@@ -22,6 +21,8 @@ namespace ProjetoTerapia.Pages
 
         [BindProperty]
         public string Observacao { get; set; } = "";
+        public List<ResultadoTestePaciente> ResultadosTeste { get; set; } = new();
+        public ResultadoTestePaciente? UltimoResultadoTeste { get; set; }
 
         public IActionResult OnGet()
         {
@@ -49,7 +50,16 @@ namespace ProjetoTerapia.Pages
                 .Take(5)
                 .ToList();
 
+           ResultadosTeste = _context.ResultadosTestePacientes
+               .Where(x => x.PacienteId == pacienteId)
+               .OrderByDescending(x => x.DataResultado)
+               .Take(5)
+               .ToList();
+
+            UltimoResultadoTeste = ResultadosTeste.FirstOrDefault();
+
             return Page();
+
         }
 
         public IActionResult OnPost()

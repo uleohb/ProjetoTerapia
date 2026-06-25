@@ -83,6 +83,7 @@ namespace ProjetoTerapia.Pages
                 Mensagem = "Email ou senha inválidos.";
                 return Page();
             }
+            HttpContext.Session.Remove("ClinicaLogada");
 
             HttpContext.Session.SetString(
                 "PacienteLogado",
@@ -146,6 +147,8 @@ namespace ProjetoTerapia.Pages
                 Mensagem = "Não encontramos uma conta de paciente com este Google. Crie sua conta primeiro.";
                 return Page();
             }
+
+            HttpContext.Session.Remove("ClinicaLogada");
 
             HttpContext.Session.SetString(
                 "PacienteLogado",

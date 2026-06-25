@@ -60,6 +60,71 @@
 
         </section>
 
+        @if (Model.UltimoResultadoTeste != null)
+        {
+            <section class="resultado-teste-card">
+
+                <div class="resultado-info-principal">
+
+                    <span>Último teste emocional</span>
+
+                    <h2>
+                        @Model.UltimoResultadoTeste.Nivel
+                    </h2>
+
+                    <p>
+                        @Model.UltimoResultadoTeste.Mensagem
+                    </p>
+
+                    <small>
+                        Realizado em @Model.UltimoResultadoTeste.DataResultado.ToString("dd/MM/yyyy HH:mm")
+                    </small>
+
+                </div>
+
+                <div class="resultado-numeros">
+
+                    <div>
+                        <span>Ansiedade</span>
+                        <strong>@Model.UltimoResultadoTeste.PercentualAnsiedade%</strong>
+                    </div>
+
+                    <div>
+                        <span>Depressão</span>
+                        <strong>@Model.UltimoResultadoTeste.PercentualDepressao%</strong>
+                    </div>
+
+                </div>
+
+                <a href="/Teste" class="btn-refazer-teste">
+                    Refazer teste
+                </a>
+
+            </section>
+        }
+        else
+        {
+            <section class="resultado-teste-card vazio">
+
+                <div>
+                    <span>Teste emocional</span>
+
+                    <h2>
+                        Você ainda não fez um teste logado
+                    </h2>
+
+                    <p>
+                        Faça o teste emocional para salvar seu resultado e acompanhar sua evolução.
+                    </p>
+                </div>
+
+                <a href="/Teste" class="btn-refazer-teste">
+                    Fazer teste agora
+                </a>
+
+            </section>
+        }
+
         <section class="cards-grid">
 
             <div class="info-card">
@@ -567,6 +632,86 @@
             color: #64748b;
             line-height: 1.6;
         }
+
+    .resultado-teste-card {
+        background: white;
+        border-radius: 28px;
+        padding: 30px;
+        margin-bottom: 28px;
+        box-shadow: 0 18px 45px rgba(15,23,42,.06);
+        border: 1px solid #e2e8f0;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 24px;
+    }
+
+        .resultado-teste-card.vazio {
+            grid-template-columns: 1fr auto;
+        }
+
+            .resultado-info-principal span,
+            .resultado-teste-card.vazio span {
+                color: #0ea5e9;
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            .resultado-info-principal h2,
+            .resultado-teste-card.vazio h2 {
+                margin: 8px 0;
+                font-size: 28px;
+                color: #0f172a;
+            }
+
+            .resultado-info-principal p,
+            .resultado-teste-card.vazio p {
+                color: #64748b;
+                line-height: 1.6;
+            }
+
+    .resultado-info-principal small {
+        display: block;
+        margin-top: 10px;
+        color: #94a3b8;
+    }
+
+    .resultado-numeros {
+        display: flex;
+        gap: 14px;
+    }
+
+        .resultado-numeros div {
+            min-width: 130px;
+            padding: 18px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .resultado-numeros span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .resultado-numeros strong {
+            font-size: 26px;
+            color: #0ea5e9;
+        }
+
+    .btn-refazer-teste {
+        padding: 15px 22px;
+        border-radius: 16px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        text-decoration: none;
+        font-weight: 800;
+        white-space: nowrap;
+    }
 
     @@media(max-width: 1000px) {
 

@@ -126,7 +126,8 @@
                 ? "A"
                 : clinica.Nome.Trim().Substring(0, 1).ToUpper();
 
-                <article class="card-clinica">
+                <article class="card-clinica"
+                         onclick="window.location.href='/PerfilClinica?id=@clinica.Id'">
 
                     <div class="card-header">
 
@@ -218,38 +219,41 @@
 
                     <div class="acoes-card">
 
-                        <div class="acoes-card">
-
-                            @if (!string.IsNullOrWhiteSpace(whatsapp))
-                            {
-                                <a href="https://wa.me/@whatsapp"
-                                   target="_blank"
-                                   class="btn-whatsapp">
-                                    <img src="/imagem/whatsapp.png" alt="WhatsApp" class="icone-rede" />
-                                    <span>Conversar pelo WhatsApp</span>
-                                </a>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(instagram))
-                            {
-                                <a href="@instagram"
-                                   target="_blank"
-                                   class="btn-secundario">
-                                    <img src="/imagem/instagram.png" alt="Instagram" class="icone-rede" />
-                                    <span>Instagram</span>
-                                </a>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(site))
-                            {
-                                <a href="@site"
-                                   target="_blank"
-                                   class="btn-secundario">
-                                    <span>Site</span>
-                                </a>
-                            }
-
+                        <div class="atalho-perfil">
+                            Ver perfil completo
                         </div>
+
+                        @if (!string.IsNullOrWhiteSpace(whatsapp))
+                        {
+                            <a href="/PerfilClinica?handler=Whatsapp&id=@clinica.Id"
+                               target="_blank"
+                               onclick="event.stopPropagation();"
+                               class="btn-whatsapp">
+                                <img src="/imagem/whatsapp.png" alt="WhatsApp" class="icone-whatsapp" />
+                                <span>WhatsApp</span>
+                            </a>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(instagram))
+                        {
+                            <a href="@instagram"
+                               target="_blank"
+                               onclick="event.stopPropagation();"
+                               class="btn-instagram">
+                                <img src="/imagem/instagram.png" alt="Instagram" class="icone-instagram" />
+                                <span>Instagram</span>
+                            </a>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(site))
+                        {
+                            <a href="@site"
+                               target="_blank"
+                               onclick="event.stopPropagation();"
+                               class="btn-site">
+                                <span>Site oficial</span>
+                            </a>
+                        }
 
                     </div>
 
@@ -507,6 +511,7 @@
         background: rgba(255,255,255,.96);
         border-radius: 28px;
         padding: 28px;
+        cursor: pointer;
         box-shadow: 0 20px 50px rgba(15,23,42,.08);
         border: 1px solid #e2e8f0;
         transition: .25s;
@@ -618,49 +623,97 @@
         }
 
     .acoes-card {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
-        flex-wrap: wrap;
+        margin-top: 22px;
     }
 
     .btn-whatsapp,
-    .btn-secundario {
-        flex: 1;
-        min-width: 160px;
+    .btn-instagram,
+    .btn-site {
+        width: 100%;
+        height: 58px;
         text-decoration: none;
-        padding: 14px 16px;
         border-radius: 16px;
-        font-weight: 700;
+        font-weight: 800;
+        font-size: 16px;
         transition: .25s;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         text-align: center;
+        border: none;
     }
 
     .btn-whatsapp {
-        background: #22c55e;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
         color: white;
+        box-shadow: 0 12px 26px rgba(34,197,94,.18);
     }
 
-    .btn-secundario {
-        background: white;
-        color: #0ea5e9;
-        border: 1px solid #dbeafe;
+    .btn-instagram {
+        background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
+        color: white;
+        box-shadow: 0 12px 26px rgba(221,42,123,.18);
     }
 
-    .icone-rede {
-        width: 18px;
-        height: 18px;
+    .btn-site {
+        background: linear-gradient(135deg, #0ea5e9, #2563eb, #14b8a6);
+        color: white;
+        box-shadow: 0 12px 26px rgba(14,165,233,.18);
+    }
+
+    .icone-whatsapp {
+        width: 42px;
+        height: 42px;
         object-fit: contain;
+        display: block;
         flex-shrink: 0;
     }
 
-        .btn-whatsapp:hover,
-        .btn-secundario:hover {
-            transform: translateY(-2px);
-        }
+    .icone-instagram {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        display: block;
+        flex-shrink: 0;
+    }
+
+    .btn-whatsapp:hover,
+    .btn-instagram:hover,
+    .btn-site:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 30px rgba(15,23,42,.14);
+    }
+
+    .atalho-perfil {
+        margin: 18px 0 4px;
+        padding: 14px 18px;
+        border-radius: 16px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 800;
+        text-align: center;
+        transition: .25s;
+    }
+
+    .card-clinica:hover .atalho-perfil {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+    }
+
+    @@media(max-width: 768px)
+
+    {
+        .acoes-card
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }
 
     .alerta-vazio {
         background: white;

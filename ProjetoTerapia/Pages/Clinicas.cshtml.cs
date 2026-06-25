@@ -37,11 +37,11 @@ namespace ProjetoTerapia.Pages
                 var buscaNormalizada = Busca.Trim();
 
                 query = query.Where(c =>
-                    c.Nome.Contains(buscaNormalizada) ||
-                    c.Descricao.Contains(buscaNormalizada) ||
-                    c.Endereco.Contains(buscaNormalizada) ||
-                    c.Cidade.Contains(buscaNormalizada) ||
-                    c.Especialidades.Contains(buscaNormalizada)
+                 c.Nome.Contains(buscaNormalizada) ||
+                 c.Descricao.Contains(buscaNormalizada) ||
+                 c.Endereco.Contains(buscaNormalizada) ||
+                 c.Cidade.Contains(buscaNormalizada) ||
+                 (c.Especialidades != null && c.Especialidades.Contains(buscaNormalizada))
                 );
             }
 

@@ -1,399 +1,567 @@
 ﻿@page
 @model ProjetoTerapia.Pages.PainelClinicaModel
 
-@if (Model.Clinica != null)
-{
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    @if (!Model.Clinica.Aprovado)
-    {
+<div class="painel-page">
 
-        <div class="alert-pendente">
+    <div class="rgb rgb-1"></div>
+    <div class="rgb rgb-2"></div>
+    <div class="rgb rgb-3"></div>
 
-            <h2>
-                ⏳ Cadastro em análise
-            </h2>
+    <div class="painel-container">
 
-            <p>
-                Sua clínica está aguardando aprovação.
-                Assim que for aprovada você poderá ativar seu plano.
-            </p>
+        @if (Model.Clinica != null)
+        {
+            <header class="topo-painel">
 
-        </div>
+                <div class="topo-esquerda">
 
-    }
+                    <img src="/imagem/logo.png"
+                         class="logo-painel"
+                         alt="AlinhaMente" />
 
+                    <div>
+                        <span class="badge-painel">
+                            Painel profissional
+                        </span>
 
-    @if (Model.Clinica.Aprovado && !Model.Clinica.Pago)
-    {
+                        <h1>
+                            @(string.IsNullOrEmpty(Model.Clinica.Nome)
+                                                    ? "Profissional"
+                                                    : Model.Clinica.Nome)
+                    </h1>
 
-        <div class="alert-pagamento">
+                        <p>
+                            Gerencie seu perfil, acompanhe seus resultados e organize seus atendimentos.
+                        </p>
+                    </div>
 
-            <div>
+                </div>
+
+                <div class="topo-acoes">
+
+                    <a href="/Clinicas" class="btn-topo secundario">
+                        Ver vitrine pública
+                    </a>
+
+                    <a href="/Teste" class="btn-topo principal">
+                        Voltar ao site
+                    </a>
+
+                </div>
+
+            </header>
+
+        @if (!Model.Clinica.Aprovado)
+            {
+                <section class="alerta status-analise">
+
+                    <div class="alerta-icone">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+
+                    <div>
+                        <h2>Cadastro em análise</h2>
+
+                        <p>
+                            Sua clínica está aguardando aprovação. Assim que for aprovada,
+                            você poderá ativar seu plano e aparecer na vitrine da plataforma.
+                        </p>
+                    </div>
+
+                </section>
+            }
+
+            @if (Model.Clinica.Aprovado && !Model.Clinica.Pago)
+            {
+                <section class="alerta status-aprovado">
+
+                    <div class="alerta-icone">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div>
+                        <h2>Sua clínica foi aprovada</h2>
+
+                        <p>
+                            Seu perfil está pronto. Ative seu plano para começar a receber pacientes.
+                        </p>
+                    </div>
+
+                    <a href="/PagamentoClinica" class="btn-alerta">
+                        Ativar plano
+                    </a>
+
+                </section>
+            }
+
+            @if (Model.Clinica.Pago)
+            {
+                <section class="alerta status-ativo">
+
+                    <div class="alerta-icone">
+                        <i class="fa-solid fa-shield-heart"></i>
+                    </div>
+
+                    <div>
+                        <h2>Plano ativo</h2>
+
+                        <p>
+                            Sua clínica está disponível para receber pacientes na plataforma.
+                        </p>
+                    </div>
+
+                </section>
+            }
+
+            @if (!Model.Clinica.PerfilCompleto)
+            {
+                <section class="alerta-perfil">
+
+                    <div>
+                        <span>Perfil incompleto</span>
+
+                        <h2>Finalize seu cadastro profissional</h2>
+
+                        <p>
+                            Adicione suas informações, especialidades, cidade, formas de atendimento
+                            e dados públicos para que sua clínica possa ser exibida corretamente.
+                        </p>
+                    </div>
+
+                    <a href="/CadastroClinica" class="btn-completar">
+                        Completar perfil
+                    </a>
+
+                </section>
+            }
+
+        <section class="dashboard-hero">
+
+            <div class="hero-info">
+
+                <span>Resumo profissional</span>
 
                 <h2>
-                    🎉 Sua clínica foi aprovada!
+                    Seu desempenho na plataforma
                 </h2>
 
                 <p>
-                    Seu perfil já está liberado.
-                    Ative seu plano para começar a receber pacientes.
+                    Acompanhe visualizações, contatos iniciados, status financeiro
+                    e oportunidades para aparecer em mais regiões.
                 </p>
 
             </div>
 
+            <div class="hero-status">
 
-            <a href="/PagamentoClinica" class="btn-ativar">
-                💳 Ativar plano
-            </a>
+                <span>Status atual</span>
 
-        </div>
-
-    }
-
-
-    @if (Model.Clinica.Pago)
-    {
-
-        <div class="alert-ok">
-
-            <h2>
-                ✅ Plano ativo
-            </h2>
-
-            <p>
-                Sua clínica está pronta para receber pacientes.
-            </p>
-
-        </div>
-
-    }
-
-}
-
-<div class="painel-container">
-
-    <!-- BG -->
-    <div class="blur blur-1"></div>
-    <div class="blur blur-2"></div>
-
-    <div class="topo-painel">
-
-        <div class="logo-area">
-
-            <img src="/imagem/logo.png" class="logo-painel" />
-
-            <div>
-                <span class="badge-painel">
-                    Painel Profissional
-                </span>
-
-                <h1>
-                    @(string.IsNullOrEmpty(Model.Clinica?.Nome)
-                                        ? "Profissional"
-                                        : Model.Clinica.Nome)
-                </h1>
-
-                <p>
-                    Gerencie seus atendimentos e informações profissionais.
-                </p>
-            </div>
-
-        </div>
-
-        <a href="/Teste" class="btn-voltar-site">
-            Voltar ao site
-        </a>
-
-    </div>
-
-    @if (Model.Clinica != null && !Model.Clinica.PerfilCompleto)
-    {
-        <div class="alerta-perfil">
-
-            <div>
-                <span class="tag-alerta">
-                     Perfil incompleto
-                </span>
-
-                <h3>
-                    Finalize seu cadastro profissional
-                </h3>
-
-                <p>
-                    Adicione suas informações para que sua clínica
-                    possa ser analisada e aprovada pela plataforma.
-                </p>
-            </div>
-
-            <a href="/CadastroClinica"
-               class="btn-completar">
-
-                Completar perfil
-
-            </a>
-
-        </div>
-    }
-
-    @if (Model.Clinica != null)
-    {
-        <div class="titulo-secao">
-            <h2>Informações da Conta</h2>
-            <p>Resumo da sua clínica e assinatura.</p>
-        </div>
-
-        <div class="grid-cards">
-
-            <div class="card-dashboard">
-
-                <div class="icone-card">
-                    <i class="fa-solid fa-building"></i>
-                </div>
-
-                <h3>Clínica</h3>
-
-                <p>@Model.Clinica.Nome</p>
-
-            </div>
-
-            <div class="card-dashboard">
-
-                <div class= "icone-card">
-                 <i class="fa-regular fa-envelope"></i>
-                </div>
-
-                <h3>Email</h3>
-
-                <p>@Model.Clinica.Email</p>
-
-            </div>
-
-            <div class="card-dashboard">
-
-				<div class="icone-card">
-                 <i class="fa-solid fa-phone"></i>
-                </div>
-
-                <h3>Telefone</h3>
-
-                <p>@Model.Clinica.Telefone</p>
-
-            </div>
-
-            <div class="card-dashboard">
-
-				<div class="icone-card">
-                 <i class="fa-solid fa-wallet"></i>
-                </div>
-
-                <h3>Plano</h3>
-
-                @if (Model.Clinica.Pago)
-                {
-                    <p>@Model.Clinica.NomePlano</p>
-                }
-                else
-                {
-                    <p>Nenhum plano ativo</p>
-                }
-
-            </div>
-
-        </div>
-
-        <div class="card-status">
-
-            <div>
-
-                <h2>Status da Assinatura</h2>
-
-                <p>
-                    Sua clínica está atualmente:
-                </p>
-
-            </div>
-
-            <div class="status-area">
-
-                @if (Model.Clinica.Pago)
-                {
-                    <span class="status ativo">
-                         Ativo
-                    </span>
-                }
-                else
-                {
-                    <span class="status pendente">
-                         Pendente
-                    </span>
-                }
-
-            </div>
-
-        </div>
-
-        <div class="titulo-secao">
-            <h2>Área Operacional</h2>
-            <p>Gerencie seu perfil, agenda e desempenho.</p>
-        </div>
-
-        <div class="grid-operacional">
-
-            <a href="/AgendaClinica" class="card-operacional">
-
-                <div class="topo-operacional">
-                    <i class="fa-regular fa-calendar"></i>
-                </div>
-
-                <h3>Agenda</h3>
-
-                <p>
-                    Gerencie consultas e horários disponíveis.
-                </p>
-
-            </a>
-
-            <a href="#" class="card-operacional">
-
-                <div class="topo-operacional">
-                    <i class="fa-solid fa-user-group"></i>
-                </div>
-
-                <h3>Pacientes</h3>
-
-                <p>
-                    @Model.Clinica.Visualizacoes visualizações
-                </p>
+                <strong class="status-texto @(Model.Clinica.Pago ? "ativo" : "pendente")">
+                    @Model.StatusPlano
+                </strong>
 
                 <small>
-                    @Model.Clinica.CliquesWhatsapp contatos iniciados
+                    Perfil público:
+                    @(Model.PerfilPublicoAtivo ? "ativo" : "não ativo")
                 </small>
 
-            </a>
+            </div>
 
-            <a href="#" class="card-operacional">
+        </section>
 
-                <div class="topo-operacional">
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+
+                <span>Visualizações</span>
+
+                <strong>@Model.Visualizacoes</strong>
+
+                <p>
+                    Quantidade de acessos ao seu perfil público.
+                </p>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+
+                <span>Contatos iniciados</span>
+
+                <strong>@Model.CliquesWhatsapp</strong>
+
+                <p>
+                    Cliques no botão de WhatsApp do seu perfil.
+                </p>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
 
-                <h3>Financeiro</h3>
+                <span>Conversão</span>
+
+                <strong>@Model.TaxaConversao%</strong>
 
                 <p>
-                    Acompanhe pagamentos e faturamento.
+                    Relação entre visualizações e contatos recebidos.
                 </p>
 
-            </a>
+            </div>
 
-            <a href="/CadastroClinica" class="card-operacional">
+            <div class="kpi-card">
 
-                <div class="topo-operacional">
-                    <i class="fa-regular fa-id-card"></i>
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
                 </div>
 
-                <h3>Perfil Profissional</h3>
+                <span>Vencimento</span>
+
+                <strong>
+                    @(Model.DiasRestantes.HasValue
+                                        ? (Model.PlanoVencido ? "Vencido" : $"{Model.DiasRestantes} dias")
+                                        : "Sem plano")
+                                                  </strong>
 
                 <p>
-                    Atualize suas informações públicas.
+                    Data: @Model.DataVencimentoFormatada
                 </p>
 
-            </a>
+            </div>
 
-        </div>
+        </section>
 
-        <div class="acoes-dashboard">
+        <section class="conteudo-grid">
 
-            <a href="/CadastroClinica" class="btn-dashboard principal">
-                Editar perfil
-            </a>
+            <div class="painel-bloco financeiro">
 
-            <a href="/Contato" class="btn-dashboard secundario">
-                Falar com suporte
-            </a>
+                <div class="bloco-topo">
 
-        </div>
-    }
-    else
-    {
-        <div class="erro-card">
+                    <div>
+                        <span>Financeiro</span>
 
-            <h2>
-                Erro ao carregar os dados da clínica
-            </h2>
+                        <h2>Assinatura e pagamentos</h2>
 
-            <a href="/LoginClinica" class="btn-dashboard principal">
-                Fazer login novamente
-            </a>
+                        <p>
+                            Acompanhe o status do seu plano e informações básicas de pagamento.
+                        </p>
+                    </div>
 
-        </div>
-    }
+                    <div class="icone-bloco">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+
+                </div>
+
+                <div class="financeiro-grid">
+
+                    <div>
+                        <small>Plano atual</small>
+                        <strong>@(Model.Clinica.NomePlano ?? "Nenhum plano ativo")</strong>
+                    </div>
+
+                    <div>
+                        <small>Valor do plano</small>
+                        <strong>@Model.ValorPlanoFormatado</strong>
+                    </div>
+
+                    <div>
+                        <small>Pagamento confirmado</small>
+                        <strong>
+                            @(Model.Clinica.DataPagamento.HasValue
+                                                        ? Model.Clinica.DataPagamento.Value.ToString("dd/MM/yyyy")
+                                                        : "Pendente")
+                        </strong>
+                    </div>
+
+                        <div>
+                            <small>Vencimento</small>
+                            <strong>@Model.DataVencimentoFormatada</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="bloco-acoes">
+
+                        <a href="/PagamentoClinica" class="btn-bloco principal">
+                            Gerenciar plano
+                        </a>
+
+                        <a href="/Contato" class="btn-bloco secundario">
+                            Falar com suporte
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <div class="painel-bloco clube" id="clube-descontos">
+
+                    <div class="sinal-clube">
+                        <span></span>
+                    </div>
+
+                    <div class="bloco-topo">
+
+                        <div>
+                            <span>Clube de Descontos</span>
+
+                            <h2>Apareça em mais cidades</h2>
+
+                            <p>
+                                Divulgue seu perfil para mais regiões e aumente sua chance de receber novos pacientes.
+                            </p>
+                        </div>
+
+                        <div class="icone-bloco destaque">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="planos-cidades">
+
+                        <div>
+                            <strong>+5 cidades</strong>
+                            <span>R$ 30</span>
+                        </div>
+
+                        <div>
+                            <strong>+10 cidades</strong>
+                            <span>R$ 35</span>
+                        </div>
+
+                        <div>
+                            <strong>+15 cidades</strong>
+                            <span>R$ 45</span>
+                        </div>
+
+                        <div>
+                            <strong>+20 cidades</strong>
+                            <span>R$ 50</span>
+                        </div>
+
+                        <div>
+                            <strong>+25 cidades</strong>
+                            <span>R$ 55</span>
+                        </div>
+
+                    </div>
+
+                    <a href="/Contato" class="btn-clube">
+                        Solicitar divulgação
+                    </a>
+
+                </div>
+
+            </section>
+
+            <section class="titulo-secao">
+
+                <h2>Área operacional</h2>
+
+                <p>
+                    Acesse os principais recursos da sua conta profissional.
+                </p>
+
+            </section>
+
+            <section class="grid-operacional">
+
+                <a href="/AgendaClinica" class="card-operacional">
+
+                    <div class="topo-operacional">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+
+                    <h3>Agenda</h3>
+
+                    <p>
+                        Gerencie consultas, horários disponíveis e atendimentos.
+                    </p>
+
+                </a>
+
+                <a href="/CadastroClinica" class="card-operacional">
+
+                    <div class="topo-operacional">
+                        <i class="fa-regular fa-id-card"></i>
+                    </div>
+
+                    <h3>Perfil profissional</h3>
+
+                    <p>
+                        Atualize suas informações públicas, especialidades e dados de contato.
+                    </p>
+
+                </a>
+
+                <a href="/Clinicas" class="card-operacional">
+
+                    <div class="topo-operacional">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+
+                    <h3>Vitrine pública</h3>
+
+                    <p>
+                        Veja como sua clínica aparece para pacientes dentro da plataforma.
+                    </p>
+
+                </a>
+
+                <a href="#clube-descontos" class="card-operacional">
+
+                    <div class="topo-operacional">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+
+                    <h3>Divulgação regional</h3>
+
+                    <p>
+                        Conheça opções para aparecer em mais cidades e regiões.
+                    </p>
+
+                </a>
+
+            </section>
+
+            <section class="acoes-dashboard">
+
+                <a href="/CadastroClinica" class="btn-dashboard principal">
+                    Editar perfil
+                </a>
+
+                <a href="/AgendaClinica" class="btn-dashboard secundario">
+                    Abrir agenda
+                </a>
+
+                <a href="/Contato" class="btn-dashboard secundario">
+                    Falar com suporte
+                </a>
+
+            </section>
+                }
+        else
+        {
+            <div class="erro-card">
+
+                <h2>Erro ao carregar os dados da clínica</h2>
+
+                <a href="/LoginClinica" class="btn-dashboard principal">
+                    Fazer login novamente
+                </a>
+
+            </div>
+        }
+
+    </div>
 
 </div>
 
-
-<!-- Ícones FontAwesome -->
-<link rel="stylesheet"
-	  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" /> 
-
 <style>
 
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    html,
     body {
-        background: #f8fafc;
         margin: 0;
         padding: 0;
+        background: #eaf8ff;
+        color: #0f172a;
+    }
+
+    .container,
+    .container-fluid,
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        background: transparent !important;
+    }
+
+    .painel-page {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+        background: radial-gradient(circle at top left, rgba(14,165,233,.18), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,.14), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 42%, #edf3ff 100%);
+        padding: 42px 24px 70px;
+    }
+
+    .rgb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(95px);
+        opacity: .8;
+        pointer-events: none;
+    }
+
+    .rgb-1 {
+        width: 360px;
+        height: 360px;
+        background: rgba(14,165,233,.20);
+        top: -120px;
+        left: -120px;
+    }
+
+    .rgb-2 {
+        width: 320px;
+        height: 320px;
+        background: rgba(124,58,237,.18);
+        right: -120px;
+        top: 260px;
+    }
+
+    .rgb-3 {
+        width: 280px;
+        height: 280px;
+        background: rgba(20,184,166,.18);
+        left: 20%;
+        bottom: -140px;
     }
 
     .painel-container {
         position: relative;
-        overflow: hidden;
-        min-height: 100vh;
-        padding: 60px 40px;
-        max-width: 1200px;
+        z-index: 2;
+        max-width: 1240px;
         margin: auto;
     }
 
-    .blur {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(100px);
-        z-index: 0;
-    }
-
-    .blur-1 {
-        width: 300px;
-        height: 300px;
-        background: rgba(124,58,237,0.12);
-        top: -100px;
-        left: -100px;
-    }
-
-    .blur-2 {
-        width: 280px;
-        height: 280px;
-        background: rgba(37,99,235,0.12);
-        bottom: -120px;
-        right: -120px;
-    }
-
     .topo-painel {
-        position: relative;
-        z-index: 2;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 50px;
+        gap: 28px;
+        margin-bottom: 34px;
         flex-wrap: wrap;
     }
 
-    .logo-area {
+    .topo-esquerda {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 28px;
     }
 
     .logo-painel {
-        width: 260px;
+        width: 230px;
         max-width: 100%;
         height: auto;
         object-fit: contain;
@@ -403,373 +571,596 @@
         display: inline-block;
         padding: 8px 16px;
         border-radius: 999px;
-        background: rgba(37,99,235,.08);
-        color: #1d4ed8;
+        background: rgba(14,165,233,.13);
+        color: #0369a1;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 800;
         margin-bottom: 14px;
     }
 
     .topo-painel h1 {
-        font-size: 30px;
-        max-width: 600px;
-        margin: 0 0 10px;
+        font-size: 34px;
+        margin: 0 0 8px;
         line-height: 1.1;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: -1px;
         color: #0f172a;
     }
 
     .topo-painel p {
+        margin: 0;
         color: #64748b;
-        font-size: 18px;
-        max-width: 600px;
+        font-size: 16px;
+        max-width: 620px;
+        line-height: 1.6;
     }
 
-    .btn-voltar-site {
-        padding: 16px 24px;
-        border-radius: 16px;
+    .topo-acoes {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-topo,
+    .btn-alerta,
+    .btn-completar,
+    .btn-bloco,
+    .btn-clube,
+    .btn-dashboard {
         text-decoration: none;
-        background: white;
-        border: 1px solid #dbeafe;
-        color: #2563eb;
-        font-weight: 600;
-        transition: .2s;
-    }
-
-        .btn-voltar-site:hover {
-            transform: translateY(-2px);
-        }
-
-    .grid-cards {
-        position: relative;
-        z-index: 2;
-        display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-        gap: 22px;
-        margin-bottom: 35px;
-    }
-
-    .card-dashboard {
-        background: rgba(255,255,255,0.85);
-        padding: 32px;
-        border-radius: 28px;
-        border: 1px solid rgba(226,232,240,0.8);
-        backdrop-filter: blur(14px);
-        box-shadow: 0 10px 30px rgba(15,23,42,0.05);
         transition: .25s;
     }
 
-    .icone-card {
-        width: 62px;
-        height: 62px;
+    .btn-topo {
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-weight: 800;
+    }
+
+        .btn-topo.principal {
+            color: white;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+            box-shadow: 0 14px 28px rgba(14,165,233,.18);
+        }
+
+        .btn-topo.secundario {
+            color: #0ea5e9;
+            background: white;
+            border: 1px solid #dbeafe;
+        }
+
+        .btn-topo:hover,
+        .btn-alerta:hover,
+        .btn-completar:hover,
+        .btn-bloco:hover,
+        .btn-clube:hover,
+        .btn-dashboard:hover,
+        .card-operacional:hover,
+        .kpi-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .alerta,
+    .alerta-perfil,
+    .dashboard-hero,
+    .kpi-card,
+    .painel-bloco,
+    .card-operacional,
+    .erro-card {
+        background: rgba(255,255,255,.88);
+        border: 1px solid rgba(226,232,240,.9);
+        box-shadow: 0 20px 55px rgba(15,23,42,.07);
+        backdrop-filter: blur(18px);
+    }
+
+    .alerta {
+        border-radius: 28px;
+        padding: 28px;
+        margin-bottom: 26px;
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }
+
+    .alerta-icone {
+        width: 58px;
+        height: 58px;
         border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 22px;
-        background: linear-gradient( 135deg, rgba(37,99,235,.10), rgba(124,58,237,.10) );
-        color: #2563eb;
+        flex-shrink: 0;
+        background: white;
         font-size: 24px;
     }
 
-    .card-dashboard h3 {
-        margin: 0 0 10px;
-        color: #0f172a;
+    .alerta h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
     }
 
-    .card-dashboard p {
+    .alerta p {
         margin: 0;
         color: #64748b;
-        font-size: 17px;
+        line-height: 1.6;
     }
 
-    .card-dashboard:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(15,23,42,0.08);
+    .status-analise {
+        border-color: #fed7aa;
     }
 
-    .card-status {
-        position: relative;
-        z-index: 2;
-        background: white;
-        border-radius: 28px;
-        padding: 35px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        box-shadow: 0 10px 25px rgba(15,23,42,0.05);
-        margin-bottom: 35px;
-    }
-
-        .card-status h2 {
-            margin: 0 0 10px;
-            color: #0f172a;
+        .status-analise .alerta-icone {
+            color: #ea580c;
         }
 
-        .card-status p {
-            margin: 0;
-            color: #64748b;
-        }
-
-    .status {
-        padding: 14px 26px;
-        border-radius: 999px;
-        font-weight: 700;
-        font-size: 15px;
-        letter-spacing: .3px;
+    .status-aprovado {
+        border-color: #bfdbfe;
     }
 
-    .ativo {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .pendente {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .acoes-dashboard {
-        display: flex;
-        gap: 18px;
-        flex-wrap: wrap;
-    }
-
-    .btn-dashboard {
-        padding: 18px 28px;
-        border-radius: 18px;
-        text-decoration: none;
-        font-weight: 700;
-        transition: .2s;
-    }
-
-        .btn-dashboard:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-dashboard.principal {
-            background: linear-gradient( 135deg, #2563eb, #0ea5e9 );
-            color: white;
-            box-shadow: 0 12px 30px rgba(37,99,235,.18);
-        }
-
-        .btn-dashboard.secundario {
-            background: white;
-            border: 1px solid #dbeafe;
+        .status-aprovado .alerta-icone {
             color: #2563eb;
         }
 
-    .erro-card {
-        background: white;
-        padding: 40px;
-        border-radius: 24px;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(15,23,42,0.05);
+    .status-ativo {
+        border-color: #86efac;
     }
 
-    @@media(max-width:768px) {
-
-        .painel-container {
-            padding: 40px 20px;
+        .status-ativo .alerta-icone {
+            color: #16a34a;
         }
 
-        .topo-painel h1 {
-            font-size: 42px;
-        }
-    }
-
-    .alerta-perfil {
-        position: relative;
-        z-index: 2;
-        margin-bottom: 35px;
-        padding: 30px;
-        border-radius: 28px;
-        background: linear-gradient(135deg,#fff7ed,#fffbeb);
-        border: 1px solid #fed7aa;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 25px;
-        flex-wrap: wrap;
-        box-shadow: 0 10px 25px rgba(15,23,42,0.04);
-    }
-
-    .tag-alerta {
-        display: inline-block;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: rgba(251,146,60,.15);
-        color: #c2410c;
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 14px;
-    }
-
-    .alerta-perfil h3 {
-        margin: 0 0 10px;
-        color: #7c2d12;
-        font-size: 28px;
-    }
-
-    .alerta-perfil p {
-        margin: 0;
-        color: #9a3412;
-        max-width: 650px;
-        line-height: 1.7;
-    }
-
-    .btn-completar {
-        padding: 18px 26px;
-        border-radius: 18px;
-        text-decoration: none;
-        background: linear-gradient(135deg,#f97316,#ea580c);
+    .btn-alerta {
+        margin-left: auto;
+        padding: 14px 22px;
+        border-radius: 16px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
         color: white;
-
-
-        font-weight: 700;
-        transition: .2s;
+        font-weight: 800;
         white-space: nowrap;
     }
 
-        .btn-completar:hover {
-            transform: translateY(-2px);
-        }
-
-    .grid-operacional {
-        position: relative;
-        z-index: 2;
-        display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-        gap: 22px;
-        margin-bottom: 35px;
-    }
-
-    .card-operacional {
-        background: rgba(255,255,255,0.88);
-        border: 1px solid rgba(226,232,240,.9);
+    .alerta-perfil {
+        margin-bottom: 28px;
+        padding: 30px;
         border-radius: 28px;
-        padding: 28px;
-        text-decoration: none;
-        transition: .25s;
-        backdrop-filter: blur(14px);
-        box-shadow: 0 10px 30px rgba(15,23,42,.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
     }
 
-        .card-operacional:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 45px rgba(15,23,42,.08);
+        .alerta-perfil span {
+            color: #ea580c;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
         }
 
+        .alerta-perfil h2 {
+            margin: 8px 0 10px;
+            font-size: 28px;
+        }
+
+        .alerta-perfil p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 760px;
+        }
+
+    .btn-completar {
+        padding: 16px 22px;
+        border-radius: 16px;
+        background: linear-gradient(135deg,#f97316,#ea580c);
+        color: white;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .dashboard-hero {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 28px;
+        align-items: center;
+        border-radius: 32px;
+        padding: 36px;
+        margin-bottom: 26px;
+    }
+
+    .hero-info span,
+    .painel-bloco span,
+    .titulo-secao span {
+        color: #0ea5e9;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .hero-info h2 {
+        font-size: 38px;
+        margin: 10px 0 12px;
+        letter-spacing: -1px;
+    }
+
+    .hero-info p {
+        color: #64748b;
+        line-height: 1.7;
+        max-width: 720px;
+        margin: 0;
+    }
+
+    .hero-status {
+        background: linear-gradient(135deg,#0f172a,#1e293b);
+        color: white;
+        border-radius: 26px;
+        padding: 26px;
+    }
+
+        .hero-status span {
+            color: rgba(255,255,255,.7);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+    .status-texto {
+        display: block;
+        font-size: 28px;
+        margin: 12px 0;
+        font-weight: 800;
+    }
+
+        .status-texto.ativo {
+            color: #86efac;
+        }
+
+        .status-texto.pendente {
+            color: #fde68a;
+        }
+
+    .hero-status small {
+        color: rgba(255,255,255,.72);
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 18px;
+        margin-bottom: 26px;
+    }
+
+    .kpi-card {
+        border-radius: 26px;
+        padding: 24px;
+        transition: .25s;
+    }
+
+    .kpi-icon,
+    .icone-bloco,
     .topo-operacional {
-        width: 60px;
-        height: 60px;
+        width: 56px;
+        height: 56px;
         border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 22px;
-        background: linear-gradient( 135deg, rgba(37,99,235,.10), rgba(124,58,237,.10) );
+        background: linear-gradient(135deg,rgba(14,165,233,.14),rgba(124,58,237,.12));
+        color: #0ea5e9;
+        font-size: 22px;
+        margin-bottom: 18px;
     }
 
-        .topo-operacional i {
-            font-size: 22px;
-            color: #2563eb;
-        }
+    .kpi-card span {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
 
-    .card-operacional h3 {
-        margin: 0 0 10px;
+    .kpi-card strong {
+        display: block;
+        font-size: 38px;
+        margin: 8px 0;
         color: #0f172a;
-        font-size: 20px;
+        letter-spacing: -1px;
     }
 
-    .card-operacional p {
+    .kpi-card p {
         margin: 0;
         color: #64748b;
-        line-height: 1.7;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .conteudo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 34px;
+    }
+
+    .painel-bloco {
+        border-radius: 30px;
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bloco-topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+
+        .bloco-topo h2 {
+            margin: 8px 0 10px;
+            font-size: 28px;
+        }
+
+        .bloco-topo p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+    .icone-bloco.destaque {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .financeiro-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+        .financeiro-grid div,
+        .planos-cidades div {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .financeiro-grid small {
+            display: block;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .financeiro-grid strong {
+            color: #0f172a;
+        }
+
+    .bloco-acoes {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-bloco {
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-weight: 800;
+    }
+
+        .btn-bloco.principal {
+            color: white;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        }
+
+        .btn-bloco.secundario {
+            color: #0ea5e9;
+            background: white;
+            border: 1px solid #dbeafe;
+        }
+
+    .clube {
+        background: linear-gradient(135deg,rgba(255,255,255,.92),rgba(236,254,255,.92));
+    }
+
+    .sinal-clube {
+        position: absolute;
+        right: 24px;
+        top: 24px;
+        width: 18px;
+        height: 18px;
+    }
+
+        .sinal-clube span {
+            display: block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 rgba(34,197,94,.6);
+            animation: pulse 1.7s infinite;
+        }
+
+    @@keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(34,197,94,.55);
+        }
+
+        70% {
+            box-shadow: 0 0 0 15px rgba(34,197,94,0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(34,197,94,0);
+        }
+    }
+
+    .planos-cidades {
+        display: grid;
+        grid-template-columns: repeat(5,1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .planos-cidades strong {
+            display: block;
+            color: #0f172a;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .planos-cidades span {
+            color: #0ea5e9;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+    .btn-clube {
+        display: block;
+        text-align: center;
+        width: 100%;
+        padding: 15px;
+        border-radius: 16px;
+        background: linear-gradient(135deg,#0ea5e9,#2563eb,#14b8a6);
+        color: white;
+        font-weight: 800;
     }
 
     .titulo-secao {
-        position: relative;
-        z-index: 2;
-        margin-bottom: 22px;
+        margin-bottom: 18px;
     }
 
         .titulo-secao h2 {
             margin: 0 0 8px;
-            font-size: 28px;
-            color: #0f172a;
+            font-size: 30px;
         }
 
         .titulo-secao p {
+            color: #64748b;
+            margin: 0;
+        }
+
+    .grid-operacional {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .card-operacional {
+        border-radius: 26px;
+        padding: 24px;
+        text-decoration: none;
+        transition: .25s;
+    }
+
+        .card-operacional h3 {
+            margin: 0 0 10px;
+            color: #0f172a;
+            font-size: 20px;
+        }
+
+        .card-operacional p {
             margin: 0;
             color: #64748b;
+            line-height: 1.6;
+            font-size: 14px;
         }
 
-    /*ícone de alerta de pagamento*/
-
-    .alert-pagamento {
-        margin: 25px;
-        padding: 25px;
-        border-radius: 20px;
-        background: linear-gradient(135deg,#7c3aed,#2563eb);
-        color: white;
+    .acoes-dashboard {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
     }
 
-
-    .btn-ativar {
-        background: white;
-        color: #2563eb;
-        padding: 14px 25px;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none;
+    .btn-dashboard {
+        padding: 16px 22px;
+        border-radius: 16px;
+        font-weight: 800;
     }
 
-    .alert-pendente {
-        position: relative;
-        z-index: 2;
-        margin: 25px;
-        padding: 30px;
+        .btn-dashboard.principal {
+            color: white;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+            box-shadow: 0 12px 25px rgba(14,165,233,.16);
+        }
+
+        .btn-dashboard.secundario {
+            color: #0ea5e9;
+            background: white;
+            border: 1px solid #dbeafe;
+        }
+
+    .erro-card {
+        padding: 40px;
         border-radius: 28px;
-        background: linear-gradient(135deg,#fff7ed,#fffbeb);
-        border: 1px solid #fed7aa;
-        color: #7c2d12;
-        box-shadow: 0 10px 25px rgba(15,23,42,0.04);
+        text-align: center;
     }
 
+    @@media(max-width: 1050px) {
 
-        .alert-pendente h2 {
-            margin-bottom: 10px;
+        .dashboard-hero,
+        .conteudo-grid,
+        .kpi-grid,
+        .grid-operacional {
+            grid-template-columns: 1fr 1fr;
         }
 
-
-        .alert-pendente p {
-            margin: 0;
-            line-height: 1.7;
+        .planos-cidades {
+            grid-template-columns: 1fr 1fr;
         }
-
-
-    .alert-ok {
-        position: relative;
-        z-index: 2;
-        margin: 25px;
-        padding: 30px;
-        border-radius: 28px;
-        background: #dcfce7;
-        border: 1px solid #86efac;
-        color: #166534;
-        box-shadow: 0 10px 25px rgba(15,23,42,0.04);
     }
 
+    @@media(max-width: 768px) {
 
-        .alert-ok h2 {
-            margin-bottom: 10px;
+        .painel-page {
+            padding: 24px 14px 50px;
         }
+
+        .topo-esquerda {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-painel {
+            width: 210px;
+        }
+
+        .topo-painel h1 {
+            font-size: 30px;
+        }
+
+        .dashboard-hero,
+        .conteudo-grid,
+        .kpi-grid,
+        .grid-operacional,
+        .financeiro-grid,
+        .planos-cidades {
+            grid-template-columns: 1fr;
+        }
+
+        .alerta,
+        .alerta-perfil {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-alerta,
+        .btn-completar,
+        .btn-dashboard,
+        .btn-topo,
+        .btn-bloco {
+            width: 100%;
+            text-align: center;
+        }
+
+        .topo-acoes,
+        .bloco-acoes,
+        .acoes-dashboard {
+            width: 100%;
+            flex-direction: column;
+        }
+    }
 
 </style>

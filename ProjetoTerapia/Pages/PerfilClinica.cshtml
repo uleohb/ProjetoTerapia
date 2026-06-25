@@ -48,19 +48,19 @@
                     @if (Model.Clinica.AtendimentoOnline)
                     {
                         <span class="badge-info online">
-                            💻 Online
+                             Online
                         </span>
                     }
 
                     @if (Model.Clinica.AtendimentoPresencial)
                     {
                         <span class="badge-info presencial">
-                            🏥 Presencial
+                             Presencial
                         </span>
                     }
 
                     <span class="badge-info aprovado">
-                        ✔ Verificado
+                         Verificado
                     </span>
 
                 </div>
@@ -117,7 +117,7 @@
                 <h3>Localização</h3>
 
                 <p class="info-texto">
-                    📍 @Model.Clinica.Endereco
+                     @Model.Clinica.Endereco
                 </p>
 
             </div>
@@ -147,19 +147,16 @@
                 <h3>Contato</h3>
 
                 <p>
-                    📞 @Model.Clinica.Telefone
+                     @Model.Clinica.Telefone
                 </p>
 
-                @if (!string.IsNullOrEmpty(Model.Clinica.Telefone))
-                {
-                    <a href="https://wa.me/@(Model.Clinica.Telefone)"
-                       target="_blank"
-                       class="rede whatsapp">
+                <a href="/PerfilClinica?handler=Whatsapp&id=@Model.Clinica.Id"
+                   target="_blank"
+                   class="rede whatsapp">
 
-                        <i class="fa-brands fa-whatsapp"></i>
+                    <i class="fa-brands fa-whatsapp"></i>
 
-                    </a>
-                }
+                </a>
 
             </div>
 
@@ -198,43 +195,45 @@
             </div>
 
             <!-- STATS -->
+            @if (Model.EhDonoPerfil)
+            {
+                <div class="card-side">
 
-            <div class="card-side">
+                    <h3>Estatísticas do perfil</h3>
 
-                <h3>Estatísticas</h3>
+                    <div class="stats-grid">
 
-                <div class="stats-grid">
+                        <div class="stat-box">
+                            <strong>
+                                @Model.Clinica.Visualizacoes
+                            </strong>
 
-                    <div class="stat-box">
-                        <strong>
-                            @Model.Clinica.Visualizacoes
-                        </strong>
+                            <span>
+                                Visualizações
+                            </span>
+                        </div>
 
-                        <span>
-                            Visualizações
-                        </span>
-                    </div>
+                        <div class="stat-box">
+                            <strong>
+                                @Model.Clinica.CliquesWhatsapp
+                            </strong>
 
-                    <div class="stat-box">
-                        <strong>
-                            @Model.Clinica.CliquesWhatsapp
-                        </strong>
+                            <span>
+                                Cliques WhatsApp
+                            </span>
+                        </div>
 
-                        <span>
-                            Cliques WhatsApp
-                        </span>
                     </div>
 
                 </div>
 
-            </div>
+                <a href="/CadastroClinica"
+                   class="btn-editar">
 
-            <a href="/CadastroClinica"
-               class="btn-editar">
+                    Editar perfil
 
-                Editar Perfil
-
-            </a>
+                </a>
+            }
 
         </aside>
 

@@ -1,12 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
     public class TesteModel : PageModel
     {
+        private readonly AppDbContext _context;
+        public bool PacienteLogado { get; set; }
+        public string NomePaciente { get; set; } = "";
+        public TesteModel(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
 
         [BindProperty]
@@ -26,16 +36,23 @@ namespace ProjetoTerapia.Pages
 
         public string Recomendacao { get; set; } = "";
 
+        public bool ResultadoSalvo { get; set; }
+
         public void OnGet()
         {
+            CarregarPacienteLogado();
+
             Teste teste = new Teste();
             Perguntas = teste.Perguntas;
 
             MostrarResultado = false;
+            ResultadoSalvo = false;
         }
 
-        public void OnPost()
+        public IActionResult OnPost()
         {
+            CarregarPacienteLogado();
+
             Teste teste = new Teste();
             Perguntas = teste.Perguntas;
 
@@ -46,7 +63,10 @@ namespace ProjetoTerapia.Pages
             int maxDepressao = 0;
 
             if (Respostas == null || Respostas.Count != Perguntas.Count)
-                return;
+            {
+                MostrarResultado = false;
+                return Page();
+            }
 
             for (int i = 0; i < Perguntas.Count; i++)
             {
@@ -72,7 +92,6 @@ namespace ProjetoTerapia.Pages
 
             ScoreFinal = Math.Round((PorcentagemAnsiedade + PorcentagemDepressao) / 2.0, 1);
 
-            // MUITO ALTO
             if (ScoreFinal >= 80)
             {
                 Nivel = "Muito Alto";
@@ -81,8 +100,6 @@ namespace ProjetoTerapia.Pages
 
                 Recomendacao = "Recomendamos buscar apoio profissional o quanto antes para avaliar sua situação e iniciar um acompanhamento adequado.";
             }
-
-            // ALTO
             else if (ScoreFinal >= 60)
             {
                 Nivel = "Alto";
@@ -91,8 +108,6 @@ namespace ProjetoTerapia.Pages
 
                 Recomendacao = "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
             }
-
-            // MODERADO
             else if (ScoreFinal >= 40)
             {
                 Nivel = "Moderado";
@@ -101,8 +116,6 @@ namespace ProjetoTerapia.Pages
 
                 Recomendacao = "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
             }
-
-            // LEVEMENTE MODERADO
             else if (ScoreFinal >= 25)
             {
                 Nivel = "Levemente Moderado";
@@ -111,8 +124,6 @@ namespace ProjetoTerapia.Pages
 
                 Recomendacao = "Pequenas mudanças na rotina e o suporte adequado podem ajudar a preservar seu equilíbrio emocional.";
             }
-
-            // LEVE
             else
             {
                 Nivel = "Leve";
@@ -123,6 +134,120 @@ namespace ProjetoTerapia.Pages
             }
 
             MostrarResultado = true;
+
+            SalvarResultadoSePacienteLogado(ansiedade, depressao);
+
+            return Page();
         }
+
+        private void SalvarResultadoSePacienteLogado(int ansiedade, int depressao)
+        {
+            var pacienteIdSessao = HttpContext.Session.GetString("PacienteLogado");
+
+            if (string.IsNullOrEmpty(pacienteIdSessao))
+            {
+                ResultadoSalvo = false;
+                return;
+            }
+
+            if (!int.TryParse(pacienteIdSessao, out int pacienteId))
+            {
+                ResultadoSalvo = false;
+                return;
+            }
+
+            var pacienteExiste = _context.Pacientes
+                .Any(p => p.Id == pacienteId);
+
+            if (!pacienteExiste)
+            {
+                ResultadoSalvo = false;
+                return;
+            }
+
+            var resultadoFinal = DefinirResultadoFinal();
+
+            var resultado = new ResultadoTestePaciente
+            {
+                PacienteId = pacienteId,
+
+                PontuacaoAnsiedade = ansiedade,
+                PontuacaoDepressao = depressao,
+
+                PercentualAnsiedade = Convert.ToDecimal(PorcentagemAnsiedade),
+                PercentualDepressao = Convert.ToDecimal(PorcentagemDepressao),
+
+                ResultadoFinal = resultadoFinal,
+                Nivel = Nivel,
+                Mensagem = Mensagem,
+
+                DataResultado = DateTime.Now
+            };
+
+            _context.ResultadosTestePacientes.Add(resultado);
+            _context.SaveChanges();
+
+            ResultadoSalvo = true;
+        }
+
+        private string DefinirResultadoFinal()
+        {
+            if (ScoreFinal < 25)
+            {
+                return "Bem-estar preservado";
+            }
+
+            var diferenca = Math.Abs(PorcentagemAnsiedade - PorcentagemDepressao);
+
+            if (PorcentagemAnsiedade >= 40 && PorcentagemDepressao >= 40 && diferenca <= 20)
+            {
+                return "Sinais mistos";
+            }
+
+            if (PorcentagemAnsiedade > PorcentagemDepressao)
+            {
+                return "Sinais predominantes de ansiedade";
+            }
+
+            if (PorcentagemDepressao > PorcentagemAnsiedade)
+            {
+                return "Sinais predominantes de depressão";
+            }
+
+            return "Atenção emocional";
+        }
+
+        private void CarregarPacienteLogado()
+        {
+            var pacienteIdSessao = HttpContext.Session.GetString("PacienteLogado");
+
+            if (string.IsNullOrEmpty(pacienteIdSessao))
+            {
+                PacienteLogado = false;
+                NomePaciente = "";
+                return;
+            }
+
+            if (!int.TryParse(pacienteIdSessao, out int pacienteId))
+            {
+                PacienteLogado = false;
+                NomePaciente = "";
+                return;
+            }
+
+            var paciente = _context.Pacientes
+                .FirstOrDefault(x => x.Id == pacienteId);
+
+            if (paciente == null)
+            {
+                PacienteLogado = false;
+                NomePaciente = "";
+                return;
+            }
+
+            PacienteLogado = true;
+            NomePaciente = paciente.Nome;
+        }
+
     }
 }

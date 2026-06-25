@@ -7,6 +7,7 @@ namespace ProjetoTerapia.Models
     {
         public DbSet<Clinica> Clinicas { get; set; }
         public DbSet<RegistroHumor> RegistrosHumor { get; set; }
+        public DbSet<ResultadoTestePaciente> ResultadosTestePacientes { get; set; }
         public DbSet<RecuperacaoSenhaPaciente> RecuperacoesSenhaPacientes { get; set; }
         public DbSet<Paciente> Pacientes { get; set; }
         public DbSet<RecuperacaoSenha> RecuperacoesSenha { get; set; }
