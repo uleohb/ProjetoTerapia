@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using System.Linq;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
@@ -21,8 +21,6 @@ namespace ProjetoTerapia.Pages
 
         public List<Clinica> Clinicas { get; set; } = new List<Clinica>();
 
-        // NOVOS DADOS DO DASHBOARD
-
         public int TotalClinicas { get; set; }
 
         public int Pendentes { get; set; }
@@ -31,9 +29,19 @@ namespace ProjetoTerapia.Pages
 
         public int Ativas { get; set; }
 
-        public decimal ReceitaPrevista { get; set; }
+        public int PagamentosPendentes { get; set; }
+
+        public int AlteracoesPendentes { get; set; }
+
+        public int TotalVisualizacoes { get; set; }
+
+        public int TotalCliquesWhatsapp { get; set; }
 
         public int TaxaConversao { get; set; }
+
+        public decimal ReceitaPrevista { get; set; }
+
+        public string ReceitaPrevistaFormatada { get; set; } = "R$ 0,00";
 
         [BindProperty(SupportsGet = true)]
         public string Busca { get; set; } = "";
@@ -41,116 +49,115 @@ namespace ProjetoTerapia.Pages
         [BindProperty(SupportsGet = true)]
         public string FiltroStatus { get; set; } = "";
 
-
         public IActionResult OnGet()
         {
-            if (HttpContext.Session.GetString("AdminLogado") != "true")
+            if (!AdminEstaLogado())
             {
                 return RedirectToPage("/LoginAdmin");
             }
 
-            var query = _context.Clinicas.AsQueryable();
-
-            if (!string.IsNullOrEmpty(Busca))
-            {
-                query = query.Where(c => c.Nome.Contains(Busca));
-            }
-
-            if (!string.IsNullOrEmpty(FiltroStatus))
-            {
-                if (FiltroStatus == "pendente")
-                    query = query.Where(c => !c.Aprovado);
-
-                if (FiltroStatus == "aprovado")
-                    query = query.Where(c => c.Aprovado && !c.Pago);
-
-                if (FiltroStatus == "ativo")
-                    query = query.Where(c => c.Pago);
-            }
-
-            Clinicas = query.ToList();
-
-            // MÉTRICAS
-
-            TotalClinicas = Clinicas.Count;
-
-            Pendentes = Clinicas.Count(c => !c.Aprovado);
-
-            Aprovadas = Clinicas.Count(c => c.Aprovado && !c.Pago);
-
-            Ativas = Clinicas.Count(c => c.Pago);
-
-            // Exemplo: plano anual R$ 360
-            ReceitaPrevista = Ativas * 360;
-
-            if (Aprovadas + Ativas > 0)
-            {
-                TaxaConversao = (Ativas * 100) / (Aprovadas + Ativas);
-            }
-            else
-            {
-                TaxaConversao = 0;
-            }
+            CarregarDados();
 
             return Page();
         }
 
         public IActionResult OnPost(int id, string acao)
         {
+            if (!AdminEstaLogado())
+            {
+                return RedirectToPage("/LoginAdmin");
+            }
+
             var clinica = _context.Clinicas.FirstOrDefault(c => c.Id == id);
 
-            if (clinica != null)
+            if (clinica == null)
             {
-                if (acao == "aprovar")
+                TempData["MensagemErro"] = "Clínica não encontrada.";
+                return RedirectToPage(new { aba = "clinicas" });
+            }
+
+            if (acao == "aprovar")
+            {
+                clinica.Aprovado = true;
+                clinica.Pago = false;
+                clinica.DataAprovacao = DateTime.Now;
+
+                TempData["MensagemSucesso"] =
+                    $"Clínica {clinica.Nome} aprovada com sucesso.";
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "clinicas" });
+            }
+
+            if (acao == "aprovarAlteracao")
+            {
+                clinica.ClinicaAlteracaoPendente = false;
+
+                TempData["MensagemSucesso"] =
+                    $"Alterações da clínica {clinica.Nome} aprovadas com sucesso.";
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "clinicas" });
+            }
+
+            if (acao == "pagar")
+            {
+                if (!clinica.Aprovado)
                 {
-                    clinica.Aprovado = true;
-                    clinica.Pago = false;
-                    clinica.DataAprovacao = DateTime.Now;
-
-                    TempData["MensagemSucesso"] =
-                        $"Clínica {clinica.Nome} aprovada com sucesso!";
-                }
-
-                if (acao == "aprovarAlteracao")
-                {
-                    clinica.ClinicaAlteracaoPendente = false;
-
-                    TempData["MensagemSucesso"] =
-                        $"Alterações da clínica {clinica.Nome} aprovadas com sucesso!";
-                }
-
-                if (acao == "pagar")
-                {
-                    if (!clinica.Aprovado)
-                    {
-                        TempData["MensagemErro"] =
-                            "A clínica precisa ser aprovada antes do pagamento.";
-
-                        return RedirectToPage(new { aba = "clinicas" });
-                    }
-
-                    clinica.Pago = true;
-                    clinica.DataPagamento = DateTime.Now;
-                    clinica.DataVencimento = DateTime.Now.AddYears(1);
-
-                    TempData["MensagemSucesso"] =
-                        $"Pagamento da clínica {clinica.Nome} confirmado com sucesso!";
-                }
-
-                if (acao == "excluir")
-                {
-                    _context.Clinicas.Remove(clinica);
-
-                    TempData["MensagemSucesso"] =
-                        $"Clínica {clinica.Nome} removida com sucesso!";
-
-                    _context.SaveChanges();
+                    TempData["MensagemErro"] =
+                        "A clínica precisa ser aprovada antes da confirmação do pagamento.";
 
                     return RedirectToPage(new { aba = "clinicas" });
                 }
 
+                clinica.Pago = true;
+                clinica.NomePlano = "Plano Profissional Anual";
+                clinica.ValorPlano = 360;
+                clinica.DataPagamento = DateTime.Now;
+                clinica.DataVencimento = DateTime.Now.AddYears(1);
+
+                TempData["MensagemSucesso"] =
+                    $"Pagamento da clínica {clinica.Nome} confirmado com sucesso.";
+
                 _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "pagamentos" });
             }
+
+            if (acao == "suspender")
+            {
+                clinica.Pago = false;
+
+                TempData["MensagemSucesso"] =
+                    $"Plano da clínica {clinica.Nome} foi suspenso.";
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "clinicas" });
+            }
+
+            if (acao == "excluir")
+            {
+                try
+                {
+                    _context.Clinicas.Remove(clinica);
+                    _context.SaveChanges();
+
+                    TempData["MensagemSucesso"] =
+                        $"Clínica {clinica.Nome} removida com sucesso.";
+                }
+                catch
+                {
+                    TempData["MensagemErro"] =
+                        "Não foi possível excluir esta clínica porque ela pode possuir vínculos no sistema.";
+                }
+
+                return RedirectToPage(new { aba = "clinicas" });
+            }
+
+            TempData["MensagemErro"] = "Ação inválida.";
 
             return RedirectToPage(new { aba = "clinicas" });
         }
@@ -159,6 +166,82 @@ namespace ProjetoTerapia.Pages
         {
             HttpContext.Session.Clear();
             return RedirectToPage("/LoginAdmin");
+        }
+
+        private bool AdminEstaLogado()
+        {
+            return HttpContext.Session.GetString("AdminLogado") == "true";
+        }
+
+        private void CarregarDados()
+        {
+            var todasClinicas = _context.Clinicas.ToList();
+
+            TotalClinicas = todasClinicas.Count;
+            Pendentes = todasClinicas.Count(c => !c.Aprovado);
+            Aprovadas = todasClinicas.Count(c => c.Aprovado && !c.Pago);
+            Ativas = todasClinicas.Count(c => c.Pago);
+            PagamentosPendentes = todasClinicas.Count(c => c.Aprovado && !c.Pago);
+            AlteracoesPendentes = todasClinicas.Count(c => c.ClinicaAlteracaoPendente);
+
+            TotalVisualizacoes = todasClinicas.Sum(c => c.Visualizacoes);
+            TotalCliquesWhatsapp = todasClinicas.Sum(c => c.CliquesWhatsapp);
+
+            ReceitaPrevista = todasClinicas
+                .Where(c => c.Pago)
+                .Sum(c => c.ValorPlano ?? 360);
+
+            ReceitaPrevistaFormatada =
+                ReceitaPrevista.ToString("C", new CultureInfo("pt-BR"));
+
+            var totalAprovadasOuAtivas = Aprovadas + Ativas;
+
+            TaxaConversao = totalAprovadasOuAtivas > 0
+                ? (Ativas * 100) / totalAprovadasOuAtivas
+                : 0;
+
+            var query = todasClinicas.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(Busca))
+            {
+                var buscaNormalizada = Busca.Trim();
+
+                query = query.Where(c =>
+                    c.Nome.Contains(buscaNormalizada, StringComparison.OrdinalIgnoreCase) ||
+                    c.Email.Contains(buscaNormalizada, StringComparison.OrdinalIgnoreCase) ||
+                    c.Cidade.Contains(buscaNormalizada, StringComparison.OrdinalIgnoreCase)
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(FiltroStatus))
+            {
+                if (FiltroStatus == "pendente")
+                {
+                    query = query.Where(c => !c.Aprovado);
+                }
+
+                if (FiltroStatus == "aprovado")
+                {
+                    query = query.Where(c => c.Aprovado && !c.Pago);
+                }
+
+                if (FiltroStatus == "ativo")
+                {
+                    query = query.Where(c => c.Pago);
+                }
+
+                if (FiltroStatus == "alteracao")
+                {
+                    query = query.Where(c => c.ClinicaAlteracaoPendente);
+                }
+            }
+
+            Clinicas = query
+                .OrderByDescending(c => c.ClinicaAlteracaoPendente)
+                .ThenBy(c => c.Aprovado)
+                .ThenBy(c => c.Pago)
+                .ThenBy(c => c.Nome)
+                .ToList();
         }
     }
 }

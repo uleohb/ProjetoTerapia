@@ -10,9 +10,7 @@ namespace ProjetoTerapia.Pages
 {
     public class CadastroClinicaModel : PageModel
     {
-
         private readonly AppDbContext _context;
-
         private readonly IWebHostEnvironment _environment;
 
         public CadastroClinicaModel(
@@ -28,10 +26,11 @@ namespace ProjetoTerapia.Pages
 
         public List<string> EspecialidadesSelecionadas { get; set; } = new();
 
-
-        // Propriedade para upload de foto (opcional)
         [BindProperty]
         public IFormFile? FotoUpload { get; set; }
+
+        [BindProperty]
+        public string? FotoFinal { get; set; }
 
         public IActionResult OnGet()
         {
@@ -48,14 +47,14 @@ namespace ProjetoTerapia.Pages
 
                     if (!string.IsNullOrEmpty(clinica.Especialidades))
                     {
-                        EspecialidadesSelecionadas =
-                            clinica.Especialidades.Split(',').ToList();
+                        EspecialidadesSelecionadas = clinica.Especialidades
+                            .Split(',')
+                            .Select(e => e.Trim())
+                            .Where(e => !string.IsNullOrWhiteSpace(e))
+                            .ToList();
                     }
                 }
             }
-
-            Console.WriteLine($"CLINICA CARREGADA: {NovaClinica.Id}");
-            Console.WriteLine($"EMAIL: {NovaClinica.Email}");
 
             return Page();
         }
@@ -65,85 +64,30 @@ namespace ProjetoTerapia.Pages
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
             Clinica? clinica;
+            bool editandoPerfil = id != null;
 
-            // =========================================
-            // EDITAR PERFIL
-            // =========================================
-            if (id != null)
+            if (editandoPerfil)
             {
                 clinica = _context.Clinicas
-                    .FirstOrDefault(c => c.Id == int.Parse(id));
+                    .FirstOrDefault(c => c.Id == int.Parse(id!));
 
                 if (clinica == null)
                 {
                     return RedirectToPage("/LoginClinica");
                 }
-
             }
-
-         
-
-            // =========================================
-            // NOVO CADASTRO
-            // =========================================
             else
             {
                 clinica = new Clinica();
 
-                _context.Clinicas.Add(clinica);
-
                 clinica.Aprovado = false;
                 clinica.Pago = false;
+                clinica.PerfilCompleto = false;
+                clinica.ClinicaAlteracaoPendente = false;
+
+                _context.Clinicas.Add(clinica);
             }
 
-            // =========================================
-            // TELEFONE
-            // =========================================
-            if (!string.IsNullOrEmpty(NovaClinica.Telefone))
-            {
-                NovaClinica.Telefone = NovaClinica.Telefone
-                    .Replace("(", "")
-                    .Replace(")", "")
-                    .Replace("-", "")
-                    .Replace(" ", "")
-                    .Replace("+", "");
-
-                if (!NovaClinica.Telefone.StartsWith("55"))
-                {
-                    NovaClinica.Telefone = "55" + NovaClinica.Telefone;
-                }
-            }
-
-            // =========================================
-            // INSTAGRAM
-            // =========================================
-            if (!string.IsNullOrEmpty(NovaClinica.Instagram))
-            {
-                NovaClinica.Instagram = NovaClinica.Instagram
-                    .Replace("@", "")
-                    .Trim();
-
-                if (!NovaClinica.Instagram.StartsWith("http"))
-                {
-                    NovaClinica.Instagram =
-                        "https://instagram.com/" + NovaClinica.Instagram;
-                }
-            }
-
-            // =========================================
-            // SITE
-            // =========================================
-            if (!string.IsNullOrEmpty(NovaClinica.Site))
-            {
-                if (!NovaClinica.Site.StartsWith("http"))
-                {
-                    NovaClinica.Site = "https://" + NovaClinica.Site;
-                }
-            }
-
-            // =========================================
-            // VALIDAR ATENDIMENTO
-            // =========================================
             if (!NovaClinica.AtendimentoOnline &&
                 !NovaClinica.AtendimentoPresencial)
             {
@@ -152,20 +96,19 @@ namespace ProjetoTerapia.Pages
                     "Selecione pelo menos um tipo de atendimento."
                 );
 
+                RecarregarEspecialidadesSelecionadas();
                 return Page();
             }
 
-            // =========================================
-            // ESPECIALIDADES
-            // =========================================
+            NormalizarTelefone();
+            NormalizarInstagram();
+            NormalizarSite();
+
             var especialidades = Request.Form["Especialidades"];
 
             clinica.Especialidades =
                 string.Join(",", especialidades.ToArray());
 
-            // =========================================
-            // DADOS
-            // =========================================
             clinica.Nome = NovaClinica.Nome;
             clinica.Descricao = NovaClinica.Descricao;
             clinica.CEP = NovaClinica.CEP;
@@ -178,87 +121,135 @@ namespace ProjetoTerapia.Pages
             clinica.CPF = NovaClinica.CPF;
             clinica.Valor = NovaClinica.Valor;
 
-            clinica.AtendimentoOnline =
-                NovaClinica.AtendimentoOnline;
-
-            clinica.AtendimentoPresencial =
-                NovaClinica.AtendimentoPresencial;
+            clinica.AtendimentoOnline = NovaClinica.AtendimentoOnline;
+            clinica.AtendimentoPresencial = NovaClinica.AtendimentoPresencial;
 
             clinica.PerfilCompleto = true;
+
+            SalvarFotoRecortada(clinica);
 
             if (clinica.Aprovado)
             {
                 clinica.ClinicaAlteracaoPendente = true;
+
+                TempData["Sucesso"] =
+                    "Alterações salvas e enviadas para análise da equipe.";
             }
-
-            // =========================================
-            // FOTO DE PERFIL
-            // =========================================
-
-            if (FotoUpload != null)
+            else
             {
-                // cria pasta uploads se não existir
-                var pastaUploads = Path.Combine(
-                    _environment.WebRootPath,
-                    "uploads"
-                );
-
-                if (!Directory.Exists(pastaUploads))
-                {
-                    Directory.CreateDirectory(pastaUploads);
-                }
-
-                // nome único da imagem
-                var nomeArquivo =
-                    Guid.NewGuid().ToString()
-                    + Path.GetExtension(FotoUpload.FileName);
-
-                var caminhoArquivo = Path.Combine(
-                    pastaUploads,
-                    nomeArquivo
-                );
-
-                // salva arquivo
-                using (var stream = new FileStream(
-                    caminhoArquivo,
-                    FileMode.Create))
-                {
-                    FotoUpload.CopyTo(stream);
-                }
-
-                // salva no banco
-                clinica.FotoPerfil = "/uploads/" + nomeArquivo;
+                TempData["Sucesso"] =
+                    "Perfil enviado para análise com sucesso!";
             }
-
-            Console.WriteLine("ANTES DE SALVAR");
-            Console.WriteLine($"Nome: {clinica.Nome}");
-            Console.WriteLine($"Descricao: {clinica.Descricao}");
-            Console.WriteLine($"Telefone: {clinica.Telefone}");
-            Console.WriteLine($"PerfilCompleto: {clinica.PerfilCompleto}");
-            Console.WriteLine($"SALVANDO ID: {clinica.Id}");
-            Console.WriteLine($"EMAIL: {clinica.Email}");
 
             _context.SaveChanges();
 
-
-            Console.WriteLine("DEPOIS DE SALVAR");
-            Console.WriteLine($"ID DA CLINICA: {clinica.Id}");
-
-            // =========================================
-            // LOGIN AUTOMÁTICO NO PRIMEIRO CADASTRO
-            // =========================================
-
-            if (id == null)
+            if (!editandoPerfil)
             {
+                HttpContext.Session.Remove("PacienteLogado");
+
                 HttpContext.Session.SetString(
                     "ClinicaLogada",
                     clinica.Id.ToString()
                 );
             }
 
-            TempData["Sucesso"] = "Perfil enviado para análise com sucesso!";
-
             return RedirectToPage("/CadastroClinica");
+        }
+
+        private void NormalizarTelefone()
+        {
+            if (!string.IsNullOrEmpty(NovaClinica.Telefone))
+            {
+                NovaClinica.Telefone = NovaClinica.Telefone
+                    .Replace("(", "")
+                    .Replace(")", "")
+                    .Replace("-", "")
+                    .Replace(" ", "")
+                    .Replace("+", "")
+                    .Trim();
+
+                if (!NovaClinica.Telefone.StartsWith("55"))
+                {
+                    NovaClinica.Telefone = "55" + NovaClinica.Telefone;
+                }
+            }
+        }
+
+        private void NormalizarInstagram()
+        {
+            if (!string.IsNullOrEmpty(NovaClinica.Instagram))
+            {
+                NovaClinica.Instagram = NovaClinica.Instagram
+                    .Replace("@", "")
+                    .Trim();
+
+                if (!NovaClinica.Instagram.StartsWith("http"))
+                {
+                    NovaClinica.Instagram =
+                        "https://instagram.com/" + NovaClinica.Instagram;
+                }
+            }
+        }
+
+        private void NormalizarSite()
+        {
+            if (!string.IsNullOrEmpty(NovaClinica.Site))
+            {
+                NovaClinica.Site = NovaClinica.Site.Trim();
+
+                if (!NovaClinica.Site.StartsWith("http"))
+                {
+                    NovaClinica.Site = "https://" + NovaClinica.Site;
+                }
+            }
+        }
+
+        private void SalvarFotoRecortada(Clinica clinica)
+        {
+            if (string.IsNullOrWhiteSpace(FotoFinal))
+            {
+                return;
+            }
+
+            var base64 = FotoFinal;
+
+            if (base64.Contains(","))
+            {
+                base64 = base64.Split(',')[1];
+            }
+
+            var bytes = Convert.FromBase64String(base64);
+
+            var pastaUploads = Path.Combine(
+                _environment.WebRootPath,
+                "uploads"
+            );
+
+            if (!Directory.Exists(pastaUploads))
+            {
+                Directory.CreateDirectory(pastaUploads);
+            }
+
+            var nomeArquivo = Guid.NewGuid().ToString() + ".jpg";
+
+            var caminhoArquivo = Path.Combine(
+                pastaUploads,
+                nomeArquivo
+            );
+
+            System.IO.File.WriteAllBytes(caminhoArquivo, bytes);
+
+            clinica.FotoPerfil = "/uploads/" + nomeArquivo;
+        }
+
+        private void RecarregarEspecialidadesSelecionadas()
+        {
+            var especialidades = Request.Form["Especialidades"];
+
+            EspecialidadesSelecionadas = especialidades
+                .Select(e => e ?? "")
+                .Where(e => !string.IsNullOrWhiteSpace(e))
+                .ToList();
         }
     }
 }

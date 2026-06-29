@@ -1,640 +1,1117 @@
 ﻿@page
 @model ProjetoTerapia.Pages.AdminLHModel
 
+<div class="admin-page">
 
-<div class="layout">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3 class="logo">Ponto Saúde</h3>
+    <aside class="sidebar-admin">
 
-        <a href="javascript:void(0)" onclick="mostrarAba('dashboard', this)">🏠 Dashboard</a>
-        <a href="javascript:void(0)" onclick="mostrarAba('clinicas', this)">🏥 Clínicas</a>
-        <a href="javascript:void(0)" onclick="mostrarAba('pagamentos', this)">💰 Pagamentos</a>
+        <div class="logo-admin">
+            <img src="/imagem/logo.png" alt="Alinhamento" />
+        </div>
 
-        <input type="hidden" id="abaAtual" value="dashboard" /> 
+        <nav class="menu-admin">
 
-        <form method="post" asp-page-handler="Logout">
-            <button class="btn-logout">Sair</button>
+            <a href="javascript:void(0)" onclick="mostrarAba('dashboard', this)">
+                Dashboard
+            </a>
+
+            <a href="javascript:void(0)" onclick="mostrarAba('clinicas', this)">
+                Clínicas
+            </a>
+
+            <a href="javascript:void(0)" onclick="mostrarAba('pagamentos', this)">
+                Pagamentos
+            </a>
+
+            <a href="javascript:void(0)" onclick="mostrarAba('divulgacao', this)">
+                Clube de Descontos
+            </a>
+
+        </nav>
+
+        <form method="post" asp-page-handler="Logout" class="form-logout">
+            <button class="btn-logout">
+                Sair
+            </button>
         </form>
-    </div>
 
-    <!-- CONTEÚDO -->
-    <div class="conteudo">
+    </aside>
+
+    <main class="conteudo-admin">
 
         @if (TempData["MensagemSucesso"] != null)
         {
             <div class="alerta-sucesso">
-                ✅ @TempData["MensagemSucesso"]
+                @TempData["MensagemSucesso"]
             </div>
         }
 
         @if (TempData["MensagemErro"] != null)
         {
             <div class="alerta-erro">
-                ⚠️ @TempData["MensagemErro"]
+                @TempData["MensagemErro"]
             </div>
         }
 
-        <div id="dashboard" class="aba">
+        <section id="dashboard" class="aba">
 
-            <h2 class="titulo-dashboard">📊 Painel Administrativo</h2>
-            <p class="subtitulo-dashboard">
-                Visão geral da plataforma Ponto Saúde
-            </p>
+            <div class="topo-conteudo">
+
+                <div>
+                    <span class="badge-admin">
+                        Administração
+                    </span>
+
+                    <h1>
+                        Painel Administrativo
+                    </h1>
+
+                    <p>
+                        Acompanhe cadastros, pagamentos, visualizações e solicitações da plataforma.
+                    </p>
+                </div>
+
+                <a href="/Teste" class="btn-site">
+                    Ver site
+                </a>
+
+            </div>
 
             <div class="cards-dashboard">
 
                 <div class="card-info">
-                    <span class="card-label">Total de Clínicas</span>
-                    <h3>@Model.TotalClinicas</h3>
+                    <span>Total de profissionais</span>
+                    <strong>@Model.TotalClinicas</strong>
                     <p>Cadastros realizados</p>
                 </div>
 
-                <div class="card-info">
-                    <span class="card-label">Pendentes</span>
-                    <h3>@Model.Pendentes</h3>
+                <div class="card-info pendente">
+                    <span>Pendentes</span>
+                    <strong>@Model.Pendentes</strong>
                     <p>Aguardando aprovação</p>
                 </div>
 
-                <div class="card-info">
-                    <span class="card-label">Ativas</span>
-                    <h3>@Model.Ativas</h3>
+                <div class="card-info ativo">
+                    <span>Ativos</span>
+                    <strong>@Model.Ativas</strong>
                     <p>Pagamentos confirmados</p>
                 </div>
 
-                <div class="card-info destaque">
-                    <span class="card-label">Receita Anual</span>
-                    <h3>R$ @Model.ReceitaPrevista</h3>
-                    <p>Plano anual ativo</p>
+                <div class="card-info alerta">
+                    <span>Alterações pendentes</span>
+                    <strong>@Model.AlteracoesPendentes</strong>
+                    <p>Perfis aguardando revisão</p>
                 </div>
 
-                <div class="card-info destaque-secundario">
-                    <span class="card-label">Taxa de Conversão</span>
-                    <h3>@Model.TaxaConversao%</h3>
-                    <p>De aprovadas para pagas</p>
+                <div class="card-info destaque">
+                    <span>Receita prevista</span>
+                    <strong>@Model.ReceitaPrevistaFormatada</strong>
+                    <p>Planos ativos no sistema</p>
+                </div>
+
+                <div class="card-info">
+                    <span>Visualizações</span>
+                    <strong>@Model.TotalVisualizacoes</strong>
+                    <p>Total de acessos aos perfis</p>
+                </div>
+
+                <div class="card-info">
+                    <span>Cliques WhatsApp</span>
+                    <strong>@Model.TotalCliquesWhatsapp</strong>
+                    <p>Contatos iniciados</p>
+                </div>
+
+                <div class="card-info conversao">
+                    <span>Conversão</span>
+                    <strong>@Model.TaxaConversao%</strong>
+                    <p>Aprovadas que viraram pagas</p>
                 </div>
 
             </div>
 
-        
+        </section>
 
-         </div>
+        <section id="divulgacao" class="aba" style="display:none">
 
-        <hr />
+            <div class="topo-secao">
 
-        <div id="clinicas" class="aba" style="display:none">
-
-            <h3>Gerenciar Clínicas</h3>
-            
-            <form method="get" class="filtros-admin"> @*faz a página recarregar*@
-
-                <input type="hidden" name="aba" value="clinicas" /> @*enviar junto com o filtro quando a busca é utilizada*@
-
-                <input type="text"
-                       name="Busca"
-                       value="@Model.Busca"
-                       placeholder="Buscar clínica pelo nome..." />
-
-                <select name="FiltroStatus">
-                    <option value="">Todos os status</option>
-                    <option value="pendente">Pendentes</option>
-                    <option value="aprovado">Aprovadas</option>
-                    <option value="ativo">Ativas</option>
-                </select>
-
-                <button type="submit" class="btn-filtrar">
-                    Filtrar
-                </button>
-
-
-            </form>
-
-            @foreach (var clinica in Model.Clinicas
-                        .OrderBy(c => c.Aprovado)
-                        .ThenBy(c => c.Pago))
-            {
-                <div class="card @(clinica.Pago ? "pago" : clinica.Aprovado ? "aprovado" : "pendente")">
-
-                    <h5>@clinica.Nome</h5>
-                    <p>@clinica.Descricao</p>
-                    <p><strong>R$ @clinica.Valor</strong></p>
-                    <p>@clinica.Endereco</p>
+                <div>
+                    <h2>
+                        Clube de Descontos
+                    </h2>
 
                     <p>
-                        @(clinica.Aprovado ? "✅ Aprovado" : "⏳ Pendente")
-                        |
-                        @(clinica.Pago ? "💰 Pago" : "💸 Não pago")
+                        Gerencie os planos de divulgação regional para profissionais que desejam aparecer em mais cidades.
                     </p>
+                </div>
 
-                    @if (clinica.ClinicaAlteracaoPendente)
-                    {
-                        <p style="color:#f59e0b;font-weight:bold;">
-                            🔄 Alterações aguardando aprovação
-                        </p>
-                    }
+            </div>
 
-                    @if (clinica.DataAprovacao != null)
-                    {
-                        <p>📅 Aprovado em: @clinica.DataAprovacao.Value.ToString("dd/MM/yyyy")</p>
-                    }
+            <div class="clube-grid">
 
-                    @if (clinica.DataVencimento != null)
-                    {
-                        <p>⏳ Vence em: @clinica.DataVencimento.Value.ToString("dd/MM/yyyy")</p>
-                    }
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+5 cidades</h3>
+                    <strong>R$ 30,00</strong>
+                    <p>Exibição em até 5 cidades adicionais.</p>
+                </div>
 
-                    <form method="post">
-                        <input type="hidden" name="id" value="@clinica.Id" />
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+10 cidades</h3>
+                    <strong>R$ 35,00</strong>
+                    <p>Exibição em até 10 cidades adicionais.</p>
+                </div>
 
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+15 cidades</h3>
+                    <strong>R$ 45,00</strong>
+                    <p>Maior alcance para atendimentos online.</p>
+                </div>
 
-                        @*botão de aprovar clinica depois de ser analisada*@
-                        @if (!clinica.Aprovado)
-                        {
-                            <button type="submit"
-                                    name="acao"
-                                    value="aprovar"
-                                    onclick='return confirmarAcao(this, "aprovar esta clínica?")'>
-                                Aprovar
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+20 cidades</h3>
+                    <strong>R$ 50,00</strong>
+                    <p>Presença ampliada em regiões estratégicas.</p>
+                </div>
 
-                            </button>
-                        }
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+25 cidades</h3>
+                    <strong>R$ 55,00</strong>
+                    <p>Plano com maior alcance regional.</p>
+                </div>
 
-                        @if (clinica.ClinicaAlteracaoPendente)
-                        {
-                            <button type="submit"
-                                    name="acao"
-                                    value="aprovarAlteracao"
-                                    onclick='return confirmarAcao(this, "aprovar as alterações desta clínica?")'>
-                                Aprovar Alterações
-                            </button>
-                        }
+            </div>
 
-                        @*botão de confirmar pagamento de clinica*@
-                        @if (clinica.Aprovado && !clinica.Pago)
-                        {
-                            <button type="submit"
-                             name="acao"
-                             value="pagar"
-                             onclick='return confirmarAcao(this, "confirmar o pagamento desta clínica?")'>
-                              Confirmar pagamento
-                        </button>
-                        }
+            <div class="gestao-clube">
 
-                        @*botão de exlcuir clinica*@
-                        <button type="submit" 
-                                name="acao"
-                                value="excluir"
-                                onclick='return confirmarAcao(this, "excluir permanentemente esta clínica?")'>
-                            Excluir
-                        </button>
+                <div class="gestao-card">
 
-                    </form>
+                    <span>Status atual</span>
+
+                    <h3>
+                        Gestão manual
+                    </h3>
+
+                    <p>
+                        No momento, as solicitações de divulgação regional podem ser controladas manualmente pela administração após confirmação do pagamento.
+                    </p>
 
                 </div>
-            }
 
-        </div>
+                <div class="gestao-card destaque">
 
-        <div id="pagamentos" class="aba" style="display:none">
+                    <span>Próximo recurso</span>
 
-            <h3>💰 Pagamentos</h3>
+                    <h3>
+                        Ativação automática
+                    </h3>
 
-            @foreach (var clinica in Model.Clinicas.Where(c => c.Aprovado && !c.Pago))
-            {
-                <div class="card">
-
-                    <h5>@clinica.Nome</h5>
-                    <p><strong>Plano Ponto Saúde</strong></p>
-                    <p>R$ 360 / ano (até 12x no cartão)</p>
-
-                    <a href="https://mpago.la/33FgjZL" target="_blank" rel="noopener noreferrer" class="btn-pagar">
-                        💳 Assinar plano anual
-                    </a>
-
-                    <p style="font-size:12px; color:gray;">
-                        Pagamento 100% seguro via Mercado Pago
+                    <p>
+                        Depois criaremos o cadastro de cidades extras para que o profissional apareça automaticamente nas buscas regionais após a aprovação.
                     </p>
-
-                    <p style="font-size:12px; color:#28a745;">
-                        ✔ Após o pagamento, aguarde aprovação do sistema
-                    </p>
-
-                    <form method="post">
-                        <input type="hidden" name="id" value="@clinica.Id" />
-                        <button type="submit"
-                                name="acao"
-                                value="pagar"
-                                onclick='return confirmarAcao(this, "confirmar o pagamento desta clínica?")'>
-                            Confirmar pagamento
-                        </button>
-                    </form>
 
                 </div>
-            }
 
-        </div>
+            </div>
 
-    </div>
+        </section>
 
-         <!-- MODAL DE CONFIRMAÇÃO -->
-   <div id="modalConfirmacao" class="modal-confirmacao">
+        <section id="pagamentos" class="aba" style="display:none">
+
+            <div class="topo-secao">
+
+                <div>
+                    <h2>
+                        Pagamentos
+                    </h2>
+
+                    <p>
+                        Confirme manualmente pagamentos realizados pelo link do Mercado Pago.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="lista-clinicas">
+
+                @foreach (var clinica in Model.Clinicas.Where(c => c.Aprovado && !c.Pago))
+                {
+                    <article class="card-clinica">
+
+                        <div class="card-topo">
+
+                            <div>
+                                <h3>@clinica.Nome</h3>
+                                <p>@clinica.Email</p>
+                            </div>
+
+                            <span class="tag nao-pago">
+                                Pagamento pendente
+                            </span>
+
+                        </div>
+
+                        <div class="pagamento-box">
+
+                            <div>
+                                <span>Plano</span>
+                                <strong>Plano Profissional Anual</strong>
+                            </div>
+
+                            <div>
+                                <span>Valor</span>
+                                <strong>R$ 360,00 / ano</strong>
+                            </div>
+
+                            <div>
+                                <span>Forma atual</span>
+                                <strong>Link Mercado Pago</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="acoes-card-admin">
+
+                            <a href="https://mpago.la/33FgjZL"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn-ver-perfil">
+                                Abrir link de pagamento
+                            </a>
+
+                            <form method="post">
+
+                                <input type="hidden" name="id" value="@clinica.Id" />
+
+                                <button type="submit"
+                                        name="acao"
+                                        value="pagar"
+                                        class="btn-acao pagar"
+                                        onclick='return confirmarAcao(this, "confirmar o pagamento deste profissional?")'>
+                                    Confirmar pagamento
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.Clinicas.Any(c => c.Aprovado && !c.Pago))
+                {
+                    <div class="vazio-card">
+                        Nenhum pagamento pendente no momento.
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+        <section id="divulgacao" class="aba" style="display:none">
+
+            <div class="topo-secao">
+
+                <div>
+                    <h2>
+                        Clube de Descontos
+                    </h2>
+
+                    <p>
+                        Base inicial para controlar divulgação regional e cidades extras dos profissionais.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="clube-grid">
+
+                <div class="clube-card">
+                    <span>Plano regional</span>
+                    <h3>+5 cidades</h3>
+                    <strong>R$ 30,00</strong>
+                    <p>Ideal para profissionais que querem aparecer em regiões próximas.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Plano regional</span>
+                    <h3>+10 cidades</h3>
+                    <strong>R$ 35,00</strong>
+                    <p>Boa opção para profissionais com atendimento online.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Plano regional</span>
+                    <h3>+15 cidades</h3>
+                    <strong>R$ 45,00</strong>
+                    <p>Amplia o alcance em capitais e cidades estratégicas.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Plano regional</span>
+                    <h3>+20 cidades</h3>
+                    <strong>R$ 50,00</strong>
+                    <p>Plano intermediário para maior visibilidade regional.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Plano regional</span>
+                    <h3>+25 cidades</h3>
+                    <strong>R$ 55,00</strong>
+                    <p>Maior alcance para profissionais que querem presença ampla.</p>
+                </div>
+
+            </div>
+
+            <div class="aviso-clube">
+
+                <h3>
+                    Próxima etapa
+                </h3>
+
+                <p>
+                    Para ativar isso automaticamente, vamos criar uma tabela de divulgações regionais.
+                    Aí o profissional poderá escolher cidades, pagar e aparecer automaticamente nos filtros da página de clínicas.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<div id="modalConfirmacao" class="modal-confirmacao">
 
     <div class="modal-box">
-        <h3>Confirmar ação</h3>
+
+        <h3>
+            Confirmar ação
+        </h3>
 
         <p id="textoModal">
             Deseja realmente continuar?
         </p>
 
         <div class="modal-botoes">
-            <button type="button" class="btn-cancelar" onclick="fecharModal()">
+
+            <button type="button"
+                    class="btn-cancelar"
+                    onclick="fecharModal()">
                 Cancelar
             </button>
 
-            <button type="button" class="btn-confirmar" id="btnConfirmarFinal">
+            <button type="button"
+                    class="btn-confirmar"
+                    id="btnConfirmarFinal">
                 Confirmar
             </button>
-        </div>
-    </div>
 
-</div>
+        </div>
+
+    </div>
 
 </div>
 
 <style>
 
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    html,
     body {
         margin: 0;
-        background: #f5f7fa;
+        padding: 0;
+        background: #eaf8ff;
+        color: #0f172a;
     }
 
-    /* LAYOUT */
-    .layout {
-        display: flex;
+    .container,
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        background: transparent !important;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-        width: 250px;
+    .admin-page {
         min-height: 100vh;
-        background: #0f172a;
-        color: white;
-        padding: 25px 20px;
+        display: flex;
+        background: radial-gradient(circle at top left, rgba(14,165,233,.18), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,.13), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 45%, #edf3ff 100%);
+    }
+
+    .sidebar-admin {
+        width: 290px;
+        min-height: 100vh;
+        padding: 26px 22px;
+        background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(236,254,255,.94));
+        border-right: 1px solid #dbeafe;
+        color: #0f172a;
         display: flex;
         flex-direction: column;
-        box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 0;
+        box-shadow: 12px 0 35px rgba(15,23,42,.05);
     }
 
-    .logo {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 35px;
-        color: white;
+    .logo-admin {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 34px;
     }
 
-    .sidebar a {
-        display: block;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-        color: #cbd5e1;
-        text-decoration: none;
-        font-size: 15px;
-        border-radius: 10px;
-        transition: 0.2s;
-    }
-
-        .sidebar a:hover {
-            background: #1e293b;
-            color: white;
+        .logo-admin img {
+            width: 230px;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
         }
 
-        .sidebar a.ativo {
-            background: #009ee3;
-            color: white;
-            font-weight: bold;
+    .menu-admin {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+        .menu-admin a {
+            color: #334155;
+            text-decoration: none;
+            padding: 15px 18px;
+            border-radius: 16px;
+            font-weight: 800;
+            transition: .25s;
+            background: rgba(255,255,255,.55);
+            border: 1px solid transparent;
         }
 
-   
+            .menu-admin a:hover,
+            .menu-admin a.ativo {
+                background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+                color: white;
+                box-shadow: 0 14px 28px rgba(14,165,233,.18);
+            }
+
+    .form-logout {
+        margin-top: auto;
+    }
 
     .btn-logout {
-        margin-top: auto;
         width: 100%;
-        padding: 12px;
         border: none;
-        border-radius: 10px;
-        background: #dc2626;
-        color: white;
-        font-weight: bold;
+        border-radius: 16px;
+        padding: 14px;
+        background: #fee2e2;
+        color: #991b1b;
+        font-weight: 800;
         cursor: pointer;
-        transition: 0.2s;
+        transition: .25s;
     }
 
         .btn-logout:hover {
-            background: #b91c1c;
+            transform: translateY(-2px);
+            background: #ef4444;
+            color: white;
         }
 
-    /* CONTEÚDO */
-    .conteudo {
+    .conteudo-admin {
         flex: 1;
-        padding: 30px;
+        padding: 42px 46px !important;
+        min-width: 0;
     }
 
-    /* CARDS INFO */
-    .cards {
+    .topo-conteudo,
+    .topo-secao {
         display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 28px;
+    }
+
+    .badge-admin {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(14,165,233,.13);
+        color: #0369a1;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+
+    .topo-conteudo h1,
+    .topo-secao h2 {
+        margin: 0 0 8px;
+        font-size: 36px;
+        letter-spacing: -1px;
+        color: #0f172a;
+    }
+
+    .topo-conteudo p,
+    .topo-secao p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .btn-site {
+        text-decoration: none;
+        padding: 14px 20px;
+        border-radius: 16px;
+        color: white;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        font-weight: 800;
+        box-shadow: 0 14px 30px rgba(14,165,233,.18);
+        white-space: nowrap;
+    }
+
+    .cards-dashboard {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 18px;
+    }
+
+    .card-info,
+    .card-clinica,
+    .clube-card,
+    .aviso-clube,
+    .vazio-card {
+        background: rgba(255,255,255,.9);
+        border: 1px solid rgba(226,232,240,.9);
+        box-shadow: 0 20px 55px rgba(15,23,42,.07);
+        backdrop-filter: blur(18px);
     }
 
     .card-info {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        flex: 1;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        text-align: center;
+        padding: 26px;
+        border-radius: 26px;
+        transition: .25s;
     }
 
-    /* LISTA */
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.08);
-    }
-
-        /* BOTÕES */
-        .card button {
-            margin-top: 10px;
-            margin-right: 5px;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .card-info:hover,
+        .card-clinica:hover,
+        .clube-card:hover {
+            transform: translateY(-3px);
         }
 
-            .card button[value="aprovar"] {
-                background: #28a745;
-                color: white;
-            }
+        .card-info span {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
 
-            .card button[value="pagar"] {
-                background: #ffc107;
-            }
+        .card-info strong {
+            display: block;
+            margin: 8px 0;
+            font-size: 34px;
+            color: #0f172a;
+            letter-spacing: -1px;
+        }
+
+        .card-info p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .card-info.destaque {
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        }
+
+        .card-info.conversao {
+            background: linear-gradient(135deg,#16a34a,#22c55e);
+        }
+
+        .card-info.pendente {
+            background: linear-gradient(135deg,#fff7ed,#fffbeb);
+        }
+
+        .card-info.alerta {
+            background: linear-gradient(135deg,#fef3c7,#fff7ed);
+        }
+
+        .card-info.ativo {
+            background: linear-gradient(135deg,#dcfce7,#ecfdf5);
+        }
+
+        .card-info.destaque span,
+        .card-info.destaque strong,
+        .card-info.destaque p,
+        .card-info.conversao span,
+        .card-info.conversao strong,
+        .card-info.conversao p {
+            color: white;
+        }
 
     .aba {
-        animation: fade 0.2s ease-in-out;
+        animation: fade .2s ease-in-out;
     }
 
     @@keyframes fade {
         from {
             opacity: 0;
+            transform: translateY(6px);
         }
 
         to {
             opacity: 1;
+            transform: translateY(0);
         }
     }
-
-  
-
-    .btn-pagar {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 10px 18px;
-        background: #009ee3;
-        color: white;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .btn-pagar:hover {
-     background: #007bb5;
-    }
-
-    .titulo-dashboard {
-        font-size: 32px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 8px;
-    }
-
-    .subtitulo-dashboard {
-        color: #64748b;
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
-
-    .cards-dashboard {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-    }
-
-    .card-info {
-        background: white;
-        padding: 28px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        border: 1px solid #f1f5f9;
-        transition: 0.2s;
-    }
-
-        .card-info:hover {
-            transform: translateY(-4px);
-        }
-
-    .card-label {
-        display: block;
-        font-size: 14px;
-        color: #64748b;
-        margin-bottom: 12px;
-        font-weight: 600;
-    }
-
-    .card-info h3 {
-        font-size: 34px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 10px;
-    }
-
-    .card-info p {
-        font-size: 14px;
-        color: #94a3b8;
-        margin: 0;
-    }
-
-    .card-info.destaque {
-        background: linear-gradient(135deg, #00c6ff, #009ee3);
-        color: white;
-    }
-
-        .card-info.destaque h3,
-        .card-info.destaque .card-label,
-        .card-info.destaque p {
-            color: white;
-        }
-
-    .card-info.destaque-secundario {
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        color: white;
-    }
-
-        .card-info.destaque-secundario h3,
-        .card-info.destaque-secundario .card-label,
-        .card-info.destaque-secundario p {
-            color: white;
-        }
 
     .filtros-admin {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 260px auto;
+        gap: 14px;
+        margin-bottom: 24px;
+        background: rgba(255,255,255,.85);
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 16px;
     }
 
         .filtros-admin input,
         .filtros-admin select {
-            padding: 12px 14px;
+            width: 100%;
             border: 1px solid #dbeafe;
-            border-radius: 10px;
-            font-size: 14px;
-            min-width: 220px;
-            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            background: #f8fafc;
+            outline: none;
         }
 
     .btn-filtrar {
-        padding: 12px 20px;
         border: none;
-        border-radius: 10px;
-        background: #009ee3;
+        border-radius: 16px;
+        padding: 0 24px;
         color: white;
-        font-weight: bold;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        font-weight: 800;
         cursor: pointer;
     }
 
-        .btn-filtrar:hover {
-            background: #007bb5;
-        }
-
-    /* MODAL */
-
-    .modal-confirmacao {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.55);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
+    .lista-clinicas {
+        display: grid;
+        gap: 18px;
     }
 
-    .modal-box {
-        background: white;
-        width: 420px;
-        max-width: 90%;
-        padding: 30px;
-        border-radius: 18px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        text-align: center;
-        animation: fadeModal 0.2s ease;
+    .card-clinica {
+        border-radius: 28px;
+        padding: 26px;
     }
 
-        .modal-box h3 {
-            margin-bottom: 15px;
+    .card-topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+        .card-topo h3 {
+            margin: 0 0 6px;
+            font-size: 24px;
             color: #0f172a;
         }
 
-        .modal-box p {
+        .card-topo p {
+            margin: 0;
             color: #64748b;
-            margin-bottom: 25px;
         }
 
-    .modal-botoes {
+    .status-tags {
         display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .tag {
+        display: inline-flex;
+        padding: 7px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+        .tag.pendente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tag.aprovado,
+        .tag.pago {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .tag.nao-pago {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .tag.alteracao {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+    .info-grid,
+    .pagamento-box {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
         gap: 12px;
-        justify-content: center;
+        margin-bottom: 18px;
     }
 
-    .btn-cancelar {
-        padding: 12px 20px;
+        .info-grid div,
+        .pagamento-box div {
+            padding: 14px;
+            border-radius: 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-grid span,
+        .pagamento-box span {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .info-grid strong,
+        .pagamento-box strong {
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+    .descricao-card {
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0 0 18px;
+    }
+
+    .acoes-card-admin {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+        .acoes-card-admin form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+    .btn-acao,
+    .btn-ver-perfil {
         border: none;
-        border-radius: 10px;
-        background: #e2e8f0;
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-weight: 800;
         cursor: pointer;
-        font-weight: 600;
+        text-decoration: none;
+        transition: .25s;
+        font-size: 14px;
     }
 
-    .btn-confirmar {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 10px;
-        background: #009ee3;
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
+        .btn-acao:hover,
+        .btn-ver-perfil:hover,
+        .btn-site:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-acao.aprovar {
+            color: white;
+            background: #16a34a;
+        }
+
+        .btn-acao.pagar {
+            color: white;
+            background: #0ea5e9;
+        }
+
+        .btn-acao.suspender {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .btn-acao.excluir {
+            color: white;
+            background: #ef4444;
+        }
+
+    .btn-ver-perfil {
+        color: #0ea5e9;
+        background: white;
+        border: 1px solid #dbeafe;
     }
 
-        .btn-confirmar:hover {
-            background: #007bb5;
-        }
-
-    @@keyframes fadeModal {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+    .gestao-clube {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
     }
 
-    /* ALERTAS */
+    .gestao-card {
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(226,232,240,.9);
+        box-shadow: 0 20px 55px rgba(15,23,42,.07);
+        border-radius: 26px;
+        padding: 26px;
+    }
+
+        .gestao-card span {
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .gestao-card h3 {
+            margin: 10px 0;
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .gestao-card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .gestao-card.destaque {
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        }
+
+            .gestao-card.destaque span,
+            .gestao-card.destaque h3,
+            .gestao-card.destaque p {
+                color: white;
+            }
+
+    .clube-grid {
+        display: grid;
+        grid-template-columns: repeat(5,1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .clube-card {
+        border-radius: 24px;
+        padding: 22px;
+        transition: .25s;
+    }
+
+        .clube-card span {
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .clube-card h3 {
+            margin: 10px 0;
+            font-size: 24px;
+        }
+
+        .clube-card strong {
+            display: block;
+            color: #16a34a;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .clube-card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .aviso-clube h3 {
+            margin: 0 0 10px;
+            color: #0f172a;
+        }
+
+    .alerta-sucesso,
+    .alerta-erro {
+        padding: 16px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
 
     .alerta-sucesso {
         background: #dcfce7;
         color: #166534;
-        padding: 16px 20px;
-        border-radius: 14px;
-        margin-bottom: 20px;
-        font-weight: 600;
         border: 1px solid #bbf7d0;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
     }
 
     .alerta-erro {
         background: #fee2e2;
         color: #991b1b;
-        padding: 16px 20px;
-        border-radius: 14px;
-        margin-bottom: 20px;
-        font-weight: 600;
         border: 1px solid #fecaca;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
     }
 
-    .card button[value="excluir"] {
-        background: #dc2626;
+    .modal-confirmacao {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,.60);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal-box {
+        background: white;
+        width: 430px;
+        max-width: 100%;
+        padding: 30px;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(15,23,42,.20);
+    }
+
+        .modal-box h3 {
+            margin: 0 0 12px;
+            color: #0f172a;
+        }
+
+        .modal-box p {
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+    .modal-botoes {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .btn-cancelar,
+    .btn-confirmar {
+        border: none;
+        border-radius: 14px;
+        padding: 12px 20px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .btn-cancelar {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-confirmar {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
         color: white;
+    }
+
+    @@media(max-width: 1200px) {
+
+        .cards-dashboard,
+        .clube-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .info-grid,
+        .pagamento-box {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+    @@media(max-width: 900px) {
+
+        .admin-page {
+            flex-direction: column;
+        }
+
+        .sidebar-admin {
+            width: 100%;
+            min-height: auto;
+            position: relative;
+        }
+
+        .menu-admin {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        .conteudo-admin {
+            padding: 22px;
+        }
+
+        .topo-conteudo,
+        .topo-secao,
+        .card-topo {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .filtros-admin,
+        .cards-dashboard,
+        .clube-grid,
+        .info-grid,
+        .pagamento-box {
+            grid-template-columns: 1fr;
+        }
+
+        .acoes-card-admin,
+        .acoes-card-admin form {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .btn-acao,
+        .btn-ver-perfil,
+        .btn-site,
+        .btn-filtrar {
+            width: 100%;
+            text-align: center;
+            padding: 14px;
+        }
+
+        .modal-botoes {
+            flex-direction: column;
+        }
+
+        .gestao-clube {
+            grid-template-columns: 1fr;
+        }
     }
 
 </style>
 
 <script>
+
     let formParaEnviar = null;
     let acaoSelecionada = null;
 
     function mostrarAba(nome, el) {
+
         document.querySelectorAll(".aba").forEach(div => {
             div.style.display = "none";
         });
 
-        document.querySelectorAll(".sidebar a").forEach(link => {
+        document.querySelectorAll(".menu-admin a").forEach(link => {
             link.classList.remove("ativo");
         });
 
@@ -646,16 +1123,18 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+
         const params = new URLSearchParams(window.location.search);
         const aba = params.get("aba") || "dashboard";
 
-        const link = [...document.querySelectorAll(".sidebar a")]
+        const link = [...document.querySelectorAll(".menu-admin a")]
             .find(a => a.getAttribute("onclick")?.includes(aba));
 
         mostrarAba(aba, link);
     });
 
     function confirmarAcao(botao, mensagem) {
+
         formParaEnviar = botao.form;
         acaoSelecionada = botao.value;
 
@@ -668,12 +1147,15 @@
     }
 
     function fecharModal() {
+
         document.getElementById("modalConfirmacao").style.display = "none";
+
         formParaEnviar = null;
         acaoSelecionada = null;
     }
 
     document.getElementById("btnConfirmarFinal").addEventListener("click", () => {
+
         if (formParaEnviar && acaoSelecionada) {
 
             const inputAcao = document.createElement("input");
@@ -685,4 +1167,5 @@
             formParaEnviar.submit();
         }
     });
+
 </script>
