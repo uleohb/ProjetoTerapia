@@ -33,6 +33,8 @@ namespace ProjetoTerapia.Pages
 
         public int AlteracoesPendentes { get; set; }
 
+        public List<Clinica> ClinicasComAlteracao { get; set; } = new();
+
         public int TotalVisualizacoes { get; set; }
 
         public int TotalCliquesWhatsapp { get; set; }
@@ -176,6 +178,11 @@ namespace ProjetoTerapia.Pages
         private void CarregarDados()
         {
             var todasClinicas = _context.Clinicas.ToList();
+
+            ClinicasComAlteracao = todasClinicas
+            .Where(c => c.ClinicaAlteracaoPendente)
+            .OrderBy(c => c.Nome)
+            .ToList();
 
             TotalClinicas = todasClinicas.Count;
             Pendentes = todasClinicas.Count(c => !c.Aprovado);

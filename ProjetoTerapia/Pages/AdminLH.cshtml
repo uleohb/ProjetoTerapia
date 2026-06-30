@@ -6,7 +6,7 @@
     <aside class="sidebar-admin">
 
         <div class="logo-admin">
-            <img src="/imagem/logo.png" alt="Alinhamento" />
+            <img src="/imagem/logo.png" alt="AlinhaMente" />
         </div>
 
         <nav class="menu-admin">
@@ -17,6 +17,10 @@
 
             <a href="javascript:void(0)" onclick="mostrarAba('clinicas', this)">
                 Clínicas
+            </a>
+
+            <a href="javascript:void(0)" onclick="mostrarAba('alteracoes', this)">
+                Alterações
             </a>
 
             <a href="javascript:void(0)" onclick="mostrarAba('pagamentos', this)">
@@ -131,90 +135,321 @@
 
         </section>
 
-        <section id="divulgacao" class="aba" style="display:none">
+        <section id="clinicas" class="aba" style="display:none">
 
             <div class="topo-secao">
 
                 <div>
                     <h2>
-                        Clube de Descontos
+                        Gerenciar profissionais
                     </h2>
 
                     <p>
-                        Gerencie os planos de divulgação regional para profissionais que desejam aparecer em mais cidades.
+                        Aprove cadastros, confirme pagamentos e revise perfis cadastrados.
                     </p>
                 </div>
 
             </div>
 
-            <div class="clube-grid">
+            <form method="get" class="filtros-admin">
 
-                <div class="clube-card">
-                    <span>Divulgação regional</span>
-                    <h3>+5 cidades</h3>
-                    <strong>R$ 30,00</strong>
-                    <p>Exibição em até 5 cidades adicionais.</p>
-                </div>
+                <input type="hidden" name="aba" value="clinicas" />
 
-                <div class="clube-card">
-                    <span>Divulgação regional</span>
-                    <h3>+10 cidades</h3>
-                    <strong>R$ 35,00</strong>
-                    <p>Exibição em até 10 cidades adicionais.</p>
-                </div>
+                <input type="text"
+                       name="Busca"
+                       value="@Model.Busca"
+                       placeholder="Buscar por nome, email ou cidade..." />
 
-                <div class="clube-card">
-                    <span>Divulgação regional</span>
-                    <h3>+15 cidades</h3>
-                    <strong>R$ 45,00</strong>
-                    <p>Maior alcance para atendimentos online.</p>
-                </div>
+                <select name="FiltroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="aprovado">Aprovadas sem pagamento</option>
+                    <option value="ativo">Ativas</option>
+                    <option value="alteracao">Alterações pendentes</option>
+                </select>
 
-                <div class="clube-card">
-                    <span>Divulgação regional</span>
-                    <h3>+20 cidades</h3>
-                    <strong>R$ 50,00</strong>
-                    <p>Presença ampliada em regiões estratégicas.</p>
-                </div>
+                <button type="submit" class="btn-filtrar">
+                    Filtrar
+                </button>
 
-                <div class="clube-card">
-                    <span>Divulgação regional</span>
-                    <h3>+25 cidades</h3>
-                    <strong>R$ 55,00</strong>
-                    <p>Plano com maior alcance regional.</p>
+            </form>
+
+            <div class="lista-clinicas">
+
+                @foreach (var clinica in Model.Clinicas)
+                {
+                    <article class="card-clinica">
+
+                        <div class="card-topo">
+
+                            <div>
+                                <h3>
+                                    @clinica.Nome
+                                </h3>
+
+                                <p>
+                                    @clinica.Email
+                                </p>
+                            </div>
+
+                            <div class="status-tags">
+
+                                @if (!clinica.Aprovado)
+                                {
+                                    <span class="tag pendente">
+                                        Pendente
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag aprovado">
+                                        Aprovado
+                                    </span>
+                                }
+
+                                @if (clinica.Pago)
+                                {
+                                    <span class="tag pago">
+                                        Pago
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag nao-pago">
+                                        Não pago
+                                    </span>
+                                }
+
+                                @if (clinica.ClinicaAlteracaoPendente)
+                                {
+                                    <span class="tag alteracao">
+                                        Alteração pendente
+                                    </span>
+                                }
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-grid">
+
+                        <div>
+                            <span>Cidade</span>
+                            <strong>@(string.IsNullOrWhiteSpace(clinica.Cidade) ? "Não informada" : clinica.Cidade)</strong>
+                        </div>
+
+                        <div>
+                            <span>Telefone</span>
+                            <strong>@(string.IsNullOrWhiteSpace(clinica.Telefone) ? "Não informado" : clinica.Telefone)</strong>
+                        </div>
+
+                        <div>
+                            <span>Valor consulta</span>
+                            <strong>R$ @clinica.Valor</strong>
+                        </div>
+
+                        <div>
+                            <span>Visualizações</span>
+                            <strong>@clinica.Visualizacoes</strong>
+                        </div>
+
+                        <div>
+                            <span>Cliques WhatsApp</span>
+                            <strong>@clinica.CliquesWhatsapp</strong>
+                        </div>
+
+                        <div>
+                            <span>Vencimento</span>
+                            <strong>
+                                @(clinica.DataVencimento.HasValue
+                                                                ? clinica.DataVencimento.Value.ToString("dd/MM/yyyy")
+                                                                : "Sem vencimento")
+                                                                               </strong>
+                                                                           </div>
+
+                    </div>
+
+                    <p class="descricao-card">
+                        @(string.IsNullOrWhiteSpace(clinica.Descricao)
+                                                ? "Sem descrição cadastrada."
+                                                : clinica.Descricao)
+                    </p>
+
+                        <div class="acoes-card-admin">
+
+                            <form method="post">
+
+                                <input type="hidden" name="id" value="@clinica.Id" />
+
+                            @if (!clinica.Aprovado)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="aprovar"
+                                            class="btn-acao aprovar"
+                                            onclick='return confirmarAcao(this, "aprovar este profissional?")'>
+                                        Aprovar cadastro
+                                    </button>
+                                }
+
+                                @if (clinica.ClinicaAlteracaoPendente)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="aprovarAlteracao"
+                                            class="btn-acao aprovar"
+                                            onclick='return confirmarAcao(this, "aprovar as alterações deste perfil?")'>
+                                        Aprovar alterações
+                                    </button>
+                                }
+
+                                @if (clinica.Aprovado && !clinica.Pago)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="pagar"
+                                            class="btn-acao pagar"
+                                            onclick='return confirmarAcao(this, "confirmar o pagamento deste profissional?")'>
+                                        Confirmar pagamento
+                                    </button>
+                                }
+
+                                @if (clinica.Pago)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="suspender"
+                                            class="btn-acao suspender"
+                                            onclick='return confirmarAcao(this, "suspender o plano deste profissional?")'>
+                                        Suspender plano
+                                    </button>
+                                }
+
+                                <button type="submit"
+                                        name="acao"
+                                        value="excluir"
+                                        class="btn-acao excluir"
+                                        onclick='return confirmarAcao(this, "excluir permanentemente este profissional?")'>
+                                    Excluir
+                                </button>
+
+                            </form>
+
+                            <a href="/PerfilClinica?id=@clinica.Id"
+                               target="_blank"
+                               class="btn-ver-perfil">
+                                Ver perfil público
+                            </a>
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.Clinicas.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhum profissional encontrado com os filtros selecionados.
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+        <section id="alteracoes" class="aba" style="display:none">
+
+            <div class="topo-secao">
+
+                <div>
+                    <h2>
+                        Alterações pendentes
+                    </h2>
+
+                    <p>
+                        Revise profissionais que editaram o perfil após aprovação.
+                    </p>
                 </div>
 
             </div>
 
-            <div class="gestao-clube">
+            <div class="lista-clinicas">
 
-                <div class="gestao-card">
+                @foreach (var clinica in Model.ClinicasComAlteracao)
+                {
+                    <article class="card-clinica">
 
-                    <span>Status atual</span>
+                        <div class="card-topo">
 
-                    <h3>
-                        Gestão manual
-                    </h3>
+                            <div>
+                                <h3>@clinica.Nome</h3>
+                                <p>@clinica.Email</p>
+                            </div>
 
-                    <p>
-                        No momento, as solicitações de divulgação regional podem ser controladas manualmente pela administração após confirmação do pagamento.
+                            <span class="tag alteracao">
+                                Aguardando revisão
+                            </span>
+
+                        </div>
+
+                        <div class="info-grid">
+
+                            <div>
+                                <span>Cidade</span>
+                                <strong>@(string.IsNullOrWhiteSpace(clinica.Cidade) ? "Não informada" : clinica.Cidade)</strong>
+                            </div>
+
+                            <div>
+                                <span>Telefone</span>
+                                <strong>@(string.IsNullOrWhiteSpace(clinica.Telefone) ? "Não informado" : clinica.Telefone)</strong>
+                            </div>
+
+                            <div>
+                                <span>Valor consulta</span>
+                                <strong>R$ @clinica.Valor</strong>
+                            </div>
+
+                        </div>
+
+                        <p class="descricao-card">
+                            @(string.IsNullOrWhiteSpace(clinica.Descricao)
+                                                    ? "Sem descrição cadastrada."
+                                                    : clinica.Descricao)
                     </p>
 
-                </div>
+                        <div class="acoes-card-admin">
 
-                <div class="gestao-card destaque">
+                            <form method="post">
 
-                    <span>Próximo recurso</span>
+                                <input type="hidden" name="id" value="@clinica.Id" />
 
-                    <h3>
-                        Ativação automática
-                    </h3>
+                                <button type="submit"
+                                        name="acao"
+                                        value="aprovarAlteracao"
+                                        class="btn-acao aprovar"
+                                        onclick='return confirmarAcao(this, "aprovar as alterações deste perfil?")'>
+                                    Aprovar alterações
+                                </button>
 
-                    <p>
-                        Depois criaremos o cadastro de cidades extras para que o profissional apareça automaticamente nas buscas regionais após a aprovação.
-                    </p>
+                            </form>
 
-                </div>
+                            <a href="/PerfilClinica?id=@clinica.Id"
+                               target="_blank"
+                               class="btn-ver-perfil">
+                                Ver perfil público
+                            </a>
+
+                        </div>
+
+                    </article>
+                                }
+
+                @if (!Model.ClinicasComAlteracao.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhuma alteração pendente no momento.
+                    </div>
+                }
 
             </div>
 
@@ -323,7 +558,7 @@
                     </h2>
 
                     <p>
-                        Base inicial para controlar divulgação regional e cidades extras dos profissionais.
+                        Gerencie os planos de divulgação regional para profissionais que desejam aparecer em mais cidades.
                     </p>
                 </div>
 
@@ -332,52 +567,71 @@
             <div class="clube-grid">
 
                 <div class="clube-card">
-                    <span>Plano regional</span>
+                    <span>Divulgação regional</span>
                     <h3>+5 cidades</h3>
                     <strong>R$ 30,00</strong>
-                    <p>Ideal para profissionais que querem aparecer em regiões próximas.</p>
+                    <p>Exibição em até 5 cidades adicionais.</p>
                 </div>
 
                 <div class="clube-card">
-                    <span>Plano regional</span>
+                    <span>Divulgação regional</span>
                     <h3>+10 cidades</h3>
                     <strong>R$ 35,00</strong>
-                    <p>Boa opção para profissionais com atendimento online.</p>
+                    <p>Exibição em até 10 cidades adicionais.</p>
                 </div>
 
                 <div class="clube-card">
-                    <span>Plano regional</span>
+                    <span>Divulgação regional</span>
                     <h3>+15 cidades</h3>
                     <strong>R$ 45,00</strong>
-                    <p>Amplia o alcance em capitais e cidades estratégicas.</p>
+                    <p>Maior alcance para atendimentos online.</p>
                 </div>
 
                 <div class="clube-card">
-                    <span>Plano regional</span>
+                    <span>Divulgação regional</span>
                     <h3>+20 cidades</h3>
                     <strong>R$ 50,00</strong>
-                    <p>Plano intermediário para maior visibilidade regional.</p>
+                    <p>Presença ampliada em regiões estratégicas.</p>
                 </div>
 
                 <div class="clube-card">
-                    <span>Plano regional</span>
+                    <span>Divulgação regional</span>
                     <h3>+25 cidades</h3>
                     <strong>R$ 55,00</strong>
-                    <p>Maior alcance para profissionais que querem presença ampla.</p>
+                    <p>Plano com maior alcance regional.</p>
                 </div>
 
             </div>
 
-            <div class="aviso-clube">
+            <div class="gestao-clube">
 
-                <h3>
-                    Próxima etapa
-                </h3>
+                <div class="gestao-card">
 
-                <p>
-                    Para ativar isso automaticamente, vamos criar uma tabela de divulgações regionais.
-                    Aí o profissional poderá escolher cidades, pagar e aparecer automaticamente nos filtros da página de clínicas.
-                </p>
+                    <span>Status atual</span>
+
+                    <h3>
+                        Gestão manual
+                    </h3>
+
+                    <p>
+                        As solicitações de divulgação regional podem ser controladas manualmente pela administração após confirmação do pagamento.
+                    </p>
+
+                </div>
+
+                <div class="gestao-card destaque">
+
+                    <span>Automação</span>
+
+                    <h3>
+                        Cidades extras
+                    </h3>
+
+                    <p>
+                        Na próxima etapa, o sistema irá ativar cidades extras automaticamente para o profissional aparecer em mais regiões.
+                    </p>
+
+                </div>
 
             </div>
 
@@ -584,7 +838,7 @@
     .card-info,
     .card-clinica,
     .clube-card,
-    .aviso-clube,
+    .gestao-card,
     .vazio-card {
         background: rgba(255,255,255,.9);
         border: 1px solid rgba(226,232,240,.9);
@@ -862,49 +1116,6 @@
         border: 1px solid #dbeafe;
     }
 
-    .gestao-clube {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-    }
-
-    .gestao-card {
-        background: rgba(255,255,255,.92);
-        border: 1px solid rgba(226,232,240,.9);
-        box-shadow: 0 20px 55px rgba(15,23,42,.07);
-        border-radius: 26px;
-        padding: 26px;
-    }
-
-        .gestao-card span {
-            color: #0ea5e9;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .gestao-card h3 {
-            margin: 10px 0;
-            color: #0f172a;
-            font-size: 24px;
-        }
-
-        .gestao-card p {
-            color: #64748b;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        .gestao-card.destaque {
-            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-        }
-
-            .gestao-card.destaque span,
-            .gestao-card.destaque h3,
-            .gestao-card.destaque p {
-                color: white;
-            }
-
     .clube-grid {
         display: grid;
         grid-template-columns: repeat(5,1fr);
@@ -944,10 +1155,52 @@
             font-size: 14px;
         }
 
-        .aviso-clube h3 {
-            margin: 0 0 10px;
-            color: #0f172a;
+    .gestao-clube {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .gestao-card {
+        border-radius: 26px;
+        padding: 26px;
+    }
+
+        .gestao-card span {
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
+
+        .gestao-card h3 {
+            margin: 10px 0;
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .gestao-card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .gestao-card.destaque {
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        }
+
+            .gestao-card.destaque span,
+            .gestao-card.destaque h3,
+            .gestao-card.destaque p {
+                color: white;
+            }
+
+    .vazio-card {
+        border-radius: 24px;
+        padding: 26px;
+        color: #64748b;
+        line-height: 1.6;
+    }
 
     .alerta-sucesso,
     .alerta-erro {
@@ -1056,7 +1309,7 @@
         }
 
         .conteudo-admin {
-            padding: 22px;
+            padding: 22px !important;
         }
 
         .topo-conteudo,
@@ -1070,7 +1323,8 @@
         .cards-dashboard,
         .clube-grid,
         .info-grid,
-        .pagamento-box {
+        .pagamento-box,
+        .gestao-clube {
             grid-template-columns: 1fr;
         }
 
@@ -1092,80 +1346,113 @@
         .modal-botoes {
             flex-direction: column;
         }
-
-        .gestao-clube {
-            grid-template-columns: 1fr;
-        }
     }
 
 </style>
 
 <script>
-
-    let formParaEnviar = null;
-    let acaoSelecionada = null;
+    var formParaEnviar = null;
+    var acaoSelecionada = null;
 
     function mostrarAba(nome, el) {
+        var abas = document.querySelectorAll(".aba");
 
-        document.querySelectorAll(".aba").forEach(div => {
-            div.style.display = "none";
-        });
+        for (var i = 0; i < abas.length; i++) {
+            abas[i].style.display = "none";
+        }
 
-        document.querySelectorAll(".menu-admin a").forEach(link => {
-            link.classList.remove("ativo");
-        });
+        var abaSelecionada = document.getElementById(nome);
 
-        document.getElementById(nome).style.display = "block";
+        if (abaSelecionada == null) {
+            console.log("Aba não encontrada: " + nome);
+            return;
+        }
 
-        if (el) {
+        abaSelecionada.style.display = "block";
+
+        var links = document.querySelectorAll(".menu-admin a");
+
+        for (var j = 0; j < links.length; j++) {
+            links[j].classList.remove("ativo");
+        }
+
+        if (el != null) {
             el.classList.add("ativo");
         }
+
+        var url = new URL(window.location.href);
+        url.searchParams.set("aba", nome);
+        window.history.replaceState({}, "", url);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", function () {
+        var params = new URLSearchParams(window.location.search);
+        var aba = params.get("aba");
 
-        const params = new URLSearchParams(window.location.search);
-        const aba = params.get("aba") || "dashboard";
+        if (aba == null || aba === "") {
+            aba = "dashboard";
+        }
 
-        const link = [...document.querySelectorAll(".menu-admin a")]
-            .find(a => a.getAttribute("onclick")?.includes(aba));
+        var links = document.querySelectorAll(".menu-admin a");
+        var linkAtivo = null;
 
-        mostrarAba(aba, link);
+        for (var i = 0; i < links.length; i++) {
+            var onclick = links[i].getAttribute("onclick");
+
+            if (onclick != null && onclick.indexOf("'" + aba + "'") >= 0) {
+                linkAtivo = links[i];
+                break;
+            }
+        }
+
+        mostrarAba(aba, linkAtivo);
     });
 
     function confirmarAcao(botao, mensagem) {
-
         formParaEnviar = botao.form;
         acaoSelecionada = botao.value;
 
-        document.getElementById("textoModal").innerText =
-            "Deseja realmente " + mensagem;
+        var textoModal = document.getElementById("textoModal");
+        var modal = document.getElementById("modalConfirmacao");
 
-        document.getElementById("modalConfirmacao").style.display = "flex";
+        if (textoModal != null) {
+            textoModal.innerText = "Deseja realmente " + mensagem;
+        }
+
+        if (modal != null) {
+            modal.style.display = "flex";
+        }
 
         return false;
     }
 
     function fecharModal() {
+        var modal = document.getElementById("modalConfirmacao");
 
-        document.getElementById("modalConfirmacao").style.display = "none";
+        if (modal != null) {
+            modal.style.display = "none";
+        }
 
         formParaEnviar = null;
         acaoSelecionada = null;
     }
 
-    document.getElementById("btnConfirmarFinal").addEventListener("click", () => {
+    document.addEventListener("DOMContentLoaded", function () {
+        var btnConfirmar = document.getElementById("btnConfirmarFinal");
 
-        if (formParaEnviar && acaoSelecionada) {
+        if (btnConfirmar != null) {
+            btnConfirmar.addEventListener("click", function () {
+                if (formParaEnviar != null && acaoSelecionada != null) {
+                    var inputAcao = document.createElement("input");
 
-            const inputAcao = document.createElement("input");
-            inputAcao.type = "hidden";
-            inputAcao.name = "acao";
-            inputAcao.value = acaoSelecionada;
+                    inputAcao.type = "hidden";
+                    inputAcao.name = "acao";
+                    inputAcao.value = acaoSelecionada;
 
-            formParaEnviar.appendChild(inputAcao);
-            formParaEnviar.submit();
+                    formParaEnviar.appendChild(inputAcao);
+                    formParaEnviar.submit();
+                }
+            });
         }
     });
-
 </script>

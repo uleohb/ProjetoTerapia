@@ -54,7 +54,7 @@
 
             </header>
 
-        @if (!Model.Clinica.Aprovado)
+        @if (!Model.Clinica!.Aprovado)
             {
                 <section class="alerta status-analise">
 
@@ -74,7 +74,7 @@
                 </section>
             }
 
-            @if (Model.Clinica.Aprovado && !Model.Clinica.Pago)
+            @if (Model.Clinica!.Aprovado && !Model.Clinica.Pago)
             {
                 <section class="alerta status-aprovado">
 
@@ -97,7 +97,7 @@
                 </section>
             }
 
-            @if (Model.Clinica.Pago)
+            @if (Model.Clinica!.Pago)
             {
                 <section class="alerta status-ativo">
 
@@ -116,7 +116,46 @@
                 </section>
             }
 
-            @if (!Model.Clinica.PerfilCompleto)
+            @if (Model.Clinica != null && Model.Clinica.Pago && Model.DiasRestantes.HasValue && Model.DiasRestantes <= 30 && !Model.PlanoVencido)
+            {
+                <section class="alerta-vencimento">
+
+                    <h2>
+                        Seu plano está perto de vencer
+                    </h2>
+
+                    <p>
+                        Faltam @Model.DiasRestantes dia(s) para o vencimento do seu plano.
+                        Faça a renovação para manter seu perfil ativo na plataforma.
+                    </p>
+
+                    <a href="/PagamentoClinica">
+                        Renovar plano
+                    </a>
+
+                </section>
+            }
+
+            @if (Model.Clinica != null && Model.Clinica.Pago && Model.PlanoVencido)
+            {
+                <section class="alerta-vencimento vencido">
+
+                    <h2>
+                        Plano vencido
+                    </h2>
+
+                    <p>
+                        Seu plano venceu. Renove para manter seu perfil disponível aos pacientes.
+                    </p>
+
+                    <a href="/PagamentoClinica">
+                        Regularizar plano
+                    </a>
+
+                </section>
+            }
+
+            @if (Model.Clinica != null && !Model.Clinica.PerfilCompleto)
             {
                 <section class="alerta-perfil">
 
@@ -159,7 +198,7 @@
 
                 <span>Status atual</span>
 
-                <strong class="status-texto @(Model.Clinica.Pago ? "ativo" : "pendente")">
+                <strong class="status-texto @(Model.Clinica != null && Model.Clinica.Pago ? "ativo" : "pendente")">
                     @Model.StatusPlano
                 </strong>
 
@@ -270,7 +309,7 @@
 
                     <div>
                         <small>Plano atual</small>
-                        <strong>@(Model.Clinica.NomePlano ?? "Nenhum plano ativo")</strong>
+                        <strong>@(Model.Clinica!.NomePlano ?? "Nenhum plano ativo")</strong>
                     </div>
 
                     <div>
@@ -281,8 +320,8 @@
                     <div>
                         <small>Pagamento confirmado</small>
                         <strong>
-                            @(Model.Clinica.DataPagamento.HasValue
-                                                        ? Model.Clinica.DataPagamento.Value.ToString("dd/MM/yyyy")
+                            @(Model.Clinica!.DataPagamento.HasValue
+                                                        ? Model.Clinica!.DataPagamento.Value.ToString("dd/MM/yyyy")
                                                         : "Pendente")
                         </strong>
                     </div>
@@ -308,6 +347,8 @@
 
                 </div>
 
+            @if (Model.Clinica!.Pago)
+            {
                 <div class="painel-bloco clube" id="clube-descontos">
 
                     <div class="sinal-clube">
@@ -366,7 +407,7 @@
                     </a>
 
                 </div>
-
+            }
             </section>
 
             <section class="titulo-secao">
@@ -1162,5 +1203,43 @@
             flex-direction: column;
         }
     }
+
+    .alerta-vencimento {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+        border-radius: 24px;
+        padding: 26px;
+        margin-bottom: 26px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+        .alerta-vencimento.vencido {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .alerta-vencimento h2 {
+            margin: 0 0 8px;
+        }
+
+        .alerta-vencimento p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .alerta-vencimento a {
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            background: white;
+            color: inherit;
+            font-weight: 800;
+        }
 
 </style>

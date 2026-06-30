@@ -1,32 +1,366 @@
 ﻿@page
 @model ProjetoTerapia.Pages.PagamentoClinicaModel
 
-<div style="max-width:500px; margin:auto; padding:40px; text-align:center">
+<div class="pagamento-page">
 
-    <h2>Finalize seu cadastro</h2>
+    <div class="rgb rgb-1"></div>
+    <div class="rgb rgb-2"></div>
 
-    <p><strong>Plano Ponto Saúde</strong></p>
-    <p>R$ 360 / ano (até 12x no cartão)</p>
+    <div class="pagamento-card">
 
-    <a href="https://mpago.la/33FgjZL" target="_blank" class="btn-pagar">
-        💳 Pagar com cartão
-    </a>
+        <img src="/imagem/logo.png"
+             class="logo-pagamento"
+             alt="Logo" />
 
-    <p style="margin-top:15px; font-size:12px; color:gray;">
-        Pagamento 100% seguro via Mercado Pago
-    </p>
+        @if (Model.Clinica != null)
+        {
+            @if (!Model.Clinica.Aprovado)
+            {
+                <span class="badge-pagamento analise">
+                    Cadastro em análise
+                </span>
+
+                <h1>
+                    Seu cadastro ainda está em análise
+                </h1>
+
+                <p>
+                    Após a aprovação da administração, você poderá ativar seu plano profissional.
+                </p>
+
+                <a href="/PainelClinica" class="btn-secundario">
+                    Voltar ao painel
+                </a>
+            }
+            else if (Model.Clinica.Pago && !Model.PlanoVencido && !Model.PlanoPertoDeVencer)
+            {
+                <span class="badge-pagamento ativo">
+                    Plano ativo
+                </span>
+
+                <h1>
+                    Sua assinatura está ativa
+                </h1>
+
+                <p>
+                    Seu perfil profissional já está liberado na plataforma.
+                    O pagamento só será necessário novamente próximo ao vencimento.
+                </p>
+
+                <div class="info-plano">
+
+                    <div>
+                        <span>Plano</span>
+                        <strong>@(Model.Clinica.NomePlano ?? "Plano Profissional Anual")</strong>
+                    </div>
+
+                    <div>
+                        <span>Valor</span>
+                        <strong>@Model.ValorPlanoFormatado</strong>
+                    </div>
+
+                    <div>
+                        <span>Vencimento</span>
+                        <strong>@Model.Clinica.DataVencimento?.ToString("dd/MM/yyyy")</strong>
+                    </div>
+
+                </div>
+
+                <a href="/PainelClinica" class="btn-principal">
+                    Voltar ao painel
+                </a>
+            }
+            else
+            {
+                <span class="badge-pagamento">
+                    Ativação profissional
+                </span>
+
+                <h1>
+                    Ative seu plano profissional
+                </h1>
+
+                <p>
+                    Após a confirmação do pagamento, seu perfil fica disponível para pacientes
+                    encontrarem você na plataforma.
+                </p>
+
+                @if (Model.PlanoPertoDeVencer)
+                {
+                    <div class="alerta-renovacao">
+                        Seu plano vence em @Model.DiasRestantes dia(s). Você já pode solicitar a renovação.
+                    </div>
+                }
+
+                @if (Model.PlanoVencido)
+                {
+                    <div class="alerta-vencido">
+                        Seu plano está vencido. Renove para manter seu perfil ativo.
+                    </div>
+                }
+
+                <div class="plano-box">
+
+                    <span>Plano Profissional Anual</span>
+
+                    <strong>
+                        R$ 360,00 / ano
+                    </strong>
+
+                    <p>
+                        Pagamento via Mercado Pago. Após pagar, aguarde a confirmação da administração.
+                    </p>
+
+                </div>
+
+                <div class="acoes-pagamento">
+
+                    <a href="https://mpago.la/33FgjZL"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn-principal">
+                        Pagar com Mercado Pago
+                    </a>
+
+                    <a href="/PainelClinica" class="btn-secundario">
+                        Voltar ao painel
+                    </a>
+
+                </div>
+            }
+        }
+
+    </div>
 
 </div>
 
 <style>
-    .btn-pagar {
-        display: inline-block;
-        margin-top: 15px;
-        padding: 12px 20px;
-        background: #009ee3;
-        color: white;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
+
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
     }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #eaf8ff;
+    }
+
+    .container,
+    .container-fluid,
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        background: transparent !important;
+    }
+
+    .pagamento-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%), radial-gradient(circle at bottom right, rgba(124,58,237,.16), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
+    }
+
+    .rgb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        pointer-events: none;
+    }
+
+    .rgb-1 {
+        width: 340px;
+        height: 340px;
+        background: rgba(14,165,233,.22);
+        top: -120px;
+        left: -100px;
+    }
+
+    .rgb-2 {
+        width: 320px;
+        height: 320px;
+        background: rgba(124,58,237,.18);
+        bottom: -120px;
+        right: -100px;
+    }
+
+    .pagamento-card {
+        width: 100%;
+        max-width: 620px;
+        position: relative;
+        z-index: 2;
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(226,232,240,.9);
+        backdrop-filter: blur(18px);
+        border-radius: 34px;
+        padding: 40px;
+        box-shadow: 0 25px 70px rgba(15,23,42,.10);
+        text-align: center;
+    }
+
+    .logo-pagamento {
+        width: 250px;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .badge-pagamento {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(14,165,233,.12);
+        color: #0369a1;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 18px;
+    }
+
+        .badge-pagamento.ativo {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-pagamento.analise {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+    h1 {
+        margin: 0 0 14px;
+        font-size: 36px;
+        line-height: 1.1;
+        color: #0f172a;
+        letter-spacing: -1px;
+    }
+
+    p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 24px;
+    }
+
+    .plano-box,
+    .info-plano {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 24px;
+        margin: 24px 0;
+    }
+
+        .plano-box span,
+        .info-plano span {
+            display: block;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .plano-box strong {
+            display: block;
+            font-size: 34px;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+    .info-plano {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        text-align: left;
+    }
+
+        .info-plano div {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .info-plano strong {
+            color: #0f172a;
+        }
+
+    .acoes-pagamento {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-principal,
+    .btn-secundario {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 22px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 800;
+        transition: .25s;
+    }
+
+    .btn-principal {
+        color: white;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        box-shadow: 0 14px 28px rgba(14,165,233,.18);
+    }
+
+    .btn-secundario {
+        color: #0ea5e9;
+        background: white;
+        border: 1px solid #dbeafe;
+    }
+
+        .btn-principal:hover,
+        .btn-secundario:hover {
+            transform: translateY(-2px);
+        }
+
+    .alerta-renovacao,
+    .alerta-vencido {
+        padding: 16px;
+        border-radius: 16px;
+        margin: 20px 0;
+        font-weight: 700;
+    }
+
+    .alerta-renovacao {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .alerta-vencido {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    @@media(max-width: 600px) {
+        .pagamento-card {
+            padding: 28px 22px;
+        }
+
+        h1 {
+            font-size: 30px;
+        }
+
+        .acoes-pagamento,
+        .btn-principal,
+        .btn-secundario {
+            width: 100%;
+        }
+    }
+
 </style>
