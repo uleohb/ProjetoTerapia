@@ -12,6 +12,7 @@ namespace ProjetoTerapia.Models
         public DbSet<Paciente> Pacientes { get; set; }
         public DbSet<RecuperacaoSenha> RecuperacoesSenha { get; set; }
         public DbSet<Agendamento> Agendamentos { get; set; }
+        public DbSet<DivulgacaoRegional> DivulgacoesRegionais { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {

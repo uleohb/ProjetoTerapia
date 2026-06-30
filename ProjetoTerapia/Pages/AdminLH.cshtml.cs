@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjetoTerapia.Pages
 {
@@ -50,6 +51,8 @@ namespace ProjetoTerapia.Pages
 
         [BindProperty(SupportsGet = true)]
         public string FiltroStatus { get; set; } = "";
+        public List<DivulgacaoRegional> DivulgacoesRegionais { get; set; } = new();
+        public int DivulgacoesPendentes { get; set; }
 
         public IActionResult OnGet()
         {
@@ -68,6 +71,60 @@ namespace ProjetoTerapia.Pages
             if (!AdminEstaLogado())
             {
                 return RedirectToPage("/LoginAdmin");
+            }
+
+            if (acao == "confirmarPagamentoDivulgacao" ||
+    acao == "aprovarDivulgacao" ||
+    acao == "cancelarDivulgacao")
+            {
+                var divulgacao = _context.DivulgacoesRegionais
+                    .Include(d => d.Clinica)
+                    .FirstOrDefault(d => d.Id == id);
+
+                if (divulgacao == null)
+                {
+                    TempData["MensagemErro"] = "Solicitação de divulgação não encontrada.";
+                    return RedirectToPage(new { aba = "divulgacao" });
+                }
+
+                if (acao == "confirmarPagamentoDivulgacao")
+                {
+                    divulgacao.Pago = true;
+                    divulgacao.DataPagamento = DateTime.Now;
+                    divulgacao.Status = "Pagamento confirmado";
+
+                    TempData["MensagemSucesso"] = "Pagamento da divulgação confirmado.";
+                }
+
+                if (acao == "aprovarDivulgacao")
+                {
+                    if (!divulgacao.Pago)
+                    {
+                        TempData["MensagemErro"] = "Confirme o pagamento antes de aprovar a divulgação.";
+                        return RedirectToPage(new { aba = "divulgacao" });
+                    }
+
+                    divulgacao.Aprovado = true;
+                    divulgacao.Ativo = true;
+                    divulgacao.DataAprovacao = DateTime.Now;
+                    divulgacao.DataInicio = DateTime.Now;
+                    divulgacao.DataFim = DateTime.Now.AddMonths(1);
+                    divulgacao.Status = "Ativo";
+
+                    TempData["MensagemSucesso"] = "Divulgação regional aprovada e ativada.";
+                }
+
+                if (acao == "cancelarDivulgacao")
+                {
+                    divulgacao.Ativo = false;
+                    divulgacao.Status = "Cancelado";
+
+                    TempData["MensagemSucesso"] = "Divulgação regional cancelada.";
+                }
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "divulgacao" });
             }
 
             var clinica = _context.Clinicas.FirstOrDefault(c => c.Id == id);
@@ -178,6 +235,14 @@ namespace ProjetoTerapia.Pages
         private void CarregarDados()
         {
             var todasClinicas = _context.Clinicas.ToList();
+
+            DivulgacoesRegionais = _context.DivulgacoesRegionais
+             .Include(d => d.Clinica)
+             .OrderByDescending(d => d.DataSolicitacao)
+             .ToList();
+
+            DivulgacoesPendentes = DivulgacoesRegionais
+                .Count(d => !d.Aprovado || !d.Pago);
 
             ClinicasComAlteracao = todasClinicas
             .Where(c => c.ClinicaAlteracaoPendente)

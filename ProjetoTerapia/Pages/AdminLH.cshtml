@@ -558,7 +558,7 @@
                     </h2>
 
                     <p>
-                        Gerencie os planos de divulgação regional para profissionais que desejam aparecer em mais cidades.
+                        Gerencie solicitações de divulgação regional e cidades extras dos profissionais.
                     </p>
                 </div>
 
@@ -603,35 +603,148 @@
 
             </div>
 
-            <div class="gestao-clube">
+            <div class="lista-clinicas">
 
-                <div class="gestao-card">
+                @foreach (var item in Model.DivulgacoesRegionais)
+                {
+                    <article class="card-clinica">
 
-                    <span>Status atual</span>
+                        <div class="card-topo">
 
-                    <h3>
-                        Gestão manual
-                    </h3>
+                            <div>
+                                <h3>
+                                    @(item.Clinica?.Nome ?? "Profissional não encontrado")
+                                </h3>
 
-                    <p>
-                        As solicitações de divulgação regional podem ser controladas manualmente pela administração após confirmação do pagamento.
-                    </p>
+                                <p>
+                                    @(item.Clinica?.Email ?? "")
+                                </p>
+                            </div>
 
-                </div>
+                            <div class="status-tags">
 
-                <div class="gestao-card destaque">
+                                @if (item.Ativo)
+                                {
+                                    <span class="tag pago">
+                                        Ativo
+                                    </span>
+                                }
+                                else if (item.Pago)
+                                {
+                                    <span class="tag aprovado">
+                                        Pago
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag nao-pago">
+                                        Aguardando pagamento
+                                    </span>
+                                }
 
-                    <span>Automação</span>
+                        </div>
 
-                    <h3>
-                        Cidades extras
-                    </h3>
+                    </div>
 
-                    <p>
-                        Na próxima etapa, o sistema irá ativar cidades extras automaticamente para o profissional aparecer em mais regiões.
-                    </p>
+                    <div class="info-grid">
 
-                </div>
+                        <div>
+                            <span>Plano</span>
+                            <strong>@item.NomePlano</strong>
+                        </div>
+
+                        <div>
+                            <span>Valor</span>
+                            <strong>R$ @item.Valor</strong>
+                        </div>
+
+                        <div>
+                            <span>Status</span>
+                            <strong>@item.Status</strong>
+                        </div>
+
+                        <div>
+                            <span>Cidades</span>
+                            <strong>@item.CidadesSelecionadas</strong>
+                        </div>
+
+                        <div>
+                            <span>Solicitado em</span>
+                            <strong>@item.DataSolicitacao.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </div>
+
+                        <div>
+                            <span>Fim</span>
+                            <strong>
+                                @(item.DataFim.HasValue
+                                                                ? item.DataFim.Value.ToString("dd/MM/yyyy")
+                                                                : "Não iniciado")
+                            </strong>
+                        </div>
+
+                        </div>
+
+                        <div class="acoes-card-admin">
+
+                            <form method="post">
+
+                                <input type="hidden" name="id" value="@item.Id" />
+
+                            @if (!item.Pago)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="confirmarPagamentoDivulgacao"
+                                            class="btn-acao pagar"
+                                            onclick='return confirmarAcao(this, "confirmar o pagamento desta divulgação?")'>
+                                        Confirmar pagamento
+                                    </button>
+                                }
+
+                                @if (item.Pago && !item.Aprovado)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="aprovarDivulgacao"
+                                            class="btn-acao aprovar"
+                                            onclick='return confirmarAcao(this, "aprovar e ativar esta divulgação?")'>
+                                        Aprovar divulgação
+                                    </button>
+                                }
+
+                                @if (item.Ativo)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="cancelarDivulgacao"
+                                            class="btn-acao suspender"
+                                            onclick='return confirmarAcao(this, "cancelar esta divulgação?")'>
+                                        Cancelar divulgação
+                                    </button>
+                                }
+
+                            </form>
+
+                            @if (item.Clinica != null)
+                            {
+                                <a href="/PerfilClinica?id=@item.Clinica.Id"
+                                   target="_blank"
+                                   class="btn-ver-perfil">
+                                    Ver perfil
+                                </a>
+                            }
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.DivulgacoesRegionais.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhuma solicitação de divulgação regional no momento.
+                    </div>
+                }
 
             </div>
 
