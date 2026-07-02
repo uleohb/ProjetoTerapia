@@ -1,0 +1,317 @@
+﻿@page
+@model ProjetoTerapia.Pages.SuporteModel
+
+<div class="suporte-page">
+
+    <div class="suporte-card">
+
+        <div class="topo-suporte">
+
+            <img src="/imagem/logo.png"
+                 class="logo-suporte"
+                 alt="AlinhaMente" />
+
+            <span class="badge-suporte">
+                Central de suporte
+            </span>
+
+            <h1>
+                Como podemos ajudar?
+            </h1>
+
+            <p>
+                Envie sua dúvida, problema ou solicitação. Nossa equipe receberá sua mensagem pelo email oficial de suporte.
+            </p>
+
+        </div>
+
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alerta-sucesso">
+                @TempData["Sucesso"]
+            </div>
+        }
+
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alerta-erro">
+                @TempData["Erro"]
+            </div>
+        }
+
+        <form method="post" class="form-suporte">
+
+            <div class="grid-campos">
+
+                <div class="campo">
+                    <label>Nome</label>
+                    <input asp-for="Nome" placeholder="Seu nome" required />
+                </div>
+
+                <div class="campo">
+                    <label>Email</label>
+                    <input asp-for="Email" type="email" placeholder="seuemail@gmail.com" required />
+                </div>
+
+            </div>
+
+            <div class="grid-campos">
+
+                <div class="campo">
+                    <label>Tipo de usuário</label>
+
+                    <select asp-for="TipoUsuario">
+                        <option value="Paciente">Paciente</option>
+                        <option value="Profissional">Profissional</option>
+                        <option value="Clínica">Clínica</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Visitante">Visitante</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label>Assunto</label>
+
+                    <select asp-for="Assunto" required>
+                        <option value="">Selecione</option>
+                        <option value="Problema no login">Problema no login</option>
+                        <option value="Pagamento">Pagamento</option>
+                        <option value="Cadastro profissional">Cadastro profissional</option>
+                        <option value="Alteração de perfil">Alteração de perfil</option>
+                        <option value="Clube de Descontos">Clube de Descontos</option>
+                        <option value="Agenda">Agenda</option>
+                        <option value="Outro assunto">Outro assunto</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="campo">
+                <label>Mensagem</label>
+
+                <textarea asp-for="Mensagem"
+                          placeholder="Descreva o que aconteceu ou o que você precisa..."
+                          required></textarea>
+            </div>
+
+            <button type="submit" class="btn-enviar">
+                Enviar mensagem
+            </button>
+
+        </form>
+
+        <div class="rodape-suporte">
+
+            <a href="/Teste">
+                Voltar para a página inicial
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #eaf8ff;
+    }
+
+    .container,
+    .container-fluid,
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        background: transparent !important;
+    }
+
+    .suporte-page {
+        min-height: 100vh;
+        padding: 45px 20px;
+        background:
+            radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%),
+            radial-gradient(circle at bottom right, rgba(124,58,237,.15), transparent 35%),
+            linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .suporte-card {
+        width: 100%;
+        max-width: 860px;
+        background: rgba(255,255,255,.92);
+        border: 1px solid rgba(226,232,240,.9);
+        backdrop-filter: blur(18px);
+        border-radius: 34px;
+        padding: 38px;
+        box-shadow: 0 25px 70px rgba(15,23,42,.10);
+    }
+
+    .topo-suporte {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .logo-suporte {
+        width: 245px;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .badge-suporte {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(14,165,233,.12);
+        color: #0369a1;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    h1 {
+        margin: 0 0 12px;
+        font-size: 38px;
+        color: #0f172a;
+        letter-spacing: -1px;
+    }
+
+    .topo-suporte p {
+        margin: 0 auto;
+        color: #64748b;
+        line-height: 1.7;
+        max-width: 650px;
+    }
+
+    .form-suporte {
+        display: grid;
+        gap: 18px;
+    }
+
+    .grid-campos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .campo label {
+        display: block;
+        color: #334155;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .campo input,
+    .campo select,
+    .campo textarea {
+        width: 100%;
+        border: 1px solid #dbeafe;
+        border-radius: 16px;
+        padding: 15px;
+        background: #f8fafc;
+        outline: none;
+        font-size: 15px;
+        transition: .2s;
+    }
+
+    .campo textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .campo input:focus,
+    .campo select:focus,
+    .campo textarea:focus {
+        border-color: #0ea5e9;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+    }
+
+    .btn-enviar {
+        border: none;
+        border-radius: 18px;
+        padding: 16px 22px;
+        color: white;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        font-size: 16px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: .25s;
+        box-shadow: 0 14px 28px rgba(14,165,233,.18);
+    }
+
+    .btn-enviar:hover {
+        transform: translateY(-2px);
+    }
+
+    .rodape-suporte {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .rodape-suporte a {
+        color: #0ea5e9;
+        text-decoration: none;
+        font-weight: 800;
+        background: white;
+        border: 1px solid #dbeafe;
+        border-radius: 16px;
+        padding: 13px 18px;
+    }
+
+    .alerta-sucesso,
+    .alerta-erro {
+        padding: 15px 18px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .alerta-sucesso {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alerta-erro {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    @@media(max-width: 700px) {
+        .suporte-card {
+            padding: 28px 20px;
+        }
+
+        .grid-campos {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 31px;
+        }
+
+        .rodape-suporte a {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+</style>
