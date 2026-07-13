@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjetoTerapia.Pages
 {
@@ -13,55 +14,94 @@ namespace ProjetoTerapia.Pages
             _context = context;
         }
 
-        [BindProperty]
         public Consulta Consulta { get; set; } = new();
+
+        [BindProperty]
+        public int Id { get; set; }
+
+        [BindProperty]
+        public DateTime? DataConsulta { get; set; }
+
+        [BindProperty]
+        public string TipoAtendimento { get; set; } = "";
+
+        [BindProperty]
+        public string Status { get; set; } = "";
+
+        [BindProperty]
+        public string? AnotacoesProfissional { get; set; }
 
         public IActionResult OnGet(int id)
         {
-            var clinicaIdString =
-                HttpContext.Session.GetString("ClinicaLogada");
+            var clinicaId = ObterClinicaLogadaId();
 
-            if (string.IsNullOrEmpty(clinicaIdString))
+            if (clinicaId == null)
             {
                 return RedirectToPage("/LoginClinica");
             }
 
-            var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id);
+            Consulta = _context.Consultas
+                .Include(c => c.ResultadoTestePaciente)
+                .FirstOrDefault(c => c.Id == id && c.ClinicaId == clinicaId.Value)!;
 
-            if (consulta == null)
+            if (Consulta == null)
             {
-                return RedirectToPage("/AgendaClinica");
+                return NotFound();
             }
 
-            Consulta = consulta;
+            Id = Consulta.Id;
+            DataConsulta = Consulta.DataConsulta;
+            TipoAtendimento = Consulta.TipoAtendimento;
+            Status = Consulta.Status;
+            AnotacoesProfissional = Consulta.AnotacoesProfissional;
 
             return Page();
         }
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
+            var clinicaId = ObterClinicaLogadaId();
+
+            if (clinicaId == null)
             {
-                return Page();
+                return RedirectToPage("/LoginClinica");
             }
 
-            var consultaBanco = _context.Consultas
-                .FirstOrDefault(x => x.Id == Consulta.Id);
+            var consulta = _context.Consultas
+                .FirstOrDefault(c => c.Id == Id && c.ClinicaId == clinicaId.Value);
 
-            if (consultaBanco == null)
+            if (consulta == null)
             {
-                return RedirectToPage("/AgendaClinica");
+                return NotFound();
             }
 
-            consultaBanco.NomePaciente = Consulta.NomePaciente;
-            consultaBanco.TipoAtendimento = Consulta.TipoAtendimento;
-            consultaBanco.DataConsulta = Consulta.DataConsulta;
-            consultaBanco.Status = Consulta.Status;
+            consulta.DataConsulta = DataConsulta;
+            consulta.TipoAtendimento = TipoAtendimento;
+            consulta.Status = Status;
+            consulta.AnotacoesProfissional = AnotacoesProfissional;
 
             _context.SaveChanges();
 
+            TempData["Sucesso"] = "Consulta atualizada com sucesso.";
+
             return RedirectToPage("/AgendaClinica");
+        }
+
+        private int? ObterClinicaLogadaId()
+        {
+            var clinicaIdString = HttpContext.Session.GetString("ClinicaLogada");
+
+            if (string.IsNullOrEmpty(clinicaIdString))
+            {
+                return null;
+            }
+
+            if (!int.TryParse(clinicaIdString, out int clinicaId))
+            {
+                return null;
+            }
+
+            return clinicaId;
         }
     }
 }

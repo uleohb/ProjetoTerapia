@@ -92,7 +92,122 @@
 
         </div>
 
-       
+        <div class="solicitacoes-box">
+
+            <div class="titulo-box">
+
+                <div>
+                    <h3>Solicitações de agendamento</h3>
+                    <p>Pacientes que solicitaram consulta e aguardam confirmação.</p>
+                </div>
+
+            </div>
+
+            @if (Model.SolicitacoesPendentes.Any())
+            {
+                @foreach (var consulta in Model.SolicitacoesPendentes)
+                {
+                    <div class="solicitacao-card">
+
+                        <div class="solicitacao-info">
+
+                            <div class="avatar">
+                                @(string.IsNullOrWhiteSpace(consulta.NomePaciente)
+                                                        ? "P"
+                                                        : consulta.NomePaciente.Substring(0, 1).ToUpper())
+                    </div>
+
+                            <div>
+
+                                <h4>@consulta.NomePaciente</h4>
+
+                                <div class="infos-consulta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        @(consulta.DataConsulta?.ToString("dd/MM/yyyy"))
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        @(consulta.DataConsulta?.ToString("HH:mm"))
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-solid fa-stethoscope"></i>
+                                        @consulta.TipoAtendimento
+                                    </span>
+
+                                </div>
+
+                        @if (!string.IsNullOrWhiteSpace(consulta.Observacoes))
+                                {
+                                    <p class="observacao-paciente">
+                                        @consulta.Observacoes
+                                    </p>
+                                }
+
+                                @if (consulta.ResultadoTestePaciente != null)
+                                {
+                                    <div class="resultado-consulta">
+
+                                        <span>Resultado compartilhado</span>
+
+                                        <strong>
+                                            @consulta.ResultadoTestePaciente.Nivel
+                                        </strong>
+
+                                        <p>
+                                            Ansiedade: @consulta.ResultadoTestePaciente.PercentualAnsiedade% |
+                                            Depressão: @consulta.ResultadoTestePaciente.PercentualDepressao%
+                                        </p>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <div class="acoes-solicitacao">
+
+                            <form method="post" asp-page-handler="Confirmar">
+                                <input type="hidden" name="id" value="@consulta.Id" />
+
+                                <button type="submit" class="btn-solicitacao confirmar">
+                                    Confirmar
+                                </button>
+                            </form>
+
+                            <form method="post" asp-page-handler="Cancelar">
+                                <input type="hidden" name="id" value="@consulta.Id" />
+
+                                <button type="submit" class="btn-solicitacao cancelar">
+                                    Recusar
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="consulta-vazia pequena">
+
+                    <h3>
+                        Nenhuma solicitação pendente
+                    </h3>
+
+                    <p>
+                        Quando um paciente solicitar consulta, ela aparecerá aqui primeiro.
+                    </p>
+
+                </div>
+            }
+
+        </div>
 
         <!-- CONSULTAS -->
         <div class="consultas-box">
@@ -114,8 +229,8 @@
             <div class="titulo-box">
 
                 <div>
-                    <h3>Próximos Atendimentos</h3>
-                    <p>Consultas agendadas para hoje</p>
+                    <h3>Agenda confirmada</h3>
+                    <p>Consultas confirmadas pelo profissional.</p>
                 </div>
 
             </div>
@@ -129,7 +244,9 @@
                         <div class="consulta-esquerda">
 
                             <div class="avatar">
-                                @consulta.NomePaciente.Substring(0, 1).ToUpper()
+                                @(string.IsNullOrWhiteSpace(consulta.NomePaciente)
+                                                        ? "P"
+                                                        : consulta.NomePaciente.Substring(0, 1).ToUpper())
                             </div>
 
                             <div class="dados-paciente">
@@ -154,6 +271,36 @@
                                     </span>
 
                                 </div>
+
+                        @if (consulta.ResultadoTestePaciente != null)
+                                {
+                                    <div class="resultado-consulta">
+
+                                        <span>
+                                            Resultado compartilhado
+                                        </span>
+
+                                        <strong>
+                                            @consulta.ResultadoTestePaciente.Nivel
+                                        </strong>
+
+                                        <p>
+                                            Ansiedade: @consulta.ResultadoTestePaciente.PercentualAnsiedade% |
+                                            Depressão: @consulta.ResultadoTestePaciente.PercentualDepressao%
+                                        </p>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="resultado-consulta neutro">
+
+                                        <span>
+                                            Sem resultado compartilhado
+                                        </span>
+
+                                    </div>
+                                }
 
                             </div>
 
@@ -222,7 +369,7 @@
                     <i class="fa-regular fa-calendar-xmark"></i>
 
                     <h3>
-                        Nenhuma consulta cadastrada
+                        Nenhuma consulta confirmada
                     </h3>
 
                     <p>
@@ -809,6 +956,152 @@
         .btn-buscar {
             width: 100%;
         }
+
+        .solicitacao-card,
+        .solicitacao-info,
+        .acoes-solicitacao {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-solicitacao {
+            width: 100%;
+        }
+    }
+
+    .resultado-consulta {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+    }
+
+        .resultado-consulta span {
+            display: block;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .resultado-consulta strong {
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .resultado-consulta p {
+            margin: 5px 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .resultado-consulta.neutro {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+            .resultado-consulta.neutro span {
+                color: #94a3b8;
+            }
+
+    .solicitacoes-box {
+        background: rgba(255,255,255,.95);
+        border-radius: 30px;
+        padding: 30px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(15,23,42,.04);
+        margin-bottom: 35px;
+    }
+
+    .solicitacao-card {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 22px;
+        border-radius: 24px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        margin-bottom: 16px;
+    }
+
+    .solicitacao-info {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+        .solicitacao-info h4 {
+            margin: 0 0 10px;
+            color: #0f172a;
+        }
+
+    .observacao-paciente {
+        margin: 12px 0 0;
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .acoes-solicitacao {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .btn-solicitacao {
+        border: none;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+        .btn-solicitacao:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-solicitacao.confirmar {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-solicitacao.cancelar {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+    .resultado-consulta {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+    }
+
+        .resultado-consulta span {
+            display: block;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .resultado-consulta strong {
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .resultado-consulta p {
+            margin: 5px 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .consulta-vazia.pequena {
+        padding: 35px 20px;
     }
 
 </style>

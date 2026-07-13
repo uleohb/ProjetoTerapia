@@ -22,10 +22,14 @@ namespace ProjetoTerapia.Pages
             _context = context;
         }
 
+        public bool PacienteLogado { get; set; } = false;
+
         public IActionResult OnGet(int? id)
         {
             var clinicaLogada = HttpContext.Session.GetString("ClinicaLogada");
             var pacienteLogado = HttpContext.Session.GetString("PacienteLogado");
+
+            PacienteLogado = !string.IsNullOrEmpty(pacienteLogado);
 
             if (id.HasValue)
             {

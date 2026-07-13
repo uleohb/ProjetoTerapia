@@ -16,6 +16,8 @@ namespace ProjetoTerapia.Pages
 
         public List<Consulta> Consultas { get; set; } = new();
 
+        public List<Consulta> SolicitacoesPendentes { get; set; } = new();
+
         public int ConsultasHoje { get; set; }
 
         public int Confirmadas { get; set; }
@@ -31,14 +33,29 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnGet()
         {
-            CarregarAgenda();
+            var clinicaId = ObterClinicaLogadaId();
+
+            if (clinicaId == null)
+            {
+                return RedirectToPage("/LoginClinica");
+            }
+
+            CarregarAgenda(clinicaId.Value);
+
             return Page();
         }
 
         public IActionResult OnPostConfirmar(int id)
         {
+            var clinicaId = ObterClinicaLogadaId();
+
+            if (clinicaId == null)
+            {
+                return RedirectToPage("/LoginClinica");
+            }
+
             var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
 
             if (consulta != null)
             {
@@ -51,8 +68,15 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPostCancelar(int id)
         {
+            var clinicaId = ObterClinicaLogadaId();
+
+            if (clinicaId == null)
+            {
+                return RedirectToPage("/LoginClinica");
+            }
+
             var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
 
             if (consulta != null)
             {
@@ -65,8 +89,15 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPostExcluir(int id)
         {
+            var clinicaId = ObterClinicaLogadaId();
+
+            if (clinicaId == null)
+            {
+                return RedirectToPage("/LoginClinica");
+            }
+
             var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
 
             if (consulta != null)
             {
@@ -77,26 +108,32 @@ namespace ProjetoTerapia.Pages
             return RedirectToPage();
         }
 
-        private void CarregarAgenda()
+        private void CarregarAgenda(int clinicaId)
         {
-            var clinicaIdString =
-                HttpContext.Session.GetString("ClinicaLogada");
+            Clinica = _context.Clinicas
+                .FirstOrDefault(c => c.Id == clinicaId) ?? new Clinica();
 
-            if (string.IsNullOrEmpty(clinicaIdString))
-                return;
-
-            int clinicaId = int.Parse(clinicaIdString);
-
-            var consultas = _context.Consultas
-            .Where(x => x.ClinicaId == clinicaId);
+            var query = _context.Consultas
+                .Include(x => x.Paciente)
+                .Include(x => x.ResultadoTestePaciente)
+                .Where(x => x.ClinicaId == clinicaId);
 
             if (!string.IsNullOrWhiteSpace(Busca))
             {
-                consultas = consultas.Where(x =>
-                    x.NomePaciente.Contains(Busca));
+                query = query.Where(x =>
+                    x.NomePaciente.Contains(Busca) ||
+                    x.EmailPaciente.Contains(Busca));
             }
 
-            Consultas = consultas
+            var todas = query.ToList();
+
+            SolicitacoesPendentes = todas
+                .Where(x => x.Status == "Pendente")
+                .OrderBy(x => x.DataConsulta)
+                .ToList();
+
+            Consultas = todas
+                .Where(x => x.Status == "Confirmado")
                 .OrderBy(x => x.DataConsulta)
                 .ToList();
 
@@ -104,14 +141,28 @@ namespace ProjetoTerapia.Pages
                 x.DataConsulta.HasValue &&
                 x.DataConsulta.Value.Date == DateTime.Today);
 
-            Confirmadas = Consultas.Count(x =>
-                x.Status == "Confirmado");
+            Confirmadas = todas.Count(x => x.Status == "Confirmado");
 
-            Pendentes = Consultas.Count(x =>
-                x.Status == "Pendente");
+            Pendentes = todas.Count(x => x.Status == "Pendente");
 
-            Canceladas = Consultas.Count(x =>
-                x.Status == "Cancelado");
+            Canceladas = todas.Count(x => x.Status == "Cancelado");
+        }
+
+        private int? ObterClinicaLogadaId()
+        {
+            var clinicaIdString = HttpContext.Session.GetString("ClinicaLogada");
+
+            if (string.IsNullOrEmpty(clinicaIdString))
+            {
+                return null;
+            }
+
+            if (!int.TryParse(clinicaIdString, out int clinicaId))
+            {
+                return null;
+            }
+
+            return clinicaId;
         }
     }
 }

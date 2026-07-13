@@ -1,27 +1,36 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
 
 namespace ProjetoTerapia.Models
 {
     public class Consulta
     {
-        [Key]
         public int Id { get; set; }
 
         public int ClinicaId { get; set; }
-
-        [ForeignKey("ClinicaId")]
         public Clinica? Clinica { get; set; }
 
-        [Required(ErrorMessage = "Informe o nome do paciente.")]
+        public int? PacienteId { get; set; }
+        public Paciente? Paciente { get; set; }
+
+        public int? ResultadoTestePacienteId { get; set; }
+        public ResultadoTestePaciente? ResultadoTestePaciente { get; set; }
+
         public string NomePaciente { get; set; } = "";
 
-        [Required(ErrorMessage = "Selecione o tipo de atendimento.")]
-        public string TipoAtendimento { get; set; } = "";
+        public string EmailPaciente { get; set; } = "";
 
-        [Required(ErrorMessage = "Informe a data da consulta.")]
+        public string TelefonePaciente { get; set; } = "";
+
         public DateTime? DataConsulta { get; set; }
 
+        public string TipoAtendimento { get; set; } = "";
+
         public string Status { get; set; } = "Pendente";
+
+        public string? Observacoes { get; set; }
+
+        public string? AnotacoesProfissional { get; set; }
+
+        public DateTime DataCriacao { get; set; } = DateTime.Now;
     }
 }

@@ -125,11 +125,15 @@ namespace ProjetoTerapia.Pages
         {
             return quantidade switch
             {
-                5 => ("+5 cidades", 30),
-                10 => ("+10 cidades", 35),
-                15 => ("+15 cidades", 45),
-                20 => ("+20 cidades", 50),
-                25 => ("+25 cidades", 55),
+                1 => ("+1 cidade adicional", 30),
+                3 => ("+3 cidades adicionais", 35),
+                5 => ("+5 cidades adicionais", 40),
+                8 => ("+8 cidades adicionais", 45),
+                10 => ("+10 cidades adicionais", 50),
+                15 => ("+15 cidades adicionais", 55),
+                20 => ("+20 cidades adicionais", 60),
+                25 => ("+25 cidades adicionais", 65),
+                27 => ("+27 cidades adicionais", 70),
                 _ => null
             };
         }

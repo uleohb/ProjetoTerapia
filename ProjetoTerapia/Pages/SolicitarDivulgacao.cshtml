@@ -16,7 +16,7 @@
         </h1>
 
         <p class="sub">
-            Escolha um plano para sua clínica aparecer em mais cidades e aumentar sua visibilidade para pacientes.
+            Escolha quantas cidades adicionais deseja incluir além da sua cidade principal de atendimento.
         </p>
 
         @if (TempData["Sucesso"] != null)
@@ -38,33 +38,57 @@
             <div class="planos-grid">
 
                 <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="5" required />
-                    <span>+5 cidades</span>
+                    <input type="radio" name="QuantidadeCidades" value="1" required />
+                    <span>+1 cidade</span>
                     <strong>R$ 30,00</strong>
+                </label>
+
+                <label class="plano-card">
+                    <input type="radio" name="QuantidadeCidades" value="3" />
+                    <span>+3 cidades</span>
+                    <strong>R$ 35,00</strong>
+                </label>
+
+                <label class="plano-card">
+                    <input type="radio" name="QuantidadeCidades" value="5" />
+                    <span>+5 cidades</span>
+                    <strong>R$ 40,00</strong>
+                </label>
+
+                <label class="plano-card">
+                    <input type="radio" name="QuantidadeCidades" value="8" />
+                    <span>+8 cidades</span>
+                    <strong>R$ 45,00</strong>
                 </label>
 
                 <label class="plano-card">
                     <input type="radio" name="QuantidadeCidades" value="10" />
                     <span>+10 cidades</span>
-                    <strong>R$ 35,00</strong>
+                    <strong>R$ 50,00</strong>
                 </label>
 
                 <label class="plano-card">
                     <input type="radio" name="QuantidadeCidades" value="15" />
                     <span>+15 cidades</span>
-                    <strong>R$ 45,00</strong>
+                    <strong>R$ 55,00</strong>
                 </label>
 
                 <label class="plano-card">
                     <input type="radio" name="QuantidadeCidades" value="20" />
                     <span>+20 cidades</span>
-                    <strong>R$ 50,00</strong>
+                    <strong>R$ 60,00</strong>
                 </label>
 
                 <label class="plano-card">
                     <input type="radio" name="QuantidadeCidades" value="25" />
                     <span>+25 cidades</span>
-                    <strong>R$ 55,00</strong>
+                    <strong>R$ 65,00</strong>
+                </label>
+
+                <label class="plano-card">
+                    <input type="radio" name="QuantidadeCidades" value="27" />
+                    <span>+27 cidades</span>
+                    <strong>R$ 70,00</strong>
                 </label>
 
             </div>
