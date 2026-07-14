@@ -345,98 +345,111 @@
 
                     </div>
 
-                </div>
+                    <div class="chamada-financeiro">
+                        <strong>Seu perfil ativo aumenta sua presença na plataforma.</strong>
 
-            @if (Model.Clinica!.Pago)
-            {
-                <div class="painel-bloco clube" id="clube-descontos">
-
-                    <div class="sinal-clube">
-                        <span></span>
+                        <p>
+                            Mantenha seu plano em dia para continuar aparecendo para pacientes e liberar recursos de divulgação regional.
+                        </p>
                     </div>
 
-                    <div class="bloco-topo">
+                </div>
 
-                        <div>
-                            <span>Clube de Descontos</span>
+            @if (Model.Clinica?.Pago == true)
+                {
+                    <section class="painel-bloco clube-descontos" id="clube-descontos">
 
-                            <h2>Apareça em mais cidades</h2>
+                        <div class="clube-topo">
+                            <div class="clube-titulos">
+                                <span class="clube-label">Clube de descontos</span>
+
+                                <h2>Apareça em mais cidades</h2>
 
                                 <p>
-                                    Divulgue seu perfil em cidades adicionais e aumente sua chance de receber novos pacientes.
+                                    Sua cidade principal já está inclusa no plano.
+                                    Escolha cidades adicionais para aumentar sua visibilidade
+                                    e receber novos pacientes em outras regiões.
                                 </p>
+                            </div>
+
+                            <div class="clube-topo-icone">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
                         </div>
 
-                        <div class="icone-bloco destaque">
-                            <i class="fa-solid fa-location-dot"></i>
+                        <div class="clube-info-box">
+                            <h3>Cidades adicionais</h3>
+
+                            <p>
+                                Os planos abaixo adicionam novas cidades ao seu perfil,
+                                além da cidade principal cadastrada.
+                            </p>
                         </div>
 
-                    </div>
+                        <div class="clube-grid">
 
-                        <div class="clube-planos">
-
-                            <div class="clube-plano">
-                                <strong>+1</strong>
-                                <span>cidade</span>
-                                <b>R$ 30</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+1 cidade</span>
+                                <strong>R$ 30</strong>
+                                <small>Cidade principal + 1 adicional</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+3</strong>
-                                <span>cidades</span>
-                                <b>R$ 35</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+3 cidades</span>
+                                <strong>R$ 35</strong>
+                                <small>Cidade principal + 3 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+5</strong>
-                                <span>cidades</span>
-                                <b>R$ 40</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+5 cidades</span>
+                                <strong>R$ 40</strong>
+                                <small>Cidade principal + 5 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+8</strong>
-                                <span>cidades</span>
-                                <b>R$ 45</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+8 cidades</span>
+                                <strong>R$ 45</strong>
+                                <small>Cidade principal + 8 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+10</strong>
-                                <span>cidades</span>
-                                <b>R$ 50</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+10 cidades</span>
+                                <strong>R$ 50</strong>
+                                <small>Cidade principal + 10 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+15</strong>
-                                <span>cidades</span>
-                                <b>R$ 55</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+15 cidades</span>
+                                <strong>R$ 55</strong>
+                                <small>Cidade principal + 15 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+20</strong>
-                                <span>cidades</span>
-                                <b>R$ 60</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+20 cidades</span>
+                                <strong>R$ 60</strong>
+                                <small>Cidade principal + 20 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+25</strong>
-                                <span>cidades</span>
-                                <b>R$ 65</b>
+                            <div class="clube-item">
+                                <span class="clube-qtd">+25 cidades</span>
+                                <strong>R$ 65</strong>
+                                <small>Cidade principal + 25 adicionais</small>
                             </div>
 
-                            <div class="clube-plano">
-                                <strong>+27</strong>
-                                <span>cidades</span>
-                                <b>R$ 70</b>
+                            <div class="clube-item destaque">
+                                <span class="clube-qtd">+27 cidades</span>
+                                <strong>R$ 70</strong>
+                                <small>Cobertura ampliada</small>
                             </div>
 
                         </div>
 
-                        <a href="/SolicitarDivulgacao" class="btn-clube">
-                            Solicitar divulgação
+                        <a href="/SolicitarDivulgacao" class="btn-clube-descontos">
+                            Solicitar divulgação regional
                         </a>
 
-                </div>
-            }
+                    </section>
+                } 
             </section>
 
             <section class="titulo-secao">
@@ -544,6 +557,10 @@
 
 <style>
 
+    /* =========================================================
+           FONTE / RESET GERAL
+        ========================================================= */
+
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
     * {
@@ -559,6 +576,10 @@
         color: #0f172a;
     }
 
+    a {
+        text-decoration: none;
+    }
+
     .container,
     .container-fluid,
     main {
@@ -568,12 +589,16 @@
         background: transparent !important;
     }
 
+    /* =========================================================
+           FUNDO DA PÁGINA
+        ========================================================= */
+
     .painel-page {
         position: relative;
         min-height: 100vh;
         overflow: hidden;
-        background: radial-gradient(circle at top left, rgba(14,165,233,.18), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,.14), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 42%, #edf3ff 100%);
         padding: 42px 24px 70px;
+        background: radial-gradient(circle at top left, rgba(14,165,233,.18), transparent 32%), radial-gradient(circle at bottom right, rgba(124,58,237,.14), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 42%, #edf3ff 100%);
     }
 
     .rgb {
@@ -615,6 +640,10 @@
         margin: auto;
     }
 
+    /* =========================================================
+           TOPO DO PAINEL
+        ========================================================= */
+
     .topo-painel {
         display: flex;
         justify-content: space-between;
@@ -649,12 +678,12 @@
     }
 
     .topo-painel h1 {
-        font-size: 34px;
         margin: 0 0 8px;
+        color: #0f172a;
+        font-size: 34px;
         line-height: 1.1;
         font-weight: 800;
         letter-spacing: -1px;
-        color: #0f172a;
     }
 
     .topo-painel p {
@@ -671,11 +700,16 @@
         flex-wrap: wrap;
     }
 
+    /* =========================================================
+           BOTÕES GERAIS
+        ========================================================= */
+
     .btn-topo,
     .btn-alerta,
     .btn-completar,
     .btn-bloco,
     .btn-clube,
+    .btn-clube-descontos,
     .btn-dashboard {
         text-decoration: none;
         transition: .25s;
@@ -704,11 +738,16 @@
         .btn-completar:hover,
         .btn-bloco:hover,
         .btn-clube:hover,
+        .btn-clube-descontos:hover,
         .btn-dashboard:hover,
         .card-operacional:hover,
         .kpi-card:hover {
             transform: translateY(-3px);
         }
+
+    /* =========================================================
+           CARDS BASE / VIDRO
+        ========================================================= */
 
     .alerta,
     .alerta-perfil,
@@ -722,6 +761,10 @@
         box-shadow: 0 20px 55px rgba(15,23,42,.07);
         backdrop-filter: blur(18px);
     }
+
+    /* =========================================================
+           ALERTAS DE STATUS
+        ========================================================= */
 
     .alerta {
         border-radius: 28px;
@@ -789,6 +832,10 @@
         white-space: nowrap;
     }
 
+    /* =========================================================
+           ALERTA DE PERFIL INCOMPLETO
+        ========================================================= */
+
     .alerta-perfil {
         margin-bottom: 28px;
         padding: 30px;
@@ -826,6 +873,10 @@
         font-weight: 800;
         white-space: nowrap;
     }
+
+    /* =========================================================
+           HERO DO DASHBOARD
+        ========================================================= */
 
     .dashboard-hero {
         display: grid;
@@ -892,6 +943,10 @@
         color: rgba(255,255,255,.72);
     }
 
+    /* =========================================================
+           KPIs
+        ========================================================= */
+
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(4,1fr);
@@ -942,11 +997,16 @@
         font-size: 14px;
     }
 
+    /* =========================================================
+           BLOCOS PRINCIPAIS
+        ========================================================= */
+
     .conteudo-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
         margin-bottom: 34px;
+        align-items: flex-start;
     }
 
     .painel-bloco {
@@ -981,6 +1041,10 @@
         flex-shrink: 0;
     }
 
+    /* =========================================================
+           FINANCEIRO
+        ========================================================= */
+
     .financeiro-grid {
         display: grid;
         grid-template-columns: repeat(2,1fr);
@@ -988,8 +1052,7 @@
         margin-bottom: 22px;
     }
 
-        .financeiro-grid div,
-        .planos-cidades div {
+        .financeiro-grid div {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 18px;
@@ -1030,9 +1093,96 @@
             border: 1px solid #dbeafe;
         }
 
-    .clube {
-        background: linear-gradient(135deg,rgba(255,255,255,.92),rgba(236,254,255,.92));
+    /* =========================================================
+           CLUBE DE DESCONTOS / DIVULGAÇÃO REGIONAL
+           Corrigido:
+           - planos organizados em cards
+           - textos separados
+           - layout responsivo
+           - compatível com .clube e .clube-descontos
+        ========================================================= */
+
+    .clube,
+    .clube-descontos {
+        background: radial-gradient(circle at top right, rgba(14,165,233,.12), transparent 30%), linear-gradient(135deg,#f6fcff,#eef9ff);
+        border: 1px solid #dbeafe;
+        border-radius: 32px;
+        padding: 34px;
+        box-shadow: 0 18px 40px rgba(15,23,42,.05);
     }
+
+    .clube-topo,
+    .clube-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 28px;
+        margin-bottom: 24px;
+    }
+
+        .clube-titulos,
+        .clube-header > div:first-child {
+            max-width: 760px;
+        }
+
+    .clube-label {
+        display: inline-block;
+        margin-bottom: 12px;
+        color: #0ea5e9;
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .clube h2,
+    .clube-descontos h2,
+    .clube-titulos h2 {
+        margin: 0 0 12px;
+        color: #0f172a;
+        font-size: 34px;
+        line-height: 1.15;
+        letter-spacing: -1px;
+    }
+
+    .clube p,
+    .clube-descontos p,
+    .clube-titulos p,
+    .clube-header p {
+        margin: 0;
+        color: #475569;
+        font-size: 17px;
+        line-height: 1.7;
+    }
+
+    .clube-topo-icone,
+    .clube-icone {
+        position: relative;
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
+        border-radius: 24px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 18px 35px rgba(14,165,233,.22);
+    }
+
+        .clube-icone span,
+        .sinal-clube span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #22c55e;
+            border: 4px solid #eefbff;
+            animation: pulse 1.7s infinite;
+        }
 
     .sinal-clube {
         position: absolute;
@@ -1041,16 +1191,6 @@
         width: 18px;
         height: 18px;
     }
-
-        .sinal-clube span {
-            display: block;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 0 rgba(34,197,94,.6);
-            animation: pulse 1.7s infinite;
-        }
 
     @@keyframes pulse {
         0% {
@@ -1066,36 +1206,121 @@
         }
     }
 
-    .planos-cidades {
-        display: grid;
-        grid-template-columns: repeat(5,1fr);
-        gap: 10px;
-        margin-bottom: 20px;
+    .clube-info-box,
+    .clube-aviso {
+        background: white;
+        border: 1px solid #dbeafe;
+        border-radius: 22px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
     }
 
-        .planos-cidades strong {
+        .clube-info-box h3,
+        .clube-aviso strong {
             display: block;
+            margin: 0 0 8px;
             color: #0f172a;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        .planos-cidades span {
-            color: #0ea5e9;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
         }
 
-    .btn-clube {
-        display: block;
-        text-align: center;
+        .clube-info-box p,
+        .clube-aviso p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+    .clube-grid,
+    .clube-planos,
+    .planos-cidades {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+        .clube-item,
+        .clube-plano,
+        .planos-cidades div {
+            background: white;
+            border: 1px solid #dbeafe;
+            border-radius: 22px;
+            padding: 20px 18px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: .25s;
+            box-shadow: 0 10px 25px rgba(15,23,42,.04);
+        }
+
+            .clube-item:hover,
+            .clube-plano:hover,
+            .planos-cidades div:hover {
+                transform: translateY(-4px);
+                border-color: #0ea5e9;
+                box-shadow: 0 18px 30px rgba(14,165,233,.10);
+            }
+
+            .clube-item.destaque,
+            .clube-plano.destaque {
+                background: linear-gradient(135deg,#eff6ff,#ecfeff);
+                border-color: #7dd3fc;
+            }
+
+            .clube-qtd,
+            .clube-plano strong,
+            .planos-cidades strong {
+                display: block;
+                color: #0f172a;
+                font-size: 20px;
+                font-weight: 900;
+                line-height: 1.3;
+                margin-bottom: 10px;
+            }
+
+            .clube-item strong,
+            .clube-plano b,
+            .planos-cidades span {
+                display: block;
+                color: #0ea5e9;
+                font-size: 28px;
+                font-weight: 900;
+                margin-bottom: 8px;
+            }
+
+            .clube-item small {
+                color: #64748b;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+    .btn-clube,
+    .btn-clube-descontos {
         width: 100%;
-        padding: 15px;
-        border-radius: 16px;
+        min-height: 64px;
+        border-radius: 20px;
         background: linear-gradient(135deg,#0ea5e9,#2563eb,#14b8a6);
         color: white;
-        font-weight: 800;
+        font-size: 18px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 16px 32px rgba(14,165,233,.18);
     }
+
+        .btn-clube:hover,
+        .btn-clube-descontos:hover {
+            box-shadow: 0 20px 40px rgba(14,165,233,.24);
+        }
+
+    /* =========================================================
+           SEÇÃO OPERACIONAL
+        ========================================================= */
 
     .titulo-secao {
         margin-bottom: 18px;
@@ -1162,76 +1387,19 @@
             border: 1px solid #dbeafe;
         }
 
+    /* =========================================================
+           ERRO
+        ========================================================= */
+
     .erro-card {
         padding: 40px;
         border-radius: 28px;
         text-align: center;
     }
 
-    @@media(max-width: 1050px) {
-
-        .dashboard-hero,
-        .conteudo-grid,
-        .kpi-grid,
-        .grid-operacional {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .planos-cidades {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @@media(max-width: 768px) {
-
-        .painel-page {
-            padding: 24px 14px 50px;
-        }
-
-        .topo-esquerda {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .logo-painel {
-            width: 210px;
-        }
-
-        .topo-painel h1 {
-            font-size: 30px;
-        }
-
-        .dashboard-hero,
-        .conteudo-grid,
-        .kpi-grid,
-        .grid-operacional,
-        .financeiro-grid,
-        .planos-cidades {
-            grid-template-columns: 1fr;
-        }
-
-        .alerta,
-        .alerta-perfil {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .btn-alerta,
-        .btn-completar,
-        .btn-dashboard,
-        .btn-topo,
-        .btn-bloco {
-            width: 100%;
-            text-align: center;
-        }
-
-        .topo-acoes,
-        .bloco-acoes,
-        .acoes-dashboard {
-            width: 100%;
-            flex-direction: column;
-        }
-    }
+    /* =========================================================
+           ALERTA DE VENCIMENTO
+        ========================================================= */
 
     .alerta-vencimento {
         background: #fef3c7;
@@ -1263,12 +1431,185 @@
         }
 
         .alerta-vencimento a {
-            text-decoration: none;
             padding: 14px 20px;
             border-radius: 16px;
             background: white;
             color: inherit;
             font-weight: 800;
         }
+
+    /* =========================================================
+       AJUSTE FINO DO CLUBE DE DESCONTOS
+       Deixa os cards menores e evita bloco gigante
+    ========================================================= */
+
+    .clube,
+    .clube-descontos {
+        padding: 28px;
+    }
+
+    .clube-grid,
+    .clube-planos,
+    .planos-cidades {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+        .clube-item,
+        .clube-plano,
+        .planos-cidades div {
+            min-height: 112px;
+            padding: 15px 16px;
+            border-radius: 18px;
+        }
+
+            .clube-qtd,
+            .clube-plano strong,
+            .planos-cidades strong {
+                font-size: 15px;
+                margin-bottom: 6px;
+            }
+
+            .clube-item strong,
+            .clube-plano b,
+            .planos-cidades span {
+                font-size: 25px;
+                margin-bottom: 5px;
+            }
+
+            .clube-item small {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+    .btn-clube,
+    .btn-clube-descontos {
+        min-height: 58px;
+        border-radius: 18px;
+        font-size: 16px;
+    }
+
+    .chamada-financeiro {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: linear-gradient(135deg,#eff6ff,#ecfeff);
+        border: 1px solid #dbeafe;
+    }
+
+        .chamada-financeiro strong {
+            display: block;
+            color: #0f172a;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .chamada-financeiro p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+    /* =========================================================
+       RESPONSIVO
+    ========================================================= */
+
+    @@media(max-width: 1050px) {
+
+        .dashboard-hero,
+        .conteudo-grid,
+        .kpi-grid,
+        .grid-operacional {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .clube-grid,
+        .clube-planos,
+        .planos-cidades {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media(max-width: 768px) {
+
+        .painel-page {
+            padding: 24px 14px 50px;
+        }
+
+        .topo-esquerda {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-painel {
+            width: 210px;
+        }
+
+        .topo-painel h1 {
+            font-size: 30px;
+        }
+
+        .dashboard-hero,
+        .conteudo-grid,
+        .kpi-grid,
+        .grid-operacional,
+        .financeiro-grid,
+        .clube-grid,
+        .clube-planos,
+        .planos-cidades {
+            grid-template-columns: 1fr;
+        }
+
+        .alerta,
+        .alerta-perfil,
+        .clube-topo,
+        .clube-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .clube,
+        .clube-descontos {
+            padding: 26px 20px;
+            border-radius: 26px;
+        }
+
+            .clube h2,
+            .clube-descontos h2,
+            .clube-titulos h2 {
+                font-size: 28px;
+            }
+
+            .clube p,
+            .clube-descontos p,
+            .clube-titulos p,
+            .clube-header p {
+                font-size: 15px;
+            }
+
+        .clube-item,
+        .clube-plano,
+        .planos-cidades div {
+            min-height: auto;
+        }
+
+        .btn-alerta,
+        .btn-completar,
+        .btn-dashboard,
+        .btn-topo,
+        .btn-bloco {
+            width: 100%;
+            text-align: center;
+        }
+
+        .topo-acoes,
+        .bloco-acoes,
+        .acoes-dashboard {
+            width: 100%;
+            flex-direction: column;
+        }
+    }
 
 </style>

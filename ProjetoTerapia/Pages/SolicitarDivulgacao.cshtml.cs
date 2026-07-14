@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace ProjetoTerapia.Pages
 {
@@ -20,11 +22,44 @@ namespace ProjetoTerapia.Pages
 
         public List<DivulgacaoRegional> MinhasSolicitacoes { get; set; } = new();
 
+        public List<string> CidadesDisponiveis { get; set; } = new()
+        {
+            "São Paulo",
+            "Osasco",
+            "Barueri",
+            "Carapicuíba",
+            "Cotia",
+            "Taboão da Serra",
+            "Embu das Artes",
+            "Itapevi",
+            "Jandira",
+            "Santana de Parnaíba",
+            "Guarulhos",
+            "Santo André",
+            "São Bernardo do Campo",
+            "São Caetano do Sul",
+            "Diadema",
+            "Mauá",
+            "Ribeirão Pires",
+            "Mogi das Cruzes",
+            "Suzano",
+            "Poá",
+            "Itaquaquecetuba",
+            "Santos",
+            "São Vicente",
+            "Praia Grande",
+            "Guarujá",
+            "Cubatão",
+            "Itanhaém",
+            "Mongaguá",
+            "Peruíbe"
+        };
+
         [BindProperty]
         public int QuantidadeCidades { get; set; }
 
         [BindProperty]
-        public string CidadesSelecionadas { get; set; } = "";
+        public List<string> CidadesEscolhidas { get; set; } = new();
 
         public IActionResult OnGet()
         {
@@ -70,23 +105,25 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
-            var cidades = CidadesSelecionadas
-                .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(c => c.Trim())
-                .Where(c => !string.IsNullOrWhiteSpace(c))
-                .Distinct()
-                .ToList();
+            var cidades = LimparCidadesSelecionadas();
 
             if (!cidades.Any())
             {
-                TempData["Erro"] = "Informe pelo menos uma cidade.";
+                TempData["Erro"] = "Selecione pelo menos uma cidade adicional.";
+                CarregarSolicitacoes(Clinica.Id);
+                return Page();
+            }
+
+            if (cidades.Any(c => TextosIguais(c, Clinica.Cidade)))
+            {
+                TempData["Erro"] = "Sua cidade principal já está inclusa no plano. Escolha apenas cidades adicionais.";
                 CarregarSolicitacoes(Clinica.Id);
                 return Page();
             }
 
             if (cidades.Count > QuantidadeCidades)
             {
-                TempData["Erro"] = $"Este plano permite até {QuantidadeCidades} cidades.";
+                TempData["Erro"] = $"Este plano permite até {QuantidadeCidades} cidade(s) adicional(is).";
                 CarregarSolicitacoes(Clinica.Id);
                 return Page();
             }
@@ -113,6 +150,48 @@ namespace ProjetoTerapia.Pages
             return RedirectToPage("/SolicitarDivulgacao");
         }
 
+        public bool EhCidadePrincipal(string cidade)
+        {
+            if (Clinica == null)
+                return false;
+
+            return TextosIguais(cidade, Clinica.Cidade);
+        }
+
+        public bool CidadeSelecionada(string cidade)
+        {
+            return CidadesEscolhidas.Any(c => TextosIguais(c, cidade));
+        }
+
+        private List<string> LimparCidadesSelecionadas()
+        {
+            var cidadesLimpas = new List<string>();
+            var usadas = new HashSet<string>();
+
+            foreach (var cidade in CidadesEscolhidas)
+            {
+                if (string.IsNullOrWhiteSpace(cidade))
+                    continue;
+
+                var cidadeTratada = cidade.Trim();
+
+                var cidadeExisteNaLista = CidadesDisponiveis
+                    .Any(c => TextosIguais(c, cidadeTratada));
+
+                if (!cidadeExisteNaLista)
+                    continue;
+
+                var chave = NormalizarTexto(cidadeTratada);
+
+                if (usadas.Add(chave))
+                {
+                    cidadesLimpas.Add(cidadeTratada);
+                }
+            }
+
+            return cidadesLimpas;
+        }
+
         private void CarregarSolicitacoes(int clinicaId)
         {
             MinhasSolicitacoes = _context.DivulgacoesRegionais
@@ -136,6 +215,24 @@ namespace ProjetoTerapia.Pages
                 27 => ("+27 cidades adicionais", 70),
                 _ => null
             };
+        }
+
+        private bool TextosIguais(string? textoA, string? textoB)
+        {
+            return NormalizarTexto(textoA ?? "") == NormalizarTexto(textoB ?? "");
+        }
+
+        private string NormalizarTexto(string texto)
+        {
+            var textoMinusculo = texto.ToLower().Trim();
+
+            var textoNormalizado = textoMinusculo.Normalize(NormalizationForm.FormD);
+
+            var caracteres = textoNormalizado
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray();
+
+            return new string(caracteres).Normalize(NormalizationForm.FormC);
         }
     }
 }

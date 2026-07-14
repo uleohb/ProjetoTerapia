@@ -16,8 +16,24 @@
         </h1>
 
         <p class="sub">
-            Escolha quantas cidades adicionais deseja incluir além da sua cidade principal de atendimento.
+            Escolha um plano e selecione as cidades adicionais onde deseja aparecer.
+            Sua cidade principal já está inclusa no plano profissional.
         </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Clinica?.Cidade))
+        {
+            <div class="cidade-principal-box">
+
+                <span>Sua cidade principal</span>
+
+                <strong>@Model.Clinica.Cidade</strong>
+
+                <p>
+                    Ela já está inclusa no seu plano. As cidades abaixo serão adicionadas à sua divulgação regional.
+                </p>
+
+            </div>
+        }
 
         @if (TempData["Sucesso"] != null)
         {
@@ -35,74 +51,120 @@
 
         <form method="post">
 
-            <div class="planos-grid">
+            <div class="secao-form">
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="1" required />
-                    <span>+1 cidade</span>
-                    <strong>R$ 30,00</strong>
-                </label>
+                <div class="secao-titulo">
+                    <span>Etapa 1</span>
+                    <h2>Escolha o plano</h2>
+                    <p>O limite de cidades será definido pelo plano selecionado.</p>
+                </div>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="3" />
-                    <span>+3 cidades</span>
-                    <strong>R$ 35,00</strong>
-                </label>
+                <div class="planos-grid">
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="5" />
-                    <span>+5 cidades</span>
-                    <strong>R$ 40,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="1" required
+                               checked="@(Model.QuantidadeCidades == 1 ? "checked" : null)" />
+                        <span>+1 cidade</span>
+                        <strong>R$ 30,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="8" />
-                    <span>+8 cidades</span>
-                    <strong>R$ 45,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="3"
+                               checked="@(Model.QuantidadeCidades == 3 ? "checked" : null)" />
+                        <span>+3 cidades</span>
+                        <strong>R$ 35,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="10" />
-                    <span>+10 cidades</span>
-                    <strong>R$ 50,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="5"
+                               checked="@(Model.QuantidadeCidades == 5 ? "checked" : null)" />
+                        <span>+5 cidades</span>
+                        <strong>R$ 40,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="15" />
-                    <span>+15 cidades</span>
-                    <strong>R$ 55,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="8"
+                               checked="@(Model.QuantidadeCidades == 8 ? "checked" : null)" />
+                        <span>+8 cidades</span>
+                        <strong>R$ 45,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="20" />
-                    <span>+20 cidades</span>
-                    <strong>R$ 60,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="10"
+                               checked="@(Model.QuantidadeCidades == 10 ? "checked" : null)" />
+                        <span>+10 cidades</span>
+                        <strong>R$ 50,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="25" />
-                    <span>+25 cidades</span>
-                    <strong>R$ 65,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="15"
+                               checked="@(Model.QuantidadeCidades == 15 ? "checked" : null)" />
+                        <span>+15 cidades</span>
+                        <strong>R$ 55,00</strong>
+                    </label>
 
-                <label class="plano-card">
-                    <input type="radio" name="QuantidadeCidades" value="27" />
-                    <span>+27 cidades</span>
-                    <strong>R$ 70,00</strong>
-                </label>
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="20"
+                               checked="@(Model.QuantidadeCidades == 20 ? "checked" : null)" />
+                        <span>+20 cidades</span>
+                        <strong>R$ 60,00</strong>
+                    </label>
+
+                    <label class="plano-card">
+                        <input type="radio" name="QuantidadeCidades" value="25"
+                               checked="@(Model.QuantidadeCidades == 25 ? "checked" : null)" />
+                        <span>+25 cidades</span>
+                        <strong>R$ 65,00</strong>
+                    </label>
+
+                    <label class="plano-card destaque">
+                        <input type="radio" name="QuantidadeCidades" value="27"
+                               checked="@(Model.QuantidadeCidades == 27 ? "checked" : null)" />
+                        <span>+27 cidades</span>
+                        <strong>R$ 70,00</strong>
+                    </label>
+
+                </div>
 
             </div>
 
-            <div class="campo">
-                <label>Cidades onde deseja aparecer</label>
+            <div class="secao-form">
 
-                <textarea asp-for="CidadesSelecionadas"
-                          placeholder="Exemplo: São Paulo, Rio de Janeiro, Belo Horizonte, Curitiba"
-                          required></textarea>
+                <div class="secao-titulo linha">
+                    <div>
+                        <span>Etapa 2</span>
+                        <h2>Selecione as cidades</h2>
+                        <p>Escolha apenas cidades adicionais. A cidade principal não precisa ser selecionada.</p>
+                    </div>
 
-                <small>
-                    Separe as cidades por vírgula ou escreva uma por linha.
-                </small>
+                    <div class="contador-cidades">
+                        <strong id="contadorSelecionadas">0</strong>
+                        <span id="contadorLimite">/ 0 cidades</span>
+                    </div>
+                </div>
+
+                <div class="cidades-grid">
+
+                    @foreach (var cidade in Model.CidadesDisponiveis)
+                    {
+                        if (Model.EhCidadePrincipal(cidade))
+                        {
+                            continue;
+                        }
+
+                        <label class="cidade-opcao">
+                            <input type="checkbox"
+                                   name="CidadesEscolhidas"
+                                   value="@cidade"
+                                   class="cidade-check"
+                                   checked="@(Model.CidadeSelecionada(cidade) ? "checked" : null)" />
+
+                            <span>@cidade</span>
+                        </label>
+                    }
+
+                </div>
+
             </div>
 
             <button type="submit" class="btn-principal">
@@ -157,6 +219,88 @@
 
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var radiosPlano = document.querySelectorAll("input[name='QuantidadeCidades']");
+        var cidades = document.querySelectorAll(".cidade-check");
+        var contadorSelecionadas = document.getElementById("contadorSelecionadas");
+        var contadorLimite = document.getElementById("contadorLimite");
+
+        function obterLimite() {
+            var selecionado = document.querySelector("input[name='QuantidadeCidades']:checked");
+
+            if (selecionado == null) {
+                return 0;
+            }
+
+            return parseInt(selecionado.value);
+        }
+
+        function atualizarPlanos() {
+            radiosPlano.forEach(function (radio) {
+                var card = radio.closest(".plano-card");
+
+                if (card != null) {
+                    card.classList.toggle("selecionado", radio.checked);
+                }
+            });
+        }
+
+        function atualizarCidades() {
+            var limite = obterLimite();
+
+            var selecionadas = Array.from(cidades).filter(function (cidade) {
+                return cidade.checked;
+            });
+
+            if (limite > 0 && selecionadas.length > limite) {
+                selecionadas.slice(limite).forEach(function (cidade) {
+                    cidade.checked = false;
+                });
+
+                selecionadas = Array.from(cidades).filter(function (cidade) {
+                    return cidade.checked;
+                });
+            }
+
+            cidades.forEach(function (cidade) {
+                var card = cidade.closest(".cidade-opcao");
+
+                if (card != null) {
+                    card.classList.toggle("selecionada", cidade.checked);
+                }
+
+                if (limite === 0) {
+                    cidade.disabled = true;
+                }
+                else if (!cidade.checked && selecionadas.length >= limite) {
+                    cidade.disabled = true;
+                }
+                else {
+                    cidade.disabled = false;
+                }
+            });
+
+            contadorSelecionadas.innerText = selecionadas.length;
+            contadorLimite.innerText = "/ " + limite + " cidade(s)";
+        }
+
+        radiosPlano.forEach(function (radio) {
+            radio.addEventListener("change", function () {
+                atualizarPlanos();
+                atualizarCidades();
+            });
+        });
+
+        cidades.forEach(function (cidade) {
+            cidade.addEventListener("change", atualizarCidades);
+        });
+
+        atualizarPlanos();
+        atualizarCidades();
+    });
+</script>
+
 <style>
 
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -171,6 +315,7 @@
         margin: 0;
         padding: 0;
         background: #eaf8ff;
+        color: #0f172a;
     }
 
     .container,
@@ -187,7 +332,7 @@
         padding: 45px 22px;
         background: radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%), radial-gradient(circle at bottom right, rgba(124,58,237,.16), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
         display: grid;
-        grid-template-columns: 1.1fr .9fr;
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
         gap: 26px;
         align-items: start;
     }
@@ -229,33 +374,124 @@
     .sub {
         color: #64748b;
         line-height: 1.7;
+        margin-bottom: 24px;
+    }
+
+    .cidade-principal-box {
+        background: linear-gradient(135deg,#eff6ff,#ecfeff);
+        border: 1px solid #bfdbfe;
+        border-radius: 22px;
+        padding: 18px 20px;
+        margin-bottom: 22px;
+    }
+
+        .cidade-principal-box span {
+            display: block;
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .cidade-principal-box strong {
+            display: block;
+            color: #0f172a;
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .cidade-principal-box p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+    .secao-form {
         margin-bottom: 28px;
     }
 
+    .secao-titulo {
+        margin-bottom: 16px;
+    }
+
+        .secao-titulo.linha {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .secao-titulo span {
+            display: inline-block;
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .secao-titulo h2 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .secao-titulo p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+    .contador-cidades {
+        min-width: 135px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #dbeafe;
+        text-align: center;
+    }
+
+        .contador-cidades strong {
+            color: #0ea5e9;
+            font-size: 24px;
+        }
+
+        .contador-cidades span {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
     .planos-grid {
         display: grid;
-        grid-template-columns: repeat(5,1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
-        margin-bottom: 24px;
     }
 
     .plano-card {
         display: block;
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 22px;
+        border-radius: 20px;
         padding: 18px;
         cursor: pointer;
         transition: .25s;
     }
 
-        .plano-card:hover {
+        .plano-card:hover,
+        .plano-card.selecionado {
             transform: translateY(-3px);
             border-color: #0ea5e9;
+            background: #eff6ff;
+            box-shadow: 0 14px 26px rgba(14,165,233,.10);
         }
 
         .plano-card input {
             margin-bottom: 12px;
+            accent-color: #0ea5e9;
         }
 
         .plano-card span {
@@ -270,38 +506,47 @@
             font-size: 20px;
         }
 
-    .campo {
-        margin-bottom: 22px;
+        .plano-card.destaque {
+            background: linear-gradient(135deg,#f8fafc,#ecfeff);
+        }
+
+    .cidades-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
     }
 
-        .campo label {
-            display: block;
-            color: #334155;
-            font-weight: 800;
-            margin-bottom: 8px;
+    .cidade-opcao {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 13px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: .25s;
+        min-height: 52px;
+    }
+
+        .cidade-opcao:hover,
+        .cidade-opcao.selecionada {
+            border-color: #0ea5e9;
+            background: #eff6ff;
         }
 
-        .campo textarea {
-            width: 100%;
-            min-height: 130px;
-            border-radius: 18px;
-            border: 1px solid #dbeafe;
-            padding: 16px;
-            outline: none;
-            resize: vertical;
-            background: #f8fafc;
+        .cidade-opcao input {
+            accent-color: #0ea5e9;
         }
 
-            .campo textarea:focus {
-                border-color: #0ea5e9;
-                background: white;
-                box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+            .cidade-opcao input:disabled + span {
+                opacity: .45;
             }
 
-        .campo small {
-            display: block;
-            color: #94a3b8;
-            margin-top: 8px;
+        .cidade-opcao span {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
         }
 
     .btn-principal,
@@ -332,6 +577,11 @@
         background: white;
         border: 1px solid #dbeafe;
     }
+
+        .btn-principal:hover,
+        .btn-voltar:hover {
+            transform: translateY(-2px);
+        }
 
     .historico-card h2 {
         margin: 0 0 20px;
@@ -404,23 +654,53 @@
         color: #64748b;
     }
 
-    @@media(max-width: 1100px) {
+    @@media(max-width: 1180px) {
         .divulgacao-page {
             grid-template-columns: 1fr;
         }
 
-        .planos-grid {
-            grid-template-columns: 1fr 1fr;
+        .historico-card {
+            order: 2;
+        }
+    }
+
+    @@media(max-width: 850px) {
+        .planos-grid,
+        .cidades-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .secao-titulo.linha {
+            flex-direction: column;
+        }
+
+        .contador-cidades {
+            width: 100%;
         }
     }
 
     @@media(max-width: 650px) {
-        .planos-grid {
+        .divulgacao-page {
+            padding: 24px 14px;
+        }
+
+        .divulgacao-card,
+        .historico-card {
+            padding: 24px 20px;
+            border-radius: 28px;
+        }
+
+        .planos-grid,
+        .cidades-grid {
             grid-template-columns: 1fr;
         }
 
         h1 {
             font-size: 30px;
+        }
+
+        .logo-divulgacao {
+            width: 200px;
         }
     }
 
