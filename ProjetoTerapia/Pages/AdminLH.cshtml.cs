@@ -74,8 +74,8 @@ namespace ProjetoTerapia.Pages
             }
 
             if (acao == "confirmarPagamentoDivulgacao" ||
-    acao == "aprovarDivulgacao" ||
-    acao == "cancelarDivulgacao")
+              acao == "aprovarDivulgacao" ||
+              acao == "cancelarDivulgacao")
             {
                 var divulgacao = _context.DivulgacoesRegionais
                     .Include(d => d.Clinica)
@@ -98,6 +98,17 @@ namespace ProjetoTerapia.Pages
 
                 if (acao == "aprovarDivulgacao")
                 {
+                    if (divulgacao.Status == "Expirado" || divulgacao.DataSolicitacao.AddHours(72) < DateTime.Now && !divulgacao.Pago)
+                    {
+                        divulgacao.Status = "Expirado";
+                        divulgacao.Ativo = false;
+
+                        _context.SaveChanges();
+
+                        TempData["MensagemErro"] = "Esta solicitação expirou porque o pagamento não foi confirmado em até 72 horas.";
+                        return RedirectToPage(new { aba = "divulgacao" });
+                    }
+
                     if (!divulgacao.Pago)
                     {
                         TempData["MensagemErro"] = "Confirme o pagamento antes de aprovar a divulgação.";

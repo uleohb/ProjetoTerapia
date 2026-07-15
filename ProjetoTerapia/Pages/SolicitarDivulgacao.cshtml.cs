@@ -63,6 +63,7 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnGet()
         {
+
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
             if (id == null)
@@ -75,6 +76,12 @@ namespace ProjetoTerapia.Pages
 
             if (!Clinica.Pago)
                 return RedirectToPage("/PagamentoClinica");
+
+            if (string.IsNullOrWhiteSpace(Clinica.Cidade))
+            {
+                TempData["Erro"] = "Antes de solicitar divulgação regional, preencha sua cidade principal no perfil profissional.";
+                return RedirectToPage("/CadastroClinica");
+            }
 
             CarregarSolicitacoes(Clinica.Id);
 
@@ -95,6 +102,12 @@ namespace ProjetoTerapia.Pages
 
             if (!Clinica.Pago)
                 return RedirectToPage("/PagamentoClinica");
+
+            if (string.IsNullOrWhiteSpace(Clinica.Cidade))
+            {
+                TempData["Erro"] = "Antes de solicitar divulgação regional, preencha sua cidade principal no perfil profissional.";
+                return RedirectToPage("/CadastroClinica");
+            }
 
             var plano = ObterPlano(QuantidadeCidades);
 
@@ -194,10 +207,28 @@ namespace ProjetoTerapia.Pages
 
         private void CarregarSolicitacoes(int clinicaId)
         {
-            MinhasSolicitacoes = _context.DivulgacoesRegionais
+            var solicitacoes = _context.DivulgacoesRegionais
                 .Where(d => d.ClinicaId == clinicaId)
                 .OrderByDescending(d => d.DataSolicitacao)
                 .ToList();
+
+            foreach (var item in solicitacoes)
+            {
+                var expirou = !item.Pago &&
+                              !item.Aprovado &&
+                              item.Status != "Cancelado" &&
+                              item.DataSolicitacao.AddHours(72) < DateTime.Now;
+
+                if (expirou)
+                {
+                    item.Status = "Expirado";
+                    item.Ativo = false;
+                }
+            }
+
+            _context.SaveChanges();
+
+            MinhasSolicitacoes = solicitacoes;
         }
 
         private (string Nome, decimal Valor)? ObterPlano(int quantidade)

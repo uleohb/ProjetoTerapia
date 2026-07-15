@@ -203,9 +203,28 @@
                             <span>@item.NomePlano</span>
                             <strong>R$ @item.Valor</strong>
                             <p>@item.CidadesSelecionadas</p>
+
+                            @if (!item.Pago && item.Status != "Expirado")
+                            {
+                                var prazoPagamento = item.DataSolicitacao.AddHours(72);
+                                var horasRestantes = Math.Ceiling((prazoPagamento - DateTime.Now).TotalHours);
+
+                                <small class="prazo-pagamento">
+                                    Prazo para pagamento: até @prazoPagamento.ToString("dd/MM/yyyy HH:mm")
+                                    (@horasRestantes hora(s) restante(s))
+                                </small>
+                            }
+
+                            @if (item.Status == "Expirado")
+                            {
+                                <small class="prazo-expirado">
+                                    Prazo de pagamento encerrado. Faça uma nova solicitação se ainda tiver interesse.
+                                </small>
+                            }
+
                         </div>
 
-                        <div class="status">
+                        <div class="status @(item.Status == "Expirado" ? "expirado" : "")">
                             @item.Status
                         </div>
 
@@ -652,6 +671,28 @@
 
     .vazio {
         color: #64748b;
+    }
+
+    .status.expirado {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .prazo-pagamento,
+    .prazo-expirado {
+        display: block;
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .prazo-pagamento {
+        color: #92400e;
+    }
+
+    .prazo-expirado {
+        color: #991b1b;
+        font-weight: 700;
     }
 
     @@media(max-width: 1180px) {

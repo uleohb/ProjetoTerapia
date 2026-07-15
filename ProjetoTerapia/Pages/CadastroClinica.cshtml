@@ -231,6 +231,53 @@
             </div>
 
             <div class="campo">
+                <label>Cidade principal de atendimento</label>
+
+                <input type="text"
+                       asp-for="NovaClinica.Cidade"
+                       id="cidadeClinica"
+                       list="listaCidades"
+                       placeholder="Ex: Osasco"
+                       required />
+
+                <datalist id="listaCidades">
+                    <option value="São Paulo"></option>
+                    <option value="Osasco"></option>
+                    <option value="Barueri"></option>
+                    <option value="Carapicuíba"></option>
+                    <option value="Cotia"></option>
+                    <option value="Taboão da Serra"></option>
+                    <option value="Embu das Artes"></option>
+                    <option value="Itapevi"></option>
+                    <option value="Jandira"></option>
+                    <option value="Santana de Parnaíba"></option>
+                    <option value="Guarulhos"></option>
+                    <option value="Santo André"></option>
+                    <option value="São Bernardo do Campo"></option>
+                    <option value="São Caetano do Sul"></option>
+                    <option value="Diadema"></option>
+                    <option value="Mauá"></option>
+                    <option value="Ribeirão Pires"></option>
+                    <option value="Mogi das Cruzes"></option>
+                    <option value="Suzano"></option>
+                    <option value="Poá"></option>
+                    <option value="Itaquaquecetuba"></option>
+                    <option value="Santos"></option>
+                    <option value="São Vicente"></option>
+                    <option value="Praia Grande"></option>
+                    <option value="Guarujá"></option>
+                    <option value="Cubatão"></option>
+                    <option value="Itanhaém"></option>
+                    <option value="Mongaguá"></option>
+                    <option value="Peruíbe"></option>
+                </datalist>
+
+                <small>
+                    Essa será sua cidade principal na vitrine. Ela já fica inclusa no plano profissional.
+                </small>
+            </div>
+
+            <div class="campo">
                 <label>Endereço</label>
                 <input type="text"
                        asp-for="NovaClinica.Endereco"
@@ -409,6 +456,14 @@
     .campo {
         margin-bottom: 22px;
     }
+
+        .campo small {
+            display: block;
+            color: #94a3b8;
+            margin-top: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
 
         .campo label {
             display: block;
@@ -909,11 +964,18 @@
 
                         if(!data.erro){
 
-                            document.querySelector("[name='NovaClinica.Endereco']")
-                            .value =
-                            data.logradouro + ", " +
-                            data.bairro + " - " +
-                            data.localidade;
+                                const campoEndereco = document.querySelector("[name='NovaClinica.Endereco']");
+                                const campoCidade = document.querySelector("[name='NovaClinica.Cidade']");
+
+                                if (campoEndereco) {
+                                    campoEndereco.value =
+                                    data.logradouro + ", " +
+                                    data.bairro;
+                                }
+
+                               if (campoCidade) {
+                                   campoCidade.value = data.localidade;
+                               }
 
                         }
 
