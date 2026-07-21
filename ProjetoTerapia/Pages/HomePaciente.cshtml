@@ -737,13 +737,192 @@
             grid-template-columns: 1fr;
         }
 
+            .hero h1 {
+                font-size: 34px;
+            }
+
+        .resultado-teste-card,
+        .resultado-teste-card.vazio {
+            grid-template-columns: 1fr;
+            align-items: stretch;
+        }
+
+        .resultado-numeros {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+            .resultado-numeros div {
+                min-width: 0;
+            }
+
+        .btn-refazer-teste {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    /* =========================================================
+       MOBILE - HOME DO PACIENTE
+    ========================================================= */
+
+    @@media(max-width: 650px) {
+
+        .main-content {
+            padding: 16px;
+        }
+
+        .hero {
+            padding: 26px 20px;
+            border-radius: 26px;
+        }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+        .hero-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+
+        .hero-card {
+            padding: 24px;
+            border-radius: 24px;
+        }
+
+            .hero-card h2 {
+                font-size: 58px;
+            }
+
+        .resultado-teste-card {
+            padding: 24px 20px;
+            border-radius: 26px;
+            overflow: hidden;
+        }
+
+            .resultado-info-principal h2,
+            .resultado-teste-card.vazio h2 {
+                font-size: 30px;
+                line-height: 1.2;
+            }
+
+            .resultado-info-principal p,
+            .resultado-teste-card.vazio p {
+                font-size: 15px;
+            }
+
+        .resultado-numeros {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+            .resultado-numeros div {
+                padding: 14px 10px;
+                border-radius: 18px;
+            }
+
+            .resultado-numeros span {
+                font-size: 12px;
+            }
+
+            .resultado-numeros strong {
+                font-size: 22px;
+                word-break: break-word;
+            }
+
+        .diario-card,
+        .historico-card,
+        .info-card {
+            padding: 24px 20px;
+            border-radius: 24px;
+        }
+
+        .section-title h2 {
+            font-size: 24px;
+        }
+
+        .section-title p {
+            font-size: 15px;
+        }
+
         .mood-options {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+            margin: 18px 0;
+        }
+
+        .mood-btn {
+            min-height: 82px;
+            padding: 10px 4px;
+            border-radius: 16px;
+        }
+
+            .mood-btn strong {
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+
+            .mood-btn span {
+                display: block;
+                font-size: 10px;
+                line-height: 1.2;
+                font-weight: 700;
+            }
+
+        textarea {
+            min-height: 130px;
+            font-size: 14px;
+            border-radius: 18px;
+        }
+
+        .timeline-item {
+            align-items: flex-start;
+        }
+
+        .timeline-date {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+    }
+
+    @@media(max-width: 420px) {
+
+        .resultado-numeros {
             grid-template-columns: 1fr;
         }
 
-        .hero h1 {
-            font-size: 34px;
+        .mood-options {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 6px;
         }
+
+        .mood-btn {
+            min-height: 76px;
+            padding: 8px 3px;
+        }
+
+            .mood-btn strong {
+                font-size: 22px;
+            }
+
+            .mood-btn span {
+                font-size: 9px;
+            }
     }
 
 </style>

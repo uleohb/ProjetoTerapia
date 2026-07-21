@@ -121,8 +121,8 @@
 
         @if (Model.NovaClinica.ClinicaAlteracaoPendente)
         {
-            <div class="alerta-info">
-                Você possui alterações aguardando aprovação da equipe.
+            <div class="aviso-analise">
+                Suas alterações estão em análise pela nossa equipe.
             </div>
         }
 
@@ -321,35 +321,104 @@
                 <input type="text" asp-for="NovaClinica.CPF" required />
             </div>
 
-            <div class="campo">
-                <label>Especialidades</label>
+            @{
+                var especialidadesFixas = new List<string>
+                        {
+                        "Ansiedade",
+                        "Depressão",
+                        "Infantil"
+                        };
 
-                <label class="checkbox-item">
-                    <input type="checkbox"
-                           name="Especialidades"
-                           value="Ansiedade"
-                           @(Model.EspecialidadesSelecionadas.Contains("Ansiedade") ? "checked" : "") />
-                    <span>Ansiedade</span>
+                var especialidadesExtrasSalvas = Model.EspecialidadesSelecionadas
+                .Where(e => !especialidadesFixas.Contains(e))
+                .Take(17)
+                .ToList();
+            }
+
+            <div class="campo grupo-opcoes">
+
+                <label class="label-principal">
+                    Especialidades
                 </label>
-                <label class="checkbox-item">
-                    <input type="checkbox"
-                           name="Especialidades"
-                           value="Depressão"
-                           @(Model.EspecialidadesSelecionadas.Contains("Depressão") ? "checked" : "") />
-                    <span>Depressão</span>
-                </label>
-                <label class="checkbox-item">
-                    <input type="checkbox"
-                           name="Especialidades"
-                           value="Infantil"
-                           @(Model.EspecialidadesSelecionadas.Contains("Infantil") ? "checked" : "") />
-                    <span>Infantil</span>
-                </label>
+
+                <p class="ajuda-campo">
+                    Selecione as principais especialidades ou adicione outras. Limite máximo: 20 especialidades.
+                </p>
+
+                <div class="checkbox-grid">
+
+                    <label class="checkbox-item">
+                        <input type="checkbox"
+                               name="Especialidades"
+                               value="Ansiedade"
+                               @(Model.EspecialidadesSelecionadas.Contains("Ansiedade") ? "checked" : "") />
+                        <span>Ansiedade</span>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox"
+                               name="Especialidades"
+                               value="Depressão"
+                               @(Model.EspecialidadesSelecionadas.Contains("Depressão") ? "checked" : "") />
+                        <span>Depressão</span>
+                    </label>
+
+                    <label class="checkbox-item">
+                        <input type="checkbox"
+                               name="Especialidades"
+                               value="Infantil"
+                               @(Model.EspecialidadesSelecionadas.Contains("Infantil") ? "checked" : "") />
+                        <span>Infantil</span>
+                    </label>
+
+                </div>
+
+                <div class="especialidade-extra-box">
+
+                    <label class="label-extra">
+                        Outra especialidade
+                    </label>
+
+                    <div class="linha-especialidade-extra">
+                        <input type="text"
+                               id="especialidadeExtraInput"
+                               placeholder="Ex: Burnout, TDAH, Luto, Casal..." />
+
+                        <button type="button"
+                                id="btnAdicionarEspecialidade">
+                            Adicionar
+                        </button>
+                    </div>
+
+                    <small>
+                        Adicione uma por vez. O restante pode ser detalhado na descrição profissional.
+                    </small>
+
+                    <div id="listaEspecialidadesExtras" class="chips-especialidades">
+
+                        @foreach (var espExtra in especialidadesExtrasSalvas)
+                        {
+                            <span class="chip-especialidade" data-valor="@espExtra">
+                                @espExtra
+                                <button type="button" class="remover-chip">×</button>
+                                <input type="hidden" name="Especialidades" value="@espExtra" />
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="campo">
-                <label>Tipo de atendimento</label>
-                <div class="checkbox-group">
+            <div class="campo grupo-opcoes">
+
+                <label class="label-principal">
+                    Tipo de atendimento
+                </label>
+
+                <div class="checkbox-grid atendimento-grid">
+
                     <label class="checkbox-item">
                         <input asp-for="NovaClinica.AtendimentoPresencial" />
                         <span>Presencial</span>
@@ -359,7 +428,9 @@
                         <input asp-for="NovaClinica.AtendimentoOnline" />
                         <span>Online</span>
                     </label>
+
                 </div>
+
             </div>
 
             <div class="campo">
@@ -385,9 +456,8 @@
 
             </button>
 
-            <div class="alerta-info">
-                Após o envio, nossa equipe realizará a análise das informações cadastradas.
-                Após a aprovação e confirmação do plano, seu perfil será disponibilizado para os pacientes na plataforma.
+            <div class="aviso-final">
+                Cadastros e alterações passam por análise da nossa equipe antes de serem publicados.
             </div>
 
 
@@ -511,14 +581,16 @@
             transform: scale(1.01);
         }
 
-    .alerta-info {
-        margin-top: 20px;
+    .aviso-final {
+        margin-top: 18px;
         background: #eff6ff;
         border: 1px solid #bfdbfe;
-        padding: 18px;
+        padding: 14px 16px;
         border-radius: 14px;
         color: #1e3a8a;
-        font-size: 14px;
+        font-size: 13.5px;
+        font-weight: 600;
+        line-height: 1.5;
     }
 
     .checkbox-group {
@@ -552,9 +624,7 @@
         .topo-perfil h1 {
             font-size: 42px;
             font-weight: 700;
-            background: linear-gradient( 135deg, #2563eb, #0ea5e9 );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #2563eb;
         }
 
     .logo-perfil {
@@ -725,6 +795,18 @@
             word-break: break-word;
         }
 
+    .aviso-analise {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 16px;
+        padding: 14px 18px;
+        margin-bottom: 36px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
     @@media(max-width:900px) {
 
         .perfil-dashboard {
@@ -793,27 +875,15 @@
     .alerta-sucesso {
         background: #dcfce7;
         color: #166534;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        animation: fadeOut 5s forwards;
-    }
-
-    @@keyframes fadeOut {
-        0%
-
-    {
-        opacity: 1;
-    }
-
-    80% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
-
+        border: 1px solid #bbf7d0;
+        padding: 14px 18px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+        transition: .4s ease;
+        animation: none;
     }
 
     .opcional {
@@ -931,6 +1001,164 @@
     #salvar-foto {
         background: #2563eb;
         color: white;
+    }
+
+    /* =========================================================
+       CHECKBOXES / ESPECIALIDADES / ATENDIMENTO
+    ========================================================= */
+
+    .grupo-opcoes {
+        margin-bottom: 26px;
+    }
+
+    .label-principal {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .ajuda-campo {
+        margin: 0 0 14px;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .campo label.checkbox-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        width: 100%;
+        margin: 0;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid #dbeafe;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+        .campo label.checkbox-item:hover {
+            background: #eff6ff;
+            border-color: #0ea5e9;
+        }
+
+        .campo label.checkbox-item input[type="checkbox"] {
+            width: 20px !important;
+            height: 20px !important;
+            min-width: 20px;
+            margin: 0;
+            padding: 0;
+            accent-color: #0ea5e9;
+        }
+
+        .campo label.checkbox-item span {
+            color: #334155;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+    .atendimento-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Especialidade extra */
+
+    .especialidade-extra-box {
+        margin-top: 16px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+    }
+
+    .label-extra {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-weight: 700;
+    }
+
+    .linha-especialidade-extra {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+    }
+
+        .linha-especialidade-extra input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid #dbeafe;
+            outline: none;
+        }
+
+        .linha-especialidade-extra button {
+            border: none;
+            border-radius: 14px;
+            padding: 0 18px;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+    .chips-especialidades {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .chip-especialidade {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: #e0f2fe;
+        color: #0369a1;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .remover-chip {
+        width: 22px;
+        height: 22px;
+        border: none;
+        border-radius: 50%;
+        background: white;
+        color: #0369a1;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    @@media(max-width: 650px)
+
+    {
+        .checkbox-grid, .atendimento-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .linha-especialidade-extra {
+        grid-template-columns: 1fr;
+    }
+
+        .linha-especialidade-extra button {
+            padding: 14px;
+        }
+
     }
 
 </style>
@@ -1176,6 +1404,108 @@
 
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputExtra = document.getElementById("especialidadeExtraInput");
+        const btnAdicionar = document.getElementById("btnAdicionarEspecialidade");
+        const listaExtras = document.getElementById("listaEspecialidadesExtras");
+
+        function contarEspecialidades() {
+            return document.querySelectorAll("input[name='Especialidades']:checked").length +
+                   document.querySelectorAll("#listaEspecialidadesExtras input[name='Especialidades']").length;
+        }
+
+        function especialidadeJaExiste(valor) {
+            const valorNormalizado = valor.trim().toLowerCase();
+
+            const existentes = document.querySelectorAll("input[name='Especialidades']");
+
+            for (let i = 0; i < existentes.length; i++) {
+                if (existentes[i].value.trim().toLowerCase() === valorNormalizado) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function criarChip(valor) {
+            const chip = document.createElement("span");
+            chip.className = "chip-especialidade";
+            chip.dataset.valor = valor;
+
+            chip.innerHTML = `
+                ${valor}
+                <button type="button" class="remover-chip">×</button>
+                <input type="hidden" name="Especialidades" value="${valor}" />
+            `;
+
+            listaExtras.appendChild(chip);
+        }
+
+        if (btnAdicionar) {
+            btnAdicionar.addEventListener("click", function () {
+                const valor = inputExtra.value.trim();
+
+                if (!valor) {
+                    return;
+                }
+
+                if (contarEspecialidades() >= 20) {
+                    alert("Você pode cadastrar no máximo 20 especialidades.");
+                    return;
+                }
+
+                if (especialidadeJaExiste(valor)) {
+                    alert("Essa especialidade já foi adicionada.");
+                    return;
+                }
+
+                criarChip(valor);
+                inputExtra.value = "";
+                inputExtra.focus();
+            });
+        }
+
+        if (inputExtra) {
+            inputExtra.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    btnAdicionar.click();
+                }
+            });
+        }
+
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("remover-chip")) {
+                e.target.closest(".chip-especialidade").remove();
+            }
+        });
+
+        document.querySelectorAll("input[name='Especialidades']").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                if (contarEspecialidades() > 20) {
+                    this.checked = false;
+                    alert("Você pode cadastrar no máximo 20 especialidades.");
+                }
+            });
+        });
+    });
+
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const alerta = document.querySelector(".alerta-sucesso");
+
+        if (alerta) {
+            setTimeout(function () {
+                alerta.style.opacity = "0";
+                alerta.style.transform = "translateY(-8px)";
+
+                setTimeout(function () {
+                    alerta.style.display = "none";
+                }, 400);
+            }, 8000);
+        }
+    });
 
 </script>
 

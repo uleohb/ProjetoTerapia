@@ -31,19 +31,43 @@ namespace ProjetoTerapia.Pages
                 HttpContext.Session.GetString("PacienteLogado")
             );
 
+            /*
+                Busca apenas profissionais aprovados e com plano ativo.
+                Ou seja: só aparece na vitrine quem foi aprovado e está pago.
+            */
             var clinicasAtivas = _context.Clinicas
                 .Where(c => c.Aprovado && c.Pago)
                 .ToList();
 
+            /*
+                Busca divulgações regionais realmente ativas.
+                A clínica só aparece em cidade extra se:
+                - a divulgação estiver ativa
+                - estiver aprovada
+                - estiver paga
+                - status for Ativo
+                - estiver dentro do período válido
+            */
             var divulgacoesAtivas = _context.DivulgacoesRegionais
                 .Where(d =>
                     d.Ativo &&
                     d.Aprovado &&
                     d.Pago &&
+                    d.Status == "Ativo" &&
+                    (!d.DataInicio.HasValue || d.DataInicio.Value.Date <= DateTime.Today) &&
                     (!d.DataFim.HasValue || d.DataFim.Value.Date >= DateTime.Today)
                 )
                 .ToList();
 
+            /*
+                Busca geral:
+                - nome
+                - descrição
+                - endereço
+                - cidade principal
+                - especialidades
+                - cidades extras compradas no Clube de Descontos
+            */
             if (!string.IsNullOrWhiteSpace(Busca))
             {
                 var buscaNormalizada = Busca.Trim();
@@ -60,6 +84,10 @@ namespace ProjetoTerapia.Pages
                     .ToList();
             }
 
+            /*
+                Filtro por perfil/especialidade.
+                Exemplo: ansiedade, depressão, infantil, burnout etc.
+            */
             if (!string.IsNullOrWhiteSpace(Perfil))
             {
                 var perfilNormalizado = Perfil.Trim();
@@ -69,8 +97,15 @@ namespace ProjetoTerapia.Pages
                     .ToList();
             }
 
+            /*
+                Ordenação:
+                1. Quem comprou divulgação naquela cidade buscada aparece primeiro
+                2. Depois quem atende online
+                3. Depois ordem alfabética
+            */
             Clinicas = clinicasAtivas
                 .OrderByDescending(c => TemCidadeExtraAtiva(c.Id, Busca, divulgacoesAtivas))
+                .ThenByDescending(c => TextoContem(c.Cidade, Busca))
                 .ThenByDescending(c => c.AtendimentoOnline)
                 .ThenBy(c => c.Nome)
                 .ToList();
@@ -82,7 +117,9 @@ namespace ProjetoTerapia.Pages
             List<DivulgacaoRegional> divulgacoesAtivas)
         {
             if (string.IsNullOrWhiteSpace(cidadeBuscada))
+            {
                 return false;
+            }
 
             var divulgacoesDaClinica = divulgacoesAtivas
                 .Where(d => d.ClinicaId == clinicaId)
@@ -99,7 +136,9 @@ namespace ProjetoTerapia.Pages
                 foreach (var cidade in cidades)
                 {
                     if (TextoContem(cidade, cidadeBuscada))
+                    {
                         return true;
+                    }
                 }
             }
 
@@ -109,7 +148,9 @@ namespace ProjetoTerapia.Pages
         private bool TextoContem(string? texto, string busca)
         {
             if (string.IsNullOrWhiteSpace(texto) || string.IsNullOrWhiteSpace(busca))
+            {
                 return false;
+            }
 
             var textoNormalizado = NormalizarTexto(texto);
             var buscaNormalizada = NormalizarTexto(busca);

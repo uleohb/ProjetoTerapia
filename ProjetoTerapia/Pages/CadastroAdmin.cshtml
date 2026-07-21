@@ -1,0 +1,254 @@
+﻿@page
+@model ProjetoTerapia.Pages.CadastroAdminModel
+
+<div class="cadastro-admin-page">
+
+    <div class="cadastro-card">
+
+        <img src="/imagem/logo.png" class="logo-admin-cadastro" />
+
+        <span class="badge-admin">
+            Área restrita
+        </span>
+
+        <h1>
+            Cadastro administrativo
+        </h1>
+
+
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alerta-erro">
+                @TempData["Erro"]
+            </div>
+        }
+
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alerta-sucesso">
+                @TempData["Sucesso"]
+            </div>
+        }
+
+        <form method="post">
+
+            <input type="hidden" asp-for="Chave" />
+
+            <div class="campo">
+                <label>Nome</label>
+                <input asp-for="Nome" placeholder="Nome do administrador" required />
+            </div>
+
+            <div class="campo">
+                <label>Email</label>
+                <input asp-for="Email" type="email" placeholder="email@exemplo.com" required />
+            </div>
+
+            @if (!Model.PrimeiroAdmin)
+            {
+                <div class="campo">
+                    <label>Perfil</label>
+
+                    <select asp-for="Perfil">
+                        <option value="Operacional">Operacional</option>
+                        <option value="Gestor">Gestor</option>
+                        <option value="Master">Master</option>
+                    </select>
+                </div>
+            }
+
+            <div class="campo">
+                <label>Senha</label>
+                <input asp-for="Senha" type="password" placeholder="Mínimo 6 caracteres" required />
+            </div>
+
+            <div class="campo">
+                <label>Confirmar senha</label>
+                <input asp-for="ConfirmarSenha" type="password" placeholder="Repita a senha" required />
+            </div>
+
+            <button type="submit" class="btn-principal">
+                Salvar administrador
+            </button>
+
+        </form>
+
+        <a href="/LoginAdmin" class="btn-voltar">
+            Voltar
+        </a>
+
+    </div>
+
+</div>
+
+<style>
+
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #eaf8ff;
+        color: #0f172a;
+    }
+
+    .container,
+    .container-fluid,
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        background: transparent !important;
+    }
+
+    .cadastro-admin-page {
+        min-height: 100vh;
+        padding: 40px 20px;
+        background: radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%), radial-gradient(circle at bottom right, rgba(124,58,237,.16), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cadastro-card {
+        width: 100%;
+        max-width: 560px;
+        background: rgba(255,255,255,.94);
+        border: 1px solid rgba(226,232,240,.9);
+        border-radius: 34px;
+        padding: 36px;
+        box-shadow: 0 25px 70px rgba(15,23,42,.10);
+        backdrop-filter: blur(18px);
+    }
+
+    .logo-admin-cadastro {
+        width: 230px;
+        display: block;
+        margin: 0 auto 12px;
+    }
+
+    .badge-admin {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(14,165,233,.12);
+        color: #0369a1;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    h1 {
+        margin: 0 0 12px;
+        font-size: 34px;
+        color: #0f172a;
+        letter-spacing: -1px;
+    }
+
+    p {
+        margin: 0 0 24px;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .campo {
+        margin-bottom: 18px;
+    }
+
+        .campo label {
+            display: block;
+            color: #334155;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .campo input,
+        .campo select {
+            width: 100%;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 15px;
+            background: #f8fafc;
+            outline: none;
+            font-size: 15px;
+        }
+
+            .campo input:focus,
+            .campo select:focus {
+                border-color: #0ea5e9;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+            }
+
+    .btn-principal,
+    .btn-voltar {
+        width: 100%;
+        min-height: 56px;
+        border-radius: 18px;
+        border: none;
+        text-decoration: none;
+        font-weight: 800;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: .25s;
+    }
+
+    .btn-principal {
+        color: white;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .btn-voltar {
+        margin-top: 14px;
+        color: #0ea5e9;
+        background: white;
+        border: 1px solid #dbeafe;
+    }
+
+        .btn-principal:hover,
+        .btn-voltar:hover {
+            transform: translateY(-2px);
+        }
+
+    .alerta-sucesso,
+    .alerta-erro {
+        padding: 14px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+        font-weight: 700;
+    }
+
+    .alerta-sucesso {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .alerta-erro {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    @@media(max-width: 650px)
+
+    {
+        .cadastro-card
+
+    {
+        padding: 28px 22px;
+    }
+
+    h1 {
+        font-size: 29px;
+    }
+
+    }
+</style>

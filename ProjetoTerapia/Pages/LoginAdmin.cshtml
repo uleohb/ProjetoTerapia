@@ -20,34 +20,29 @@
             Painel Administrativo
         </h1>
 
-        <p class="sub-login">
-            Entre com suas credenciais para gerenciar profissionais,
-            pagamentos, cadastros e divulgações da plataforma.
-        </p>
-
         @if (Model.Erro)
         {
-            <div class="erro">
-                Usuário ou senha incorretos.
+            <div class="alerta-erro">
+                Email ou senha inválidos.
             </div>
         }
 
         <form method="post">
 
             <div class="campo-login">
-                <label>Usuário</label>
+                <label>Email</label>
 
-                <input type="text"
-                       asp-for="Usuario"
-                       placeholder="Digite seu usuário"
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="admin@email.com"
                        required />
             </div>
 
             <div class="campo-login">
                 <label>Senha</label>
 
-                <input type="password"
-                       asp-for="SenhaHash"
+                <input asp-for="Senha"
+                       type="password"
                        placeholder="Digite sua senha"
                        required />
             </div>
@@ -80,6 +75,7 @@
         margin: 0;
         padding: 0;
         background: #eaf8ff;
+        color: #0f172a;
     }
 
     .container,
@@ -90,6 +86,10 @@
         max-width: 100% !important;
         background: transparent !important;
     }
+
+    /* =========================================================
+           PÁGINA DE LOGIN ADMIN
+        ========================================================= */
 
     .admin-login-page {
         min-height: 100vh;
@@ -124,6 +124,10 @@
         bottom: -120px;
         right: -100px;
     }
+
+    /* =========================================================
+           CARD
+        ========================================================= */
 
     .login-admin-card {
         width: 100%;
@@ -166,12 +170,36 @@
         color: #0f172a;
     }
 
-    .sub-login {
-        color: #64748b;
-        font-size: 15px;
-        line-height: 1.7;
-        margin-bottom: 28px;
+    /* =========================================================
+           ALERTAS
+        ========================================================= */
+
+    .alerta-erro,
+    .alerta-info {
+        padding: 14px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.5;
+        text-align: left;
     }
+
+    .alerta-erro {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alerta-info {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    /* =========================================================
+           FORMULÁRIO
+        ========================================================= */
 
     .campo-login {
         text-align: left;
@@ -182,7 +210,7 @@
             display: block;
             color: #334155;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 8px;
         }
 
@@ -204,25 +232,48 @@
                 box-shadow: 0 0 0 4px rgba(14,165,233,.11);
             }
 
-    .btn-entrar-admin {
+    /* =========================================================
+           BOTÕES
+        ========================================================= */
+
+    .btn-entrar-admin,
+    .btn-criar-admin {
         width: 100%;
-        border: none;
+        min-height: 56px;
         border-radius: 16px;
-        padding: 16px;
+        font-weight: 800;
+        font-size: 16px;
+        transition: .25s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .btn-entrar-admin {
+        border: none;
         margin-top: 6px;
         background: linear-gradient(135deg,#14b8a6,#0ea5e9);
         color: white;
-        font-weight: 800;
-        font-size: 16px;
         cursor: pointer;
-        transition: .25s;
         box-shadow: 0 14px 28px rgba(14,165,233,.18);
     }
 
-        .btn-entrar-admin:hover {
+    .btn-criar-admin {
+        margin-top: 14px;
+        background: white;
+        color: #0ea5e9;
+        border: 1px solid #dbeafe;
+    }
+
+        .btn-entrar-admin:hover,
+        .btn-criar-admin:hover {
             transform: translateY(-2px);
-            box-shadow: 0 18px 34px rgba(14,165,233,.24);
         }
+
+    .btn-entrar-admin:hover {
+        box-shadow: 0 18px 34px rgba(14,165,233,.24);
+    }
 
     .voltar-site {
         display: inline-block;
@@ -233,16 +284,9 @@
         font-size: 14px;
     }
 
-    .erro {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-        padding: 14px;
-        border-radius: 14px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        font-weight: 700;
-    }
+    /* =========================================================
+           RESPONSIVO
+        ========================================================= */
 
     @@media(max-width: 600px) {
         .login-admin-card {

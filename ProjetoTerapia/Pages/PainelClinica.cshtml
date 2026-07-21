@@ -372,7 +372,7 @@
                                 </p>
                             </div>
 
-                            <div class="clube-topo-icone">
+                            <div class="icone-bloco destaque icone-localizacao">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
                         </div>
@@ -746,7 +746,7 @@
         }
 
     /* =========================================================
-           CARDS BASE / VIDRO
+           CARDS BASE
         ========================================================= */
 
     .alerta,
@@ -1042,6 +1042,95 @@
     }
 
     /* =========================================================
+           ANIMAÇÃO PREMIUM DO ÍCONE DE LOCALIZAÇÃO
+           - sem bolinha no canto
+           - aura suave expandindo em volta do bloco
+           - funciona no ícone do Clube de Descontos
+        ========================================================= */
+
+    .clube-topo-icone,
+    .icone-localizacao {
+        position: relative;
+        overflow: visible;
+        isolation: isolate;
+        animation: flutuarLocalizacao 3.2s ease-in-out infinite;
+    }
+
+        .clube-topo-icone::before,
+        .icone-localizacao::before {
+            content: "";
+            position: absolute;
+            inset: -14px;
+            border-radius: 32px;
+            background: radial-gradient(circle, rgba(34,197,94,.34) 0%, rgba(34,197,94,.18) 38%, rgba(34,197,94,.06) 62%, rgba(34,197,94,0) 78%);
+            filter: blur(7px);
+            opacity: .75;
+            z-index: -1;
+            animation: auraVerdeSuave 2.8s ease-in-out infinite;
+        }
+
+        .clube-topo-icone::after,
+        .icone-localizacao::after {
+            content: "";
+            position: absolute;
+            inset: -18px;
+            border-radius: 36px;
+            border: 2px solid rgba(34,197,94,.22);
+            opacity: 0;
+            z-index: -2;
+            animation: anelVerdeExpandindo 2.8s ease-out infinite;
+        }
+
+        .clube-topo-icone i,
+        .icone-localizacao i {
+            position: relative;
+            z-index: 2;
+        }
+
+    .sinal-clube {
+        display: none;
+    }
+
+    @@keyframes auraVerdeSuave {
+        0%, 100% {
+            transform: scale(.96);
+            opacity: .42;
+        }
+
+        50% {
+            transform: scale(1.12);
+            opacity: .78;
+        }
+    }
+
+    @@keyframes anelVerdeExpandindo {
+        0% {
+            transform: scale(.88);
+            opacity: .45;
+        }
+
+        70% {
+            transform: scale(1.22);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1.22);
+            opacity: 0;
+        }
+    }
+
+    @@keyframes flutuarLocalizacao {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    /* =========================================================
            FINANCEIRO
         ========================================================= */
 
@@ -1093,13 +1182,30 @@
             border: 1px solid #dbeafe;
         }
 
+    .chamada-financeiro {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: linear-gradient(135deg,#eff6ff,#ecfeff);
+        border: 1px solid #dbeafe;
+    }
+
+        .chamada-financeiro strong {
+            display: block;
+            color: #0f172a;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .chamada-financeiro p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
     /* =========================================================
            CLUBE DE DESCONTOS / DIVULGAÇÃO REGIONAL
-           Corrigido:
-           - planos organizados em cards
-           - textos separados
-           - layout responsivo
-           - compatível com .clube e .clube-descontos
         ========================================================= */
 
     .clube,
@@ -1107,7 +1213,7 @@
         background: radial-gradient(circle at top right, rgba(14,165,233,.12), transparent 30%), linear-gradient(135deg,#f6fcff,#eef9ff);
         border: 1px solid #dbeafe;
         border-radius: 32px;
-        padding: 34px;
+        padding: 28px;
         box-shadow: 0 18px 40px rgba(15,23,42,.05);
     }
 
@@ -1157,7 +1263,6 @@
 
     .clube-topo-icone,
     .clube-icone {
-        position: relative;
         width: 72px;
         height: 72px;
         min-width: 72px;
@@ -1169,41 +1274,6 @@
         justify-content: center;
         font-size: 30px;
         box-shadow: 0 18px 35px rgba(14,165,233,.22);
-    }
-
-        .clube-icone span,
-        .sinal-clube span {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #22c55e;
-            border: 4px solid #eefbff;
-            animation: pulse 1.7s infinite;
-        }
-
-    .sinal-clube {
-        position: absolute;
-        right: 24px;
-        top: 24px;
-        width: 18px;
-        height: 18px;
-    }
-
-    @@keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(34,197,94,.55);
-        }
-
-        70% {
-            box-shadow: 0 0 0 15px rgba(34,197,94,0);
-        }
-
-        100% {
-            box-shadow: 0 0 0 0 rgba(34,197,94,0);
-        }
     }
 
     .clube-info-box,
@@ -1237,8 +1307,8 @@
     .planos-cidades {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-        margin-bottom: 26px;
+        gap: 12px;
+        margin-bottom: 22px;
     }
 
         .clube-item,
@@ -1246,9 +1316,9 @@
         .planos-cidades div {
             background: white;
             border: 1px solid #dbeafe;
-            border-radius: 22px;
-            padding: 20px 18px;
-            min-height: 140px;
+            border-radius: 18px;
+            padding: 15px 16px;
+            min-height: 112px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1275,10 +1345,10 @@
             .planos-cidades strong {
                 display: block;
                 color: #0f172a;
-                font-size: 20px;
+                font-size: 15px;
                 font-weight: 900;
                 line-height: 1.3;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
             }
 
             .clube-item strong,
@@ -1286,25 +1356,25 @@
             .planos-cidades span {
                 display: block;
                 color: #0ea5e9;
-                font-size: 28px;
+                font-size: 25px;
                 font-weight: 900;
-                margin-bottom: 8px;
+                margin-bottom: 5px;
             }
 
             .clube-item small {
                 color: #64748b;
-                font-size: 13px;
-                line-height: 1.5;
+                font-size: 12px;
+                line-height: 1.4;
             }
 
     .btn-clube,
     .btn-clube-descontos {
         width: 100%;
-        min-height: 64px;
-        border-radius: 20px;
+        min-height: 58px;
+        border-radius: 18px;
         background: linear-gradient(135deg,#0ea5e9,#2563eb,#14b8a6);
         color: white;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 900;
         display: flex;
         align-items: center;
@@ -1439,82 +1509,8 @@
         }
 
     /* =========================================================
-       AJUSTE FINO DO CLUBE DE DESCONTOS
-       Deixa os cards menores e evita bloco gigante
-    ========================================================= */
-
-    .clube,
-    .clube-descontos {
-        padding: 28px;
-    }
-
-    .clube-grid,
-    .clube-planos,
-    .planos-cidades {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        margin-bottom: 22px;
-    }
-
-        .clube-item,
-        .clube-plano,
-        .planos-cidades div {
-            min-height: 112px;
-            padding: 15px 16px;
-            border-radius: 18px;
-        }
-
-            .clube-qtd,
-            .clube-plano strong,
-            .planos-cidades strong {
-                font-size: 15px;
-                margin-bottom: 6px;
-            }
-
-            .clube-item strong,
-            .clube-plano b,
-            .planos-cidades span {
-                font-size: 25px;
-                margin-bottom: 5px;
-            }
-
-            .clube-item small {
-                font-size: 12px;
-                line-height: 1.4;
-            }
-
-    .btn-clube,
-    .btn-clube-descontos {
-        min-height: 58px;
-        border-radius: 18px;
-        font-size: 16px;
-    }
-
-    .chamada-financeiro {
-        margin-top: 22px;
-        padding: 18px 20px;
-        border-radius: 20px;
-        background: linear-gradient(135deg,#eff6ff,#ecfeff);
-        border: 1px solid #dbeafe;
-    }
-
-        .chamada-financeiro strong {
-            display: block;
-            color: #0f172a;
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .chamada-financeiro p {
-            margin: 0;
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-    /* =========================================================
-       RESPONSIVO
-    ========================================================= */
+           RESPONSIVO
+        ========================================================= */
 
     @@media(max-width: 1050px) {
 

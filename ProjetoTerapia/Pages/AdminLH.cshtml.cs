@@ -34,6 +34,7 @@ namespace ProjetoTerapia.Pages
 
         public int AlteracoesPendentes { get; set; }
 
+        public List<AlteracaoClinica> AlteracoesClinicasPendentes { get; set; } = new();
         public List<Clinica> ClinicasComAlteracao { get; set; } = new();
 
         public int TotalVisualizacoes { get; set; }
@@ -53,14 +54,13 @@ namespace ProjetoTerapia.Pages
         public string FiltroStatus { get; set; } = "";
         public List<DivulgacaoRegional> DivulgacoesRegionais { get; set; } = new();
         public int DivulgacoesPendentes { get; set; }
+        public List<AdminLog> AdminLogs { get; set; } = new();
 
         public IActionResult OnGet()
         {
-            if (!AdminEstaLogado())
-            {
-                return RedirectToPage("/LoginAdmin");
-            }
+            if (!AdminEstaLogado()) return RedirectToPage("/LoginAdmin");
 
+            AtualizarDivulgacoesExpiradas();
             CarregarDados();
 
             return Page();
@@ -71,6 +71,96 @@ namespace ProjetoTerapia.Pages
             if (!AdminEstaLogado())
             {
                 return RedirectToPage("/LoginAdmin");
+            }
+
+            AtualizarDivulgacoesExpiradas();
+
+            if (acao == "aprovarAlteracao" || acao == "recusarAlteracao")
+            {
+                var alteracao = _context.AlteracoesClinicas
+                    .Include(a => a.Clinica)
+                    .FirstOrDefault(a => a.Id == id && a.Status == "Pendente");
+
+                if (alteracao == null)
+                {
+                    TempData["MensagemErro"] = "Solicitação de alteração não encontrada.";
+                    return RedirectToPage(new { aba = "alteracoes" });
+                }
+
+                var clinicaAlterada = alteracao.Clinica;
+
+                if (clinicaAlterada == null)
+                {
+                    TempData["MensagemErro"] = "Profissional vinculado à alteração não encontrado.";
+                    return RedirectToPage(new { aba = "alteracoes" });
+                }
+
+                if (acao == "aprovarAlteracao")
+                {
+                    clinicaAlterada.Nome = alteracao.Nome;
+                    clinicaAlterada.Email = alteracao.Email;
+                    clinicaAlterada.Telefone = alteracao.Telefone;
+                    clinicaAlterada.CEP = alteracao.CEP;
+                    clinicaAlterada.Cidade = alteracao.Cidade;
+                    clinicaAlterada.Endereco = alteracao.Endereco;
+                    clinicaAlterada.Descricao = alteracao.Descricao;
+                    clinicaAlterada.Especialidades = alteracao.Especialidades;
+                    clinicaAlterada.Documento = alteracao.Documento;
+                    clinicaAlterada.CPF = alteracao.CPF;
+                    clinicaAlterada.Valor = alteracao.Valor;
+                    clinicaAlterada.AtendimentoOnline = alteracao.AtendimentoOnline;
+                    clinicaAlterada.AtendimentoPresencial = alteracao.AtendimentoPresencial;
+                    clinicaAlterada.Instagram = alteracao.Instagram;
+                    clinicaAlterada.Site = alteracao.Site;
+
+                    if (!string.IsNullOrWhiteSpace(alteracao.FotoPerfil))
+                    {
+                        clinicaAlterada.FotoPerfil = alteracao.FotoPerfil;
+                    }
+
+                    clinicaAlterada.ClinicaAlteracaoPendente = false;
+
+                    alteracao.Status = "Aprovada";
+                    alteracao.DataAnalise = DateTime.Now;
+                    alteracao.NomeAdminAnalise = HttpContext.Session.GetString("AdminNome");
+
+                    RegistrarLog(
+                        "Aprovação de alteração de perfil",
+                        $"{HttpContext.Session.GetString("AdminNome")} aprovou as alterações do perfil de {clinicaAlterada.Nome}."
+                    );
+
+                    TempData["MensagemSucesso"] =
+                        $"Alterações da clínica {clinicaAlterada.Nome} aprovadas com sucesso.";
+                }
+
+                if (acao == "recusarAlteracao")
+                {
+                    var motivo = Request.Form["MotivoRecusa"].ToString();
+
+                    if (string.IsNullOrWhiteSpace(motivo))
+                    {
+                        motivo = "Alteração recusada pela administração.";
+                    }
+
+                    clinicaAlterada.ClinicaAlteracaoPendente = false;
+
+                    alteracao.Status = "Recusada";
+                    alteracao.MotivoRecusa = motivo;
+                    alteracao.DataAnalise = DateTime.Now;
+                    alteracao.NomeAdminAnalise = HttpContext.Session.GetString("AdminNome");
+
+                    RegistrarLog(
+                        "Recusa de alteração de perfil",
+                        $"{HttpContext.Session.GetString("AdminNome")} recusou as alterações do perfil de {clinicaAlterada.Nome}. Motivo: {motivo}"
+                    );
+
+                    TempData["MensagemSucesso"] =
+                        $"Alterações da clínica {clinicaAlterada.Nome} recusadas.";
+                }
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "alteracoes" });
             }
 
             if (acao == "confirmarPagamentoDivulgacao" ||
@@ -89,23 +179,30 @@ namespace ProjetoTerapia.Pages
 
                 if (acao == "confirmarPagamentoDivulgacao")
                 {
+                    if (divulgacao.Status == "Expirado")
+                    {
+                        TempData["MensagemErro"] = "Esta solicitação expirou. O profissional precisa criar uma nova solicitação.";
+                        return RedirectToPage(new { aba = "divulgacao" });
+                    }
+
                     divulgacao.Pago = true;
                     divulgacao.DataPagamento = DateTime.Now;
                     divulgacao.Status = "Pagamento confirmado";
+
+                    RegistrarLog(
+                     "Confirmação de pagamento de divulgação",
+                     $"{HttpContext.Session.GetString("AdminNome")} confirmou o pagamento " +
+                     $"da divulgação regional de {divulgacao.Clinica?.Nome} no plano {divulgacao.NomePlano}."
+                    );
 
                     TempData["MensagemSucesso"] = "Pagamento da divulgação confirmado.";
                 }
 
                 if (acao == "aprovarDivulgacao")
                 {
-                    if (divulgacao.Status == "Expirado" || divulgacao.DataSolicitacao.AddHours(72) < DateTime.Now && !divulgacao.Pago)
+                    if (divulgacao.Status == "Expirado")
                     {
-                        divulgacao.Status = "Expirado";
-                        divulgacao.Ativo = false;
-
-                        _context.SaveChanges();
-
-                        TempData["MensagemErro"] = "Esta solicitação expirou porque o pagamento não foi confirmado em até 72 horas.";
+                        TempData["MensagemErro"] = "Esta solicitação expirou e não pode mais ser aprovada.";
                         return RedirectToPage(new { aba = "divulgacao" });
                     }
 
@@ -122,6 +219,12 @@ namespace ProjetoTerapia.Pages
                     divulgacao.DataFim = DateTime.Now.AddMonths(1);
                     divulgacao.Status = "Ativo";
 
+                    RegistrarLog(
+                     "Aprovação de divulgação regional",
+                     $"{HttpContext.Session.GetString("AdminNome")} aprovou a " +
+                     $"divulgação regional de {divulgacao.Clinica?.Nome}. Cidades: {divulgacao.CidadesSelecionadas}."
+                    );
+
                     TempData["MensagemSucesso"] = "Divulgação regional aprovada e ativada.";
                 }
 
@@ -129,6 +232,11 @@ namespace ProjetoTerapia.Pages
                 {
                     divulgacao.Ativo = false;
                     divulgacao.Status = "Cancelado";
+
+                    RegistrarLog(
+                     "Cancelamento de divulgação regional",
+                     $"{HttpContext.Session.GetString("AdminNome")} cancelou a divulgação regional de {divulgacao.Clinica?.Nome}."
+                    );
 
                     TempData["MensagemSucesso"] = "Divulgação regional cancelada.";
                 }
@@ -152,20 +260,13 @@ namespace ProjetoTerapia.Pages
                 clinica.Pago = false;
                 clinica.DataAprovacao = DateTime.Now;
 
+                RegistrarLog(
+                 "Aprovação de profissional",
+                 $"{HttpContext.Session.GetString("AdminNome")} aprovou o cadastro do profissional {clinica.Nome}."
+                );
+
                 TempData["MensagemSucesso"] =
                     $"Clínica {clinica.Nome} aprovada com sucesso.";
-
-                _context.SaveChanges();
-
-                return RedirectToPage(new { aba = "clinicas" });
-            }
-
-            if (acao == "aprovarAlteracao")
-            {
-                clinica.ClinicaAlteracaoPendente = false;
-
-                TempData["MensagemSucesso"] =
-                    $"Alterações da clínica {clinica.Nome} aprovadas com sucesso.";
 
                 _context.SaveChanges();
 
@@ -188,6 +289,11 @@ namespace ProjetoTerapia.Pages
                 clinica.DataPagamento = DateTime.Now;
                 clinica.DataVencimento = DateTime.Now.AddYears(1);
 
+                RegistrarLog(
+                 "Confirmação de pagamento",
+                 $"{HttpContext.Session.GetString("AdminNome")} confirmou o pagamento do plano profissional de {clinica.Nome}."
+                );
+
                 TempData["MensagemSucesso"] =
                     $"Pagamento da clínica {clinica.Nome} confirmado com sucesso.";
 
@@ -199,6 +305,11 @@ namespace ProjetoTerapia.Pages
             if (acao == "suspender")
             {
                 clinica.Pago = false;
+
+                RegistrarLog(
+                 "Suspensão de plano",
+                 $"{HttpContext.Session.GetString("AdminNome")} suspendeu o plano do profissional {clinica.Nome}."
+                );
 
                 TempData["MensagemSucesso"] =
                     $"Plano da clínica {clinica.Nome} foi suspenso.";
@@ -212,6 +323,11 @@ namespace ProjetoTerapia.Pages
             {
                 try
                 {
+                    RegistrarLog(
+                     "Exclusão de profissional",
+                     $"{HttpContext.Session.GetString("AdminNome")} excluiu o profissional {clinica.Nome}."
+                    );
+
                     _context.Clinicas.Remove(clinica);
                     _context.SaveChanges();
 
@@ -234,6 +350,16 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPostLogout()
         {
+            if (AdminEstaLogado())
+            {
+                RegistrarLog(
+                    "Logout",
+                    $"{HttpContext.Session.GetString("AdminNome")} saiu do painel administrativo."
+                );
+
+                _context.SaveChanges();
+            }
+
             HttpContext.Session.Clear();
             return RedirectToPage("/LoginAdmin");
         }
@@ -247,25 +373,41 @@ namespace ProjetoTerapia.Pages
         {
             var todasClinicas = _context.Clinicas.ToList();
 
+            AlteracoesClinicasPendentes = _context.AlteracoesClinicas
+              .Include(a => a.Clinica)
+              .Where(a => a.Status == "Pendente")
+              .OrderByDescending(a => a.DataSolicitacao)
+              .ToList();
+
             DivulgacoesRegionais = _context.DivulgacoesRegionais
              .Include(d => d.Clinica)
              .OrderByDescending(d => d.DataSolicitacao)
              .ToList();
 
-            DivulgacoesPendentes = DivulgacoesRegionais
-                .Count(d => !d.Aprovado || !d.Pago);
+            AdminLogs = _context.AdminLogs
+             .OrderByDescending(l => l.DataAcao)
+             .Take(100)
+             .ToList();
 
-            ClinicasComAlteracao = todasClinicas
-            .Where(c => c.ClinicaAlteracaoPendente)
-            .OrderBy(c => c.Nome)
-            .ToList();
+            DivulgacoesPendentes = DivulgacoesRegionais
+             .Count(d =>
+              d.Status != "Expirado" &&
+              d.Status != "Cancelado" &&
+              (!d.Aprovado || !d.Pago)
+             );
+
+            ClinicasComAlteracao = AlteracoesClinicasPendentes
+             .Where(a => a.Clinica != null)
+             .Select(a => a.Clinica!)
+             .OrderBy(c => c.Nome)
+             .ToList();
 
             TotalClinicas = todasClinicas.Count;
             Pendentes = todasClinicas.Count(c => !c.Aprovado);
             Aprovadas = todasClinicas.Count(c => c.Aprovado && !c.Pago);
             Ativas = todasClinicas.Count(c => c.Pago);
             PagamentosPendentes = todasClinicas.Count(c => c.Aprovado && !c.Pago);
-            AlteracoesPendentes = todasClinicas.Count(c => c.ClinicaAlteracaoPendente);
+            AlteracoesPendentes = AlteracoesClinicasPendentes.Count;
 
             TotalVisualizacoes = todasClinicas.Sum(c => c.Visualizacoes);
             TotalCliquesWhatsapp = todasClinicas.Sum(c => c.CliquesWhatsapp);
@@ -326,5 +468,59 @@ namespace ProjetoTerapia.Pages
                 .ThenBy(c => c.Nome)
                 .ToList();
         }
+
+        private void AtualizarDivulgacoesExpiradas()
+        {
+            var divulgacoesPendentes = _context.DivulgacoesRegionais
+                .Where(d =>
+                    !d.Pago &&
+                    !d.Aprovado &&
+                    d.Status != "Cancelado" &&
+                    d.Status != "Expirado")
+                .ToList();
+
+            var houveAlteracao = false;
+
+            foreach (var divulgacao in divulgacoesPendentes)
+            {
+                var prazoExpirado = divulgacao.DataSolicitacao.AddHours(72) < DateTime.Now;
+
+                if (prazoExpirado)
+                {
+                    divulgacao.Status = "Expirado";
+                    divulgacao.Ativo = false;
+                    houveAlteracao = true;
+                }
+            }
+
+            if (houveAlteracao)
+            {
+                _context.SaveChanges();
+            }
+        }
+
+        private void RegistrarLog(string acao, string descricao)
+        {
+            var adminIdTexto = HttpContext.Session.GetString("AdminId");
+
+            if (!int.TryParse(adminIdTexto, out int adminId))
+            {
+                return;
+            }
+
+            var nomeAdmin = HttpContext.Session.GetString("AdminNome") ?? "Administrador";
+            var perfilAdmin = HttpContext.Session.GetString("AdminPerfil") ?? "Não informado";
+
+            _context.AdminLogs.Add(new AdminLog
+            {
+                AdminUsuarioId = adminId,
+                NomeAdmin = nomeAdmin,
+                PerfilAdmin = perfilAdmin,
+                Acao = acao,
+                Descricao = descricao,
+                DataAcao = DateTime.Now
+            });
+        }
+
     }
 }

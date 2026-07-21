@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoTerapia.Models;
 
@@ -11,9 +12,11 @@ using ProjetoTerapia.Models;
 namespace ProjetoTerapia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260715185431_CriandoAdministradoresELogs")]
+    partial class CriandoAdministradoresELogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,100 +136,6 @@ namespace ProjetoTerapia.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Agendamentos");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.AlteracaoClinica", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("AtendimentoOnline")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("AtendimentoPresencial")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("CEP")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CPF")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cidade")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ClinicaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DataAnalise")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataSolicitacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Documento")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Endereco")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Especialidades")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FotoPerfil")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Instagram")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MotivoRecusa")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeAdminAnalise")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Site")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Valor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClinicaId");
-
-                    b.ToTable("AlteracoesClinicas");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
@@ -635,17 +544,6 @@ namespace ProjetoTerapia.Migrations
                         .IsRequired();
 
                     b.Navigation("AdminUsuario");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.AlteracaoClinica", b =>
-                {
-                    b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
-                        .WithMany()
-                        .HasForeignKey("ClinicaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Clinica");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Consulta", b =>

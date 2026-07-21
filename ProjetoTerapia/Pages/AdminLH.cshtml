@@ -31,6 +31,10 @@
                 Clube de Descontos
             </a>
 
+            <a href="javascript:void(0)" onclick="mostrarAba('historico', this)">
+                Histórico
+            </a>
+
         </nav>
 
         <form method="post" asp-page-handler="Logout" class="form-logout">
@@ -245,7 +249,7 @@
 
                         <div>
                             <span>Valor consulta</span>
-                            <strong>R$ @clinica.Valor</strong>
+                            <strong>@clinica.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
                         </div>
 
                         <div>
@@ -294,13 +298,9 @@
 
                                 @if (clinica.ClinicaAlteracaoPendente)
                                 {
-                                    <button type="submit"
-                                            name="acao"
-                                            value="aprovarAlteracao"
-                                            class="btn-acao aprovar"
-                                            onclick='return confirmarAcao(this, "aprovar as alterações deste perfil?")'>
-                                        Aprovar alterações
-                                    </button>
+                                    <a href="?aba=alteracoes" class="btn-ver-perfil">
+                                        Ver alterações pendentes
+                                    </a>
                                 }
 
                                 @if (clinica.Aprovado && !clinica.Pago)
@@ -367,7 +367,7 @@
                     </h2>
 
                     <p>
-                        Revise profissionais que editaram o perfil após aprovação.
+                        Revise alterações enviadas por profissionais antes de publicar no perfil público.
                     </p>
                 </div>
 
@@ -375,15 +375,20 @@
 
             <div class="lista-clinicas">
 
-                @foreach (var clinica in Model.ClinicasComAlteracao)
+                @foreach (var alteracao in Model.AlteracoesClinicasPendentes)
                 {
                     <article class="card-clinica">
 
                         <div class="card-topo">
 
                             <div>
-                                <h3>@clinica.Nome</h3>
-                                <p>@clinica.Email</p>
+                                <h3>
+                                    @(alteracao.Clinica?.Nome ?? alteracao.Nome)
+                                </h3>
+
+                                <p>
+                                    @(alteracao.Clinica?.Email ?? alteracao.Email)
+                                </p>
                             </div>
 
                             <span class="tag alteracao">
@@ -392,36 +397,109 @@
 
                         </div>
 
-                        <div class="info-grid">
+                        <div class="comparacao-alteracao">
 
-                            <div>
-                                <span>Cidade</span>
-                                <strong>@(string.IsNullOrWhiteSpace(clinica.Cidade) ? "Não informada" : clinica.Cidade)</strong>
+                            <div class="coluna-comparacao atual">
+                                <span>Perfil atual publicado</span>
+
+                                <p>
+                                    <strong>Nome:</strong>
+                                    @(alteracao.Clinica?.Nome ?? "Não informado")
+                                </p>
+
+                                <p>
+                                    <strong>Cidade:</strong>
+                                    @(alteracao.Clinica?.Cidade ?? "Não informada")
+                                </p>
+
+                                <p>
+                                    <strong>Valor:</strong>
+                                    @(alteracao.Clinica != null
+                                                                    ? alteracao.Clinica.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                                                    : "Não informado")
+                            </p>
+
+                                <p>
+                                    <strong>Descrição:</strong>
+                                    @(alteracao.Clinica?.Descricao ?? "Sem descrição")
+                                </p>
+
+                                <p>
+                                    <strong>Especialidades:</strong>
+                                    @(alteracao.Clinica?.Especialidades ?? "Não informadas")
+                                </p>
                             </div>
 
-                            <div>
-                                <span>Telefone</span>
-                                <strong>@(string.IsNullOrWhiteSpace(clinica.Telefone) ? "Não informado" : clinica.Telefone)</strong>
-                            </div>
+                            <div class="coluna-comparacao nova">
+                                <span>Alteração enviada</span>
 
-                            <div>
-                                <span>Valor consulta</span>
-                                <strong>R$ @clinica.Valor</strong>
+                                <p>
+                                    <strong>Nome:</strong>
+                                    @alteracao.Nome
+                                </p>
+
+                                <p>
+                                    <strong>Cidade:</strong>
+                                    @(string.IsNullOrWhiteSpace(alteracao.Cidade) ? "Não informada" : alteracao.Cidade)
+                                </p>
+
+                                <p>
+                                    <strong>Valor:</strong>
+                                    @alteracao.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+                                </p>
+
+                                <p>
+                                    <strong>Descrição:</strong>
+                                    @(string.IsNullOrWhiteSpace(alteracao.Descricao) ? "Sem descrição enviada" : alteracao.Descricao)
+                                </p>
+
+                                <p>
+                                    <strong>Especialidades:</strong>
+                                    @(string.IsNullOrWhiteSpace(alteracao.Especialidades) ? "Não informadas" : alteracao.Especialidades)
+                                </p>
                             </div>
 
                         </div>
 
-                        <p class="descricao-card">
-                            @(string.IsNullOrWhiteSpace(clinica.Descricao)
-                                                    ? "Sem descrição cadastrada."
-                                                    : clinica.Descricao)
-                    </p>
+                        <div class="info-grid">
+
+                            <div>
+                                <span>Telefone enviado</span>
+                                <strong>@(string.IsNullOrWhiteSpace(alteracao.Telefone) ? "Não informado" : alteracao.Telefone)</strong>
+                            </div>
+
+                            <div>
+                                <span>Email enviado</span>
+                                <strong>@alteracao.Email</strong>
+                            </div>
+
+                            <div>
+                                <span>Solicitado em</span>
+                                <strong>@alteracao.DataSolicitacao.ToString("dd/MM/yyyy HH:mm")</strong>
+                            </div>
+
+                            <div>
+                                <span>Atendimento online</span>
+                                <strong>@(alteracao.AtendimentoOnline ? "Sim" : "Não")</strong>
+                            </div>
+
+                            <div>
+                                <span>Atendimento presencial</span>
+                                <strong>@(alteracao.AtendimentoPresencial ? "Sim" : "Não")</strong>
+                            </div>
+
+                            <div>
+                                <span>Status</span>
+                                <strong>@alteracao.Status</strong>
+                            </div>
+
+                        </div>
 
                         <div class="acoes-card-admin">
 
                             <form method="post">
 
-                                <input type="hidden" name="id" value="@clinica.Id" />
+                                <input type="hidden" name="id" value="@alteracao.Id" />
 
                                 <button type="submit"
                                         name="acao"
@@ -433,18 +511,40 @@
 
                             </form>
 
-                            <a href="/PerfilClinica?id=@clinica.Id"
-                               target="_blank"
-                               class="btn-ver-perfil">
-                                Ver perfil público
-                            </a>
+                            <form method="post" class="form-recusa">
+
+                                <input type="hidden" name="id" value="@alteracao.Id" />
+
+                                <input type="text"
+                                       name="MotivoRecusa"
+                                       class="input-recusa"
+                                       placeholder="Motivo da recusa..." />
+
+                                <button type="submit"
+                                        name="acao"
+                                        value="recusarAlteracao"
+                                        class="btn-acao excluir"
+                                        onclick='return confirmarAcao(this, "recusar as alterações deste perfil?")'>
+                                    Recusar
+                                </button>
+
+                            </form>
+
+                        @if (alteracao.Clinica != null)
+                            {
+                                <a href="/PerfilClinica?id=@alteracao.Clinica.Id"
+                                   target="_blank"
+                                   class="btn-ver-perfil">
+                                    Ver perfil atual
+                                </a>
+                            }
 
                         </div>
 
                     </article>
-                                }
+                }
 
-                @if (!Model.ClinicasComAlteracao.Any())
+                @if (!Model.AlteracoesClinicasPendentes.Any())
                 {
                     <div class="vazio-card">
                         Nenhuma alteração pendente no momento.
@@ -621,18 +721,36 @@
                                 </p>
                             </div>
 
-                            <div class="status-tags">
+                        <div class="status-tags">
 
-                                @if (item.Ativo)
+                                @if (item.Status == "Expirado")
+                                {
+                                    <span class="tag expirado">
+                                        Expirado
+                                    </span>
+                                }
+                                else if (item.Status == "Cancelado")
+                                {
+                                    <span class="tag cancelado">
+                                        Cancelado
+                                    </span>
+                                }
+                                else if (item.Ativo)
                                 {
                                     <span class="tag pago">
                                         Ativo
                                     </span>
                                 }
-                                else if (item.Pago)
+                                else if (item.Pago && !item.Aprovado)
                                 {
                                     <span class="tag aprovado">
-                                        Pago
+                                        Pagamento confirmado
+                                    </span>
+                                }
+                                else if (item.Pago && item.Aprovado)
+                                {
+                                    <span class="tag pago">
+                                        Aprovado
                                     </span>
                                 }
                                 else
@@ -690,7 +808,7 @@
 
                                 <input type="hidden" name="id" value="@item.Id" />
 
-                            @if (!item.Pago)
+                                @if (!item.Pago && item.Status != "Expirado" && item.Status != "Cancelado")
                                 {
                                     <button type="submit"
                                             name="acao"
@@ -699,6 +817,13 @@
                                             onclick='return confirmarAcao(this, "confirmar o pagamento desta divulgação?")'>
                                         Confirmar pagamento
                                     </button>
+                                }
+
+                                @if (item.Status == "Expirado")
+                                {
+                                    <span class="btn-acao bloqueado">
+                                        Solicitação expirada
+                                    </span>
                                 }
 
                                 @if (item.Pago && !item.Aprovado)
@@ -743,6 +868,72 @@
                 {
                     <div class="vazio-card">
                         Nenhuma solicitação de divulgação regional no momento.
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+        <section id="historico" class="aba" style="display:none">
+
+            <div class="topo-secao">
+
+                <div>
+                    <h2>
+                        Histórico administrativo
+                    </h2>
+
+                    <p>
+                        Acompanhe ações realizadas por administradores no painel.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="historico-lista">
+
+                @foreach (var log in Model.AdminLogs)
+                {
+                    <article class="historico-card">
+
+                        <div class="historico-topo">
+
+                            <div>
+                                <span class="historico-acao">
+                                    @log.Acao
+                                </span>
+
+                                <h3>
+                                    @log.NomeAdmin
+                                </h3>
+                            </div>
+
+                            <span class="tag aprovado">
+                                @log.PerfilAdmin
+                            </span>
+
+                        </div>
+
+                        <p>
+                            @log.Descricao
+                        </p>
+
+                        <div class="historico-meta">
+
+                            <span>
+                                @log.DataAcao.ToString("dd/MM/yyyy HH:mm")
+                            </span>
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.AdminLogs.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhum registro administrativo encontrado ainda.
                     </div>
                 }
 
@@ -1113,6 +1304,24 @@
         font-weight: 800;
     }
 
+        .tag.expirado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .tag.cancelado {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+    .btn-acao.bloqueado {
+        background: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+        display: inline-flex;
+        align-items: center;
+    }
+
         .tag.pendente {
             background: #fef3c7;
             color: #92400e;
@@ -1391,6 +1600,127 @@
         color: white;
     }
 
+    .historico-lista {
+        display: grid;
+        gap: 16px;
+    }
+
+    .historico-card {
+        background: rgba(255,255,255,.9);
+        border: 1px solid rgba(226,232,240,.9);
+        box-shadow: 0 20px 55px rgba(15,23,42,.07);
+        backdrop-filter: blur(18px);
+        border-radius: 26px;
+        padding: 24px;
+    }
+
+    .historico-topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 14px;
+    }
+
+    .historico-acao {
+        display: inline-block;
+        margin-bottom: 8px;
+        color: #0ea5e9;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .historico-card h3 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 22px;
+    }
+
+    .historico-card p {
+        margin: 0;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .historico-meta {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .comparacao-alteracao {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .coluna-comparacao {
+        border-radius: 22px;
+        padding: 18px;
+        border: 1px solid #e2e8f0;
+    }
+
+        .coluna-comparacao.atual {
+            background: #f8fafc;
+        }
+
+        .coluna-comparacao.nova {
+            background: #ecfeff;
+            border-color: #bae6fd;
+        }
+
+        .coluna-comparacao span {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .coluna-comparacao p {
+            margin: 0 0 10px;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+            .coluna-comparacao p:last-child {
+                margin-bottom: 0;
+            }
+
+        .coluna-comparacao strong {
+            color: #0f172a;
+        }
+
+    .form-recusa {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .input-recusa {
+        min-width: 260px;
+        border: 1px solid #dbeafe;
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        outline: none;
+        font-size: 14px;
+    }
+
+        .input-recusa:focus {
+            border-color: #0ea5e9;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+        }
+
     @@media(max-width: 1200px) {
 
         .cards-dashboard,
@@ -1459,6 +1789,15 @@
         .modal-botoes {
             flex-direction: column;
         }
+    }
+
+    .comparacao-alteracao {
+        grid-template-columns: 1fr;
+    }
+
+    .form-recusa,
+    .input-recusa {
+        width: 100%;
     }
 
 </style>
@@ -1561,6 +1900,7 @@
                     inputAcao.type = "hidden";
                     inputAcao.name = "acao";
                     inputAcao.value = acaoSelecionada;
+
 
                     formParaEnviar.appendChild(inputAcao);
                     formParaEnviar.submit();

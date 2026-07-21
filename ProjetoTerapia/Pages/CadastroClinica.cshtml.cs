@@ -104,12 +104,70 @@ namespace ProjetoTerapia.Pages
             NormalizarInstagram();
             NormalizarSite();
 
-            var especialidades = Request.Form["Especialidades"];
+            var especialidadesTexto = ObterEspecialidadesFormatadas();
 
-            clinica.Especialidades =
-                string.Join(",", especialidades.ToArray());
+            var fotoNova = SalvarFotoRecortada();
+
+            /*
+                REGRA IMPORTANTE:
+                Se a clínica já foi aprovada, não salva direto no perfil público.
+                Cria uma solicitação de alteração para o admin aprovar.
+            */
+            if (editandoPerfil && clinica.Aprovado)
+            {
+                CriarOuAtualizarAlteracaoPendente(
+                    clinica,
+                    especialidadesTexto,
+                    fotoNova
+                );
+
+                clinica.ClinicaAlteracaoPendente = true;
+
+                _context.SaveChanges();
+
+                TempData["Sucesso"] =
+                    "Alterações salvas com sucesso. Aguarde a aprovação da nossa equipe.";
+
+                return RedirectToPage("/CadastroClinica");
+            }
+
+            /*
+                Se for cadastro novo ou perfil ainda não aprovado,
+                pode salvar direto porque ainda não aparece publicamente.
+            */
+            AtualizarClinicaDireto(
+                clinica,
+                especialidadesTexto,
+                fotoNova
+            );
+
+            _context.SaveChanges();
+
+            if (!editandoPerfil)
+            {
+                HttpContext.Session.Remove("PacienteLogado");
+
+                HttpContext.Session.SetString(
+                    "ClinicaLogada",
+                    clinica.Id.ToString()
+                );
+            }
+
+            TempData["Sucesso"] =
+                "Cadastro enviado com sucesso. Aguarde a análise da nossa equipe.";
+
+            return RedirectToPage("/CadastroClinica");
+        }
+
+        private void AtualizarClinicaDireto(
+            Clinica clinica,
+            string especialidadesTexto,
+            string? fotoNova)
+        {
+            clinica.Especialidades = especialidadesTexto;
 
             clinica.Nome = NovaClinica.Nome;
+            clinica.Email = NovaClinica.Email;
             clinica.Descricao = NovaClinica.Descricao;
             clinica.CEP = NovaClinica.CEP;
             clinica.Cidade = NovaClinica.Cidade;
@@ -124,36 +182,74 @@ namespace ProjetoTerapia.Pages
             clinica.AtendimentoOnline = NovaClinica.AtendimentoOnline;
             clinica.AtendimentoPresencial = NovaClinica.AtendimentoPresencial;
 
+            if (!string.IsNullOrWhiteSpace(fotoNova))
+            {
+                clinica.FotoPerfil = fotoNova;
+            }
+
             clinica.PerfilCompleto = true;
+        }
 
-            SalvarFotoRecortada(clinica);
-
-            if (clinica.Aprovado)
-            {
-                clinica.ClinicaAlteracaoPendente = true;
-
-                TempData["Sucesso"] =
-                    "Alterações salvas e enviadas para análise da equipe.";
-            }
-            else
-            {
-                TempData["Sucesso"] =
-                    "Perfil enviado para análise com sucesso!";
-            }
-
-            _context.SaveChanges();
-
-            if (!editandoPerfil)
-            {
-                HttpContext.Session.Remove("PacienteLogado");
-
-                HttpContext.Session.SetString(
-                    "ClinicaLogada",
-                    clinica.Id.ToString()
+        private void CriarOuAtualizarAlteracaoPendente(
+            Clinica clinica,
+            string especialidadesTexto,
+            string? fotoNova)
+        {
+            var alteracao = _context.AlteracoesClinicas
+                .FirstOrDefault(a =>
+                    a.ClinicaId == clinica.Id &&
+                    a.Status == "Pendente"
                 );
+
+            if (alteracao == null)
+            {
+                alteracao = new AlteracaoClinica
+                {
+                    ClinicaId = clinica.Id,
+                    Status = "Pendente",
+                    DataSolicitacao = DateTime.Now
+                };
+
+                _context.AlteracoesClinicas.Add(alteracao);
             }
 
-            return RedirectToPage("/CadastroClinica");
+            alteracao.Nome = NovaClinica.Nome;
+            alteracao.Email = NovaClinica.Email;
+            alteracao.Telefone = NovaClinica.Telefone;
+            alteracao.CEP = NovaClinica.CEP;
+            alteracao.Cidade = NovaClinica.Cidade;
+            alteracao.Endereco = NovaClinica.Endereco;
+            alteracao.Descricao = NovaClinica.Descricao;
+            alteracao.Especialidades = especialidadesTexto;
+            alteracao.Documento = NovaClinica.Documento;
+            alteracao.CPF = NovaClinica.CPF;
+            alteracao.Valor = NovaClinica.Valor;
+            alteracao.AtendimentoOnline = NovaClinica.AtendimentoOnline;
+            alteracao.AtendimentoPresencial = NovaClinica.AtendimentoPresencial;
+            alteracao.Instagram = NovaClinica.Instagram ?? "";
+            alteracao.Site = NovaClinica.Site ?? "";
+            alteracao.FotoPerfil = !string.IsNullOrWhiteSpace(fotoNova)
+                ? fotoNova
+                : clinica.FotoPerfil;
+
+            alteracao.Status = "Pendente";
+            alteracao.MotivoRecusa = null;
+            alteracao.DataAnalise = null;
+            alteracao.NomeAdminAnalise = null;
+        }
+
+        private string ObterEspecialidadesFormatadas()
+        {
+            var especialidades = Request.Form["Especialidades"];
+
+            var lista = especialidades
+                .Select(e => e?.Trim() ?? "")
+                .Where(e => !string.IsNullOrWhiteSpace(e))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(20)
+                .ToList();
+
+            return string.Join(",", lista);
         }
 
         private void NormalizarTelefone()
@@ -204,11 +300,11 @@ namespace ProjetoTerapia.Pages
             }
         }
 
-        private void SalvarFotoRecortada(Clinica clinica)
+        private string? SalvarFotoRecortada()
         {
             if (string.IsNullOrWhiteSpace(FotoFinal))
             {
-                return;
+                return null;
             }
 
             var base64 = FotoFinal;
@@ -239,7 +335,7 @@ namespace ProjetoTerapia.Pages
 
             System.IO.File.WriteAllBytes(caminhoArquivo, bytes);
 
-            clinica.FotoPerfil = "/uploads/" + nomeArquivo;
+            return "/uploads/" + nomeArquivo;
         }
 
         private void RecarregarEspecialidadesSelecionadas()
