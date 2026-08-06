@@ -13,6 +13,7 @@
             <a href="/HomePaciente" class="active">Início</a>
             <a href="/Teste">Teste emocional</a>
             <a href="#diario">Diário emocional</a>
+            <a href="/Clinicas">Clínicas</a>
             <a href="#historico">Histórico</a>
             <a href="/HomePaciente?handler=Sair">Sair</a>
         </nav>
@@ -40,6 +41,7 @@
                 <div class="hero-actions">
                     <a href="/Teste" class="btn-primary">Fazer teste emocional</a>
                     <a href="#diario" class="btn-secondary">Registrar meu dia</a>
+                    <a href="/Clinicas" class="btn-secondary">Encontrar clínicas</a>
                 </div>
 
             </div>
@@ -143,13 +145,13 @@
                 </p>
             </div>
 
-            <div class="info-card">
+            <a href="/Clinicas" class="info-card info-card-link">
                 <span class="number">03</span>
                 <h3>Busque apoio</h3>
                 <p>
                     Encontre profissionais preparados para ajudar você em sua jornada.
                 </p>
-            </div>
+            </a>
 
         </section>
 
@@ -467,6 +469,19 @@
         .info-card p {
             color: #64748b;
             line-height: 1.6;
+        }
+
+    .info-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: .25s;
+    }
+
+        .info-card-link:hover {
+            transform: translateY(-3px);
+            border-color: #7dd3fc;
+            box-shadow: 0 22px 50px rgba(14,165,233,.12);
         }
 
     .content-grid {

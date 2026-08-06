@@ -5,10 +5,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ProjetoTerapia.Pages
 {
@@ -31,37 +28,42 @@ namespace ProjetoTerapia.Pages
 
         public void OnGet()
         {
-
         }
 
         // LOGIN NORMAL
         public IActionResult OnPost()
         {
+            var emailNormalizado = NormalizarEmail(Email);
 
-            var clinica =
-                _context.Clinicas
-                .FirstOrDefault(c => c.Email == Email);
-
-
-            if (clinica == null)
+            if (string.IsNullOrWhiteSpace(emailNormalizado))
             {
-                Erro = "Email ou senha inválidos";
+                Erro = "Informe seu email.";
                 return Page();
             }
 
+            var clinica = BuscarClinicaPorEmail(emailNormalizado);
 
-            if (string.IsNullOrEmpty(clinica.SenhaHash))
+            if (clinica == null)
+            {
+                Erro = "Email ou senha inválidos.";
+                return Page();
+            }
+
+            if (string.IsNullOrWhiteSpace(clinica.SenhaHash))
             {
                 Erro = "Essa conta foi criada pelo Google. Entre usando Google.";
                 return Page();
             }
 
-
             var partes = clinica.SenhaHash.Split(".");
 
+            if (partes.Length != 2)
+            {
+                Erro = "Não foi possível validar sua senha. Entre em contato com o suporte.";
+                return Page();
+            }
 
             var salt = Convert.FromBase64String(partes[0]);
-
 
             var hash = Convert.ToBase64String(
                 KeyDerivation.Pbkdf2(
@@ -73,19 +75,13 @@ namespace ProjetoTerapia.Pages
                 )
             );
 
-
             if (hash != partes[1])
             {
-                Erro = "Email ou senha inválidos";
+                Erro = "Email ou senha inválidos.";
                 return Page();
             }
 
-
-            HttpContext.Session.SetString(
-                "ClinicaLogada",
-                clinica.Id.ToString()
-            );
-
+            LogarClinica(clinica);
 
             return RedirectToPage("/PainelClinica");
         }
@@ -112,57 +108,53 @@ namespace ProjetoTerapia.Pages
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
             if (!result.Succeeded)
+            {
                 return RedirectToPage("/LoginClinica");
-
+            }
 
             var email = result.Principal?
                 .FindFirst(ClaimTypes.Email)?.Value;
 
+            var nome = result.Principal?
+                .FindFirst(ClaimTypes.Name)?.Value ?? "";
 
-            if (email == null)
-                return RedirectToPage("/LoginClinica");
+            var emailNormalizado = NormalizarEmail(email);
 
-
-
-            var clinica =
-                _context.Clinicas
-                .FirstOrDefault(c =>
-                    c.Email.ToLower() == email.ToLower());
-
-
-
-            // se não existe cria uma conta Google
-            if (clinica == null)
+            if (string.IsNullOrWhiteSpace(emailNormalizado))
             {
-
-                clinica = new Clinica
-                {
-                    Nome = result.Principal?
-                        .FindFirst(ClaimTypes.Name)?.Value ?? "",
-
-                    Email = email,
-
-                    SenhaHash = "",
-
-                    Pago = false,
-
-                    Aprovado = false
-                };
-
-
-                _context.Clinicas.Add(clinica);
-
-                await _context.SaveChangesAsync();
-
+                return RedirectToPage("/LoginClinica");
             }
 
+            var clinica = BuscarClinicaPorEmail(emailNormalizado);
 
+            // Só cria nova clínica se realmente não existir nenhuma com esse email
+            if (clinica == null)
+            {
+                clinica = new Clinica
+                {
+                    Nome = nome,
+                    Email = emailNormalizado,
+                    SenhaHash = "",
+                    Pago = false,
+                    Aprovado = false,
+                    PerfilCompleto = false,
+                    ClinicaAlteracaoPendente = false
+                };
 
-            HttpContext.Session.SetString(
-                "ClinicaLogada",
-                clinica.Id.ToString()
-            );
+                _context.Clinicas.Add(clinica);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Garante que a clínica encontrada não fique sem email
+                if (string.IsNullOrWhiteSpace(clinica.Email))
+                {
+                    clinica.Email = emailNormalizado;
+                    await _context.SaveChangesAsync();
+                }
+            }
 
+            LogarClinica(clinica);
 
             return RedirectToPage("/PainelClinica");
         }
@@ -170,9 +162,40 @@ namespace ProjetoTerapia.Pages
         // LOGOUT
         public IActionResult OnGetLogout()
         {
-            HttpContext.Session.Clear();
+            HttpContext.Session.Remove("ClinicaLogada");
 
             return RedirectToPage("/LoginClinica");
+        }
+
+        private Clinica? BuscarClinicaPorEmail(string email)
+        {
+            var emailNormalizado = NormalizarEmail(email);
+
+            return _context.Clinicas
+                .Where(c =>
+                    c.Email != null &&
+                    c.Email.ToLower().Trim() == emailNormalizado)
+                .OrderByDescending(c => c.PerfilCompleto)
+                .ThenByDescending(c => c.Aprovado)
+                .ThenByDescending(c => c.Pago)
+                .ThenByDescending(c => c.Id)
+                .FirstOrDefault();
+        }
+
+        private void LogarClinica(Clinica clinica)
+        {
+            HttpContext.Session.Remove("PacienteLogado");
+            HttpContext.Session.Remove("AdminLogado");
+
+            HttpContext.Session.SetString(
+                "ClinicaLogada",
+                clinica.Id.ToString()
+            );
+        }
+
+        private string NormalizarEmail(string? email)
+        {
+            return (email ?? "").Trim().ToLower();
         }
     }
 }

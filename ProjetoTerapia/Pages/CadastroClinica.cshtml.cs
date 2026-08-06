@@ -32,8 +32,13 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public string? FotoFinal { get; set; }
 
-        public IActionResult OnGet()
+        [BindProperty]
+        public string CodigoVendedor { get; set; } = "";
+
+        public IActionResult OnGet(string? vendedor)
         {
+            CapturarCodigoVendedor(vendedor);
+
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
             if (id != null)
@@ -61,6 +66,9 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
+
+            CapturarCodigoVendedor(CodigoVendedor);
+
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
             Clinica? clinica;
@@ -85,6 +93,8 @@ namespace ProjetoTerapia.Pages
                 clinica.PerfilCompleto = false;
                 clinica.ClinicaAlteracaoPendente = false;
 
+                AplicarVendedorNaClinica(clinica);
+
                 _context.Clinicas.Add(clinica);
             }
 
@@ -100,9 +110,17 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
+            NormalizarCPF();
+            NormalizarCEP();
             NormalizarTelefone();
             NormalizarInstagram();
             NormalizarSite();
+
+            if (!ValidarDadosDaClinica(clinica))
+            {
+                RecarregarEspecialidadesSelecionadas();
+                return Page();
+            }
 
             var especialidadesTexto = ObterEspecialidadesFormatadas();
 
@@ -167,7 +185,12 @@ namespace ProjetoTerapia.Pages
             clinica.Especialidades = especialidadesTexto;
 
             clinica.Nome = NovaClinica.Nome;
-            clinica.Email = NovaClinica.Email;
+
+            if (!string.IsNullOrWhiteSpace(NovaClinica.Email))
+            {
+                clinica.Email = NovaClinica.Email;
+            }
+
             clinica.Descricao = NovaClinica.Descricao;
             clinica.CEP = NovaClinica.CEP;
             clinica.Cidade = NovaClinica.Cidade;
@@ -214,7 +237,7 @@ namespace ProjetoTerapia.Pages
             }
 
             alteracao.Nome = NovaClinica.Nome;
-            alteracao.Email = NovaClinica.Email;
+            alteracao.Email = clinica.Email;
             alteracao.Telefone = NovaClinica.Telefone;
             alteracao.CEP = NovaClinica.CEP;
             alteracao.Cidade = NovaClinica.Cidade;
@@ -254,21 +277,21 @@ namespace ProjetoTerapia.Pages
 
         private void NormalizarTelefone()
         {
-            if (!string.IsNullOrEmpty(NovaClinica.Telefone))
-            {
-                NovaClinica.Telefone = NovaClinica.Telefone
-                    .Replace("(", "")
-                    .Replace(")", "")
-                    .Replace("-", "")
-                    .Replace(" ", "")
-                    .Replace("+", "")
-                    .Trim();
+            var telefone = ApenasNumeros(NovaClinica.Telefone);
 
-                if (!NovaClinica.Telefone.StartsWith("55"))
-                {
-                    NovaClinica.Telefone = "55" + NovaClinica.Telefone;
-                }
+            if (string.IsNullOrWhiteSpace(telefone))
+            {
+                NovaClinica.Telefone = "";
+                return;
             }
+
+            if ((telefone.Length == 10 || telefone.Length == 11) &&
+                !telefone.StartsWith("55"))
+            {
+                telefone = "55" + telefone;
+            }
+
+            NovaClinica.Telefone = telefone;
         }
 
         private void NormalizarInstagram()
@@ -346,6 +369,217 @@ namespace ProjetoTerapia.Pages
                 .Select(e => e ?? "")
                 .Where(e => !string.IsNullOrWhiteSpace(e))
                 .ToList();
+        }
+
+        private void CapturarCodigoVendedor(string? codigo)
+        {
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                return;
+            }
+
+            var codigoNormalizado = codigo.Trim().ToUpper();
+
+            var vendedor = _context.Vendedores
+                .FirstOrDefault(v =>
+                    v.CodigoIndicacao == codigoNormalizado &&
+                    v.Ativo
+                );
+
+            if (vendedor == null)
+            {
+                return;
+            }
+
+            HttpContext.Session.SetString(
+                "CodigoVendedorIndicacao",
+                vendedor.CodigoIndicacao
+            );
+
+            CodigoVendedor = vendedor.CodigoIndicacao;
+        }
+
+        private Vendedor? BuscarVendedorDaSessao()
+        {
+            var codigo = HttpContext.Session.GetString("CodigoVendedorIndicacao");
+
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                return null;
+            }
+
+            return _context.Vendedores
+                .FirstOrDefault(v =>
+                    v.CodigoIndicacao == codigo &&
+                    v.Ativo
+                );
+        }
+
+        private void AplicarVendedorNaClinica(Clinica clinica)
+        {
+            if (clinica.VendedorId.HasValue)
+            {
+                return;
+            }
+
+            var vendedor = BuscarVendedorDaSessao();
+
+            if (vendedor == null)
+            {
+                return;
+            }
+
+            clinica.VendedorId = vendedor.Id;
+            clinica.CodigoVendedorIndicacao = vendedor.CodigoIndicacao;
+        }
+
+        private void NormalizarCPF()
+        {
+            NovaClinica.CPF = ApenasNumeros(NovaClinica.CPF);
+        }
+
+        private void NormalizarCEP()
+        {
+            NovaClinica.CEP = ApenasNumeros(NovaClinica.CEP);
+        }
+
+        private string ApenasNumeros(string? valor)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+            {
+                return "";
+            }
+
+            return new string(valor.Where(char.IsDigit).ToArray());
+        }
+
+        private bool ValidarDadosDaClinica(Clinica clinicaAtual)
+        {
+            var valido = true;
+
+            var clinicasExistentes = _context.Clinicas
+                .Where(c => c.Id != clinicaAtual.Id)
+                .ToList();
+
+            if (string.IsNullOrWhiteSpace(NovaClinica.CPF))
+            {
+                ModelState.AddModelError("NovaClinica.CPF", "Informe o CPF.");
+                valido = false;
+            }
+            else if (!CpfValido(NovaClinica.CPF))
+            {
+                ModelState.AddModelError("NovaClinica.CPF", "Informe um CPF válido.");
+                valido = false;
+            }
+            else if (clinicasExistentes.Any(c => ApenasNumeros(c.CPF) == NovaClinica.CPF))
+            {
+                ModelState.AddModelError("NovaClinica.CPF", "Este CPF já está em uso.");
+                valido = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(NovaClinica.Telefone))
+            {
+                ModelState.AddModelError("NovaClinica.Telefone", "Informe o telefone.");
+                valido = false;
+            }
+            else if (!TelefoneValido(NovaClinica.Telefone))
+            {
+                ModelState.AddModelError("NovaClinica.Telefone", "Informe um telefone válido com DDD.");
+                valido = false;
+            }
+            else if (clinicasExistentes.Any(c => ApenasNumeros(c.Telefone) == NovaClinica.Telefone))
+            {
+                ModelState.AddModelError("NovaClinica.Telefone", "Este telefone já está em uso.");
+                valido = false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(NovaClinica.CEP) &&
+                NovaClinica.CEP.Length != 8)
+            {
+                ModelState.AddModelError("NovaClinica.CEP", "Informe um CEP válido com 8 números.");
+                valido = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(NovaClinica.Cidade))
+            {
+                ModelState.AddModelError("NovaClinica.Cidade", "Informe a cidade principal de atendimento.");
+                valido = false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(NovaClinica.Documento))
+            {
+                NovaClinica.Documento = NovaClinica.Documento.Trim().ToUpper();
+
+                var documentoJaExiste = clinicasExistentes.Any(c =>
+                    !string.IsNullOrWhiteSpace(c.Documento) &&
+                    c.Documento.Trim().ToUpper() == NovaClinica.Documento
+                );
+
+                if (documentoJaExiste)
+                {
+                    ModelState.AddModelError("NovaClinica.Documento", "Este registro profissional já está em uso.");
+                    valido = false;
+                }
+            }
+
+            return valido;
+        }
+
+        private bool TelefoneValido(string telefone)
+        {
+            if (string.IsNullOrWhiteSpace(telefone))
+            {
+                return false;
+            }
+
+            if (!telefone.StartsWith("55"))
+            {
+                return false;
+            }
+
+            return telefone.Length == 12 || telefone.Length == 13;
+        }
+
+        private bool CpfValido(string cpf)
+        {
+            cpf = ApenasNumeros(cpf);
+
+            if (cpf.Length != 11)
+            {
+                return false;
+            }
+
+            if (cpf.All(c => c == cpf[0]))
+            {
+                return false;
+            }
+
+            var soma = 0;
+
+            for (var i = 0; i < 9; i++)
+            {
+                soma += (cpf[i] - '0') * (10 - i);
+            }
+
+            var resto = soma % 11;
+            var digito1 = resto < 2 ? 0 : 11 - resto;
+
+            if ((cpf[9] - '0') != digito1)
+            {
+                return false;
+            }
+
+            soma = 0;
+
+            for (var i = 0; i < 10; i++)
+            {
+                soma += (cpf[i] - '0') * (11 - i);
+            }
+
+            resto = soma % 11;
+            var digito2 = resto < 2 ? 0 : 11 - resto;
+
+            return (cpf[10] - '0') == digito2;
         }
     }
 }

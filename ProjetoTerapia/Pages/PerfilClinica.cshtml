@@ -4,72 +4,111 @@
 <div class="perfil-page">
 
     <div class="voltar-container">
-        <a href="@(Model.EhDonoPerfil ? "/PainelClinica" : "/Clinicas")" class="btn-voltar">
+        <a href="@(Model.EhDonoPerfil ? "/PainelClinica" : "/Clinicas")"
+           class="btn-voltar"
+           onclick="return voltarPagina(this)">
             ← Voltar
         </a>
     </div>
 
-    <!-- HERO -->
+    <!-- TOPO MODERNO -->
 
-    <div class="hero-perfil">
+    <section class="perfil-topo-moderno">
 
-        <div class="hero-overlay"></div>
+        <div class="perfil-topo-card">
 
-        <div class="hero-content">
+            <div class="perfil-identidade">
 
-            <div class="avatar-perfil">
+                <div class="avatar-perfil">
 
-                @if (!string.IsNullOrEmpty(Model.Clinica.FotoPerfil))
-                {
-                    <img src="@Model.Clinica.FotoPerfil"
-                    style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
-                }
-                else
-                {
-                    @(string.IsNullOrEmpty(Model.Clinica.Nome)
-                                    ? "C"
-                                    : Model.Clinica.Nome.Substring(0, 1).ToUpper())
-                }
-
-            </div>
-
-            <div class="hero-info">
-
-                <span class="badge-top">
-                    Perfil Profissional
-                </span>
-
-                <h1>
-                    @Model.Clinica.Nome
-                </h1>
-
-                <div class="linha-badges">
-
-                    @if (Model.Clinica.AtendimentoOnline)
+                    @if (!string.IsNullOrEmpty(Model.Clinica.FotoPerfil))
                     {
-                        <span class="badge-info online">
-                             Online
-                        </span>
+                        <img src="@Model.Clinica.FotoPerfil" alt="@Model.Clinica.Nome" />
                     }
-
-                    @if (Model.Clinica.AtendimentoPresencial)
+                    else
                     {
-                        <span class="badge-info presencial">
-                             Presencial
-                        </span>
-                    }
+                        @(string.IsNullOrEmpty(Model.Clinica.Nome)
+                                            ? "C"
+                                            : Model.Clinica.Nome.Substring(0, 1).ToUpper())
+                                        }
 
-                    <span class="badge-info aprovado">
-                         Verificado
+                </div>
+
+                <div class="perfil-info-principal">
+
+                    <span class="badge-top">
+                        Perfil Profissional
                     </span>
+
+                    <h1>
+                        @Model.Clinica.Nome
+                    </h1>
+
+                    <div class="linha-badges">
+
+                        @if (Model.Clinica.AtendimentoOnline)
+                        {
+                            <span class="badge-info online">
+                                Online
+                            </span>
+                        }
+
+                        @if (Model.Clinica.AtendimentoPresencial)
+                        {
+                            <span class="badge-info presencial">
+                                Presencial
+                            </span>
+                        }
+
+                        <span class="badge-info aprovado">
+                            Verificado
+                        </span>
+
+                    </div>
 
                 </div>
 
             </div>
 
+            <div class="perfil-acoes-rapidas">
+
+                @if (!Model.EhDonoPerfil)
+                {
+                    <a href="/PerfilClinica?handler=Whatsapp&id=@Model.Clinica.Id"
+                       target="_blank"
+                       class="btn-topo whatsapp-topo">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        Chamar no WhatsApp
+                    </a>
+
+                    @if (Model.PacienteLogado)
+                    {
+                        <a href="/AgendarConsulta?id=@Model.Clinica.Id"
+                           class="btn-topo agendar-topo">
+                            Agendar consulta
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/LoginPaciente"
+                           class="btn-topo agendar-topo">
+                            Entrar para agendar
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a href="/CadastroClinica"
+                       class="btn-topo agendar-topo">
+                        Editar perfil
+                    </a>
+                }
+
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
     <!-- CONTEÚDO -->
 
@@ -274,120 +313,179 @@
 
 </div>
 
+<script>
+    function voltarPagina(link) {
+        if (document.referrer && document.referrer.includes(window.location.origin)) {
+            window.history.back();
+            return false;
+        }
+
+        window.location.href = link.getAttribute("href");
+        return false;
+    }
+</script>
+
 <style>
 
     body {
         margin: 0;
-        background: #f8fafc;
+        background: #ecfeff;
         font-family: 'Segoe UI', sans-serif;
     }
 
+    /* TOPO MODERNO */
+
     .perfil-page {
         min-height: 100vh;
+        background: #ecfeff;
+        padding-bottom: 50px;
     }
 
-    /* HERO */
+    .perfil-topo-moderno {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 25px;
+    }
 
-    .hero-perfil {
+    .perfil-topo-card {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 34px 0 18px;
+        box-shadow: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 28px;
         position: relative;
-        padding: 55px 60px;
-        background: linear-gradient(135deg,#2563eb,#0ea5e9);
-        overflow: hidden;
+        overflow: visible;
     }
 
-    .hero-overlay {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top right, rgba(255,255,255,.15), transparent 30%);
-    }
+        .perfil-topo-card::before {
+           display: none;
+        }
 
-    .hero-content {
+    .perfil-identidade {
+        display: flex;
+        align-items: center;
+        gap: 26px;
         position: relative;
         z-index: 2;
-        display: flex;
-        gap: 30px;
-        align-items: center;
-        max-width: 1200px;
-        margin: auto;
     }
 
     .avatar-perfil {
-        width: 105px;
-        height: 105px;
-        border-radius: 50%;
-        background: rgba(255,255,255,.2);
-        backdrop-filter: blur(10px);
-        border: 4px solid rgba(255,255,255,.3);
+        width: 118px;
+        height: 118px;
+        border-radius: 30px;
+        background: white;
+        color: #0ea5e9;
+        font-size: 42px;
+        font-weight: 900;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 40px;
-        font-weight: 700;
         flex-shrink: 0;
+        overflow: hidden;
+        box-shadow: 0 18px 40px rgba(14,165,233,.16);
+        border: 4px solid white;
     }
 
-    .hero-info h1 {
-        margin: 10px 0;
-        font-size: 28px;
-        font-weight: 600;
+        .avatar-perfil img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .perfil-info-principal h1 {
+        margin: 12px 0 10px;
+        font-size: 38px;
+        line-height: 1.1;
+        color: #0f172a;
         letter-spacing: -1px;
-        color: white;
     }
 
     .badge-top {
-        background: rgba(255,255,255,.15);
-        color: white;
+        display: inline-flex;
+        background: #ecfeff;
+        color: #0369a1;
         padding: 8px 14px;
         border-radius: 999px;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 900;
+        text-transform: uppercase;
     }
 
     .linha-badges {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        margin: 18px 0;
+        margin-top: 14px;
     }
 
     .badge-info {
-        padding: 8px 12px;
+        padding: 8px 13px;
         border-radius: 999px;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 900;
     }
 
     .online {
-        background: rgba(14,165,233,.18);
-        color: white;
+        background: #dcfce7;
+        color: #166534;
     }
 
     .presencial {
-        background: rgba(255,255,255,.15);
-        color: white;
+        background: #dbeafe;
+        color: #1d4ed8;
     }
 
     .aprovado {
-        background: rgba(34,197,94,.18);
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .perfil-acoes-rapidas {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 230px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .btn-topo {
+        padding: 15px 18px;
+        border-radius: 17px;
+        text-decoration: none;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: .25s;
+        text-align: center;
+    }
+
+        .btn-topo:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 35px rgba(15,23,42,.12);
+        }
+
+    .whatsapp-topo {
+        background: linear-gradient(135deg,#22c55e,#16a34a);
         color: white;
     }
 
-    .descricao-hero {
-        color: rgba(255,255,255,.78);
-        line-height: 1.7;
-        max-width: 620px;
-        font-size: 14px;
-        font-weight: 400;
-        overflow-wrap: break-word;
-        word-break: break-word;
+    .agendar-topo {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
     }
 
     /* CONTEÚDO */
 
     .conteudo-perfil {
         max-width: 1200px;
-        margin: -50px auto 50px;
+        margin: 28px auto 50px;
         position: relative;
         z-index: 10;
         display: grid;
@@ -400,11 +498,19 @@
 
     .card-perfil,
     .card-side {
-        background: white;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 26px;
+        box-shadow: 0 10px 24px rgba(15,23,42,.05);
+        border: 1px solid #ddeceb;
+        transition: .25s;
     }
+
+        .card-perfil:hover,
+        .card-side:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 60px rgba(15,23,42,.10);
+        }
 
         .card-perfil h3,
         .card-side h3 {
@@ -568,20 +674,31 @@
 
     @@media(max-width:900px) {
 
-        .hero-content {
+        .perfil-topo-card {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+
+        .perfil-identidade {
             flex-direction: column;
             text-align: center;
+        }
+
+        .linha-badges {
+            justify-content: center;
+        }
+
+        .perfil-acoes-rapidas {
+            width: 100%;
+            min-width: 0;
         }
 
         .conteudo-perfil {
             grid-template-columns: 1fr;
         }
 
-        .hero-perfil {
-            padding: 50px 25px 90px;
-        }
-
-        .hero-info h1 {
+        .perfil-info-principal h1 {
             font-size: 32px;
         }
     }

@@ -31,6 +31,10 @@
                 Clube de Descontos
             </a>
 
+            <a href="javascript:void(0)" onclick="mostrarAba('vendedores', this)">
+                Vendedores
+            </a>
+
             <a href="javascript:void(0)" onclick="mostrarAba('historico', this)">
                 Histórico
             </a>
@@ -112,9 +116,22 @@
                 </div>
 
                 <div class="card-info destaque">
-                    <span>Receita prevista</span>
+                    <span>Receita total</span>
                     <strong>@Model.ReceitaPrevistaFormatada</strong>
-                    <p>Planos ativos no sistema</p>
+
+                    <p class="resumo-receita-linha">
+                        Planos: @Model.ReceitaPlanosPrincipaisFormatada
+                    </p>
+
+                    <p class="resumo-receita-linha">
+                        Divulgação: @Model.ReceitaDivulgacaoRegionalFormatada
+                    </p>
+                </div>
+
+                <div class="card-info ativo">
+                    <span>Divulgações ativas</span>
+                    <strong>@Model.DivulgacoesAtivas</strong>
+                    <p>Cidades extras em exibição</p>
                 </div>
 
                 <div class="card-info">
@@ -599,7 +616,7 @@
 
                             <div>
                                 <span>Valor</span>
-                                <strong>R$ 360,00 / ano</strong>
+                                <strong>R$ 450,00 / ano ou 12x de R$ 37,50</strong>
                             </div>
 
                             <div>
@@ -658,7 +675,7 @@
                     </h2>
 
                     <p>
-                        Gerencie solicitações de divulgação regional e cidades extras dos profissionais.
+                        Acompanhe pagamentos e divulgações regionais ativas dos profissionais.
                     </p>
                 </div>
 
@@ -668,37 +685,65 @@
 
                 <div class="clube-card">
                     <span>Divulgação regional</span>
-                    <h3>+5 cidades</h3>
+                    <h3>+1 cidade</h3>
                     <strong>R$ 30,00</strong>
-                    <p>Exibição em até 5 cidades adicionais.</p>
+                    <p>Cidade principal + 1 adicional.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+3 cidades</h3>
+                    <strong>R$ 35,00</strong>
+                    <p>Cidade principal + 3 adicionais.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+5 cidades</h3>
+                    <strong>R$ 40,00</strong>
+                    <p>Cidade principal + 5 adicionais.</p>
+                </div>
+
+                <div class="clube-card">
+                    <span>Divulgação regional</span>
+                    <h3>+8 cidades</h3>
+                    <strong>R$ 45,00</strong>
+                    <p>Cidade principal + 8 adicionais.</p>
                 </div>
 
                 <div class="clube-card">
                     <span>Divulgação regional</span>
                     <h3>+10 cidades</h3>
-                    <strong>R$ 35,00</strong>
-                    <p>Exibição em até 10 cidades adicionais.</p>
+                    <strong>R$ 50,00</strong>
+                    <p>Cidade principal + 10 adicionais.</p>
                 </div>
 
                 <div class="clube-card">
                     <span>Divulgação regional</span>
                     <h3>+15 cidades</h3>
-                    <strong>R$ 45,00</strong>
-                    <p>Maior alcance para atendimentos online.</p>
+                    <strong>R$ 55,00</strong>
+                    <p>Cidade principal + 15 adicionais.</p>
                 </div>
 
                 <div class="clube-card">
                     <span>Divulgação regional</span>
                     <h3>+20 cidades</h3>
-                    <strong>R$ 50,00</strong>
-                    <p>Presença ampliada em regiões estratégicas.</p>
+                    <strong>R$ 60,00</strong>
+                    <p>Cidade principal + 20 adicionais.</p>
                 </div>
 
                 <div class="clube-card">
                     <span>Divulgação regional</span>
                     <h3>+25 cidades</h3>
-                    <strong>R$ 55,00</strong>
-                    <p>Plano com maior alcance regional.</p>
+                    <strong>R$ 65,00</strong>
+                    <p>Cidade principal + 25 adicionais.</p>
+                </div>
+
+                <div class="clube-card destaque">
+                    <span>Divulgação regional</span>
+                    <h3>+27 cidades</h3>
+                    <strong>R$ 70,00</strong>
+                    <p>Cobertura regional ampliada.</p>
                 </div>
 
             </div>
@@ -721,7 +766,7 @@
                                 </p>
                             </div>
 
-                        <div class="status-tags">
+                            <div class="status-tags">
 
                                 @if (item.Status == "Expirado")
                                 {
@@ -735,22 +780,22 @@
                                         Cancelado
                                     </span>
                                 }
+                                else if (item.Status == "Substituído")
+                                {
+                                    <span class="tag substituido">
+                                        Substituído
+                                    </span>
+                                }
                                 else if (item.Ativo)
                                 {
                                     <span class="tag pago">
                                         Ativo
                                     </span>
                                 }
-                                else if (item.Pago && !item.Aprovado)
+                                else if (item.Pago)
                                 {
                                     <span class="tag aprovado">
                                         Pagamento confirmado
-                                    </span>
-                                }
-                                else if (item.Pago && item.Aprovado)
-                                {
-                                    <span class="tag pago">
-                                        Aprovado
                                     </span>
                                 }
                                 else
@@ -773,7 +818,7 @@
 
                         <div>
                             <span>Valor</span>
-                            <strong>R$ @item.Valor</strong>
+                            <strong>@item.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
                         </div>
 
                         <div>
@@ -792,11 +837,38 @@
                         </div>
 
                         <div>
+                            <span>Pagamento</span>
+                            <strong>
+                                @(item.DataPagamento.HasValue
+                                                                ? item.DataPagamento.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                : "Não confirmado")
+                                                                               </strong>
+                                                                           </div>
+
+                        <div>
+                            <span>Início</span>
+                            <strong>
+                                @(item.DataInicio.HasValue
+                                                                ? item.DataInicio.Value.ToString("dd/MM/yyyy")
+                                                                : "Não iniciado")
+                                                                             </strong>
+                                                                         </div>
+
+                        <div>
                             <span>Fim</span>
                             <strong>
                                 @(item.DataFim.HasValue
                                                                 ? item.DataFim.Value.ToString("dd/MM/yyyy")
                                                                 : "Não iniciado")
+                                                                             </strong>
+                                                                         </div>
+
+                        <div>
+                            <span>Mercado Pago</span>
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(item.MercadoPagoStatus)
+                                                                ? "Sem retorno"
+                                                                : item.MercadoPagoStatus)
                             </strong>
                         </div>
 
@@ -808,32 +880,18 @@
 
                                 <input type="hidden" name="id" value="@item.Id" />
 
-                                @if (!item.Pago && item.Status != "Expirado" && item.Status != "Cancelado")
+                            @if (item.Pago &&
+                                                        !item.Ativo &&
+                                                        item.Status != "Cancelado" &&
+                                                        item.Status != "Expirado" &&
+                                                        item.Status != "Substituído")
                                 {
                                     <button type="submit"
                                             name="acao"
-                                            value="confirmarPagamentoDivulgacao"
-                                            class="btn-acao pagar"
-                                            onclick='return confirmarAcao(this, "confirmar o pagamento desta divulgação?")'>
-                                        Confirmar pagamento
-                                    </button>
-                                }
-
-                                @if (item.Status == "Expirado")
-                                {
-                                    <span class="btn-acao bloqueado">
-                                        Solicitação expirada
-                                    </span>
-                                }
-
-                                @if (item.Pago && !item.Aprovado)
-                                {
-                                    <button type="submit"
-                                            name="acao"
-                                            value="aprovarDivulgacao"
+                                            value="ativarDivulgacao"
                                             class="btn-acao aprovar"
-                                            onclick='return confirmarAcao(this, "aprovar e ativar esta divulgação?")'>
-                                        Aprovar divulgação
+                                            onclick='return confirmarAcao(this, "ativar esta divulgação regional?")'>
+                                        Ativar divulgação
                                     </button>
                                 }
 
@@ -843,12 +901,32 @@
                                             name="acao"
                                             value="cancelarDivulgacao"
                                             class="btn-acao suspender"
-                                            onclick='return confirmarAcao(this, "cancelar esta divulgação?")'>
+                                            onclick='return confirmarAcao(this, "cancelar esta divulgação regional?")'>
                                         Cancelar divulgação
                                     </button>
                                 }
 
+                                @if (!item.Ativo)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="excluirDivulgacao"
+                                            class="btn-acao excluir"
+                                            onclick='return confirmarAcao(this, "remover este registro da listagem?")'>
+                                        Excluir registro
+                                    </button>
+                                }
+
                             </form>
+
+                            @if (!string.IsNullOrWhiteSpace(item.LinkPagamento) && !item.Pago)
+                            {
+                                <a href="@item.LinkPagamento"
+                                   target="_blank"
+                                   class="btn-ver-perfil">
+                                    Abrir pagamento
+                                </a>
+                            }
 
                             @if (item.Clinica != null)
                             {
@@ -867,7 +945,198 @@
                 @if (!Model.DivulgacoesRegionais.Any())
                 {
                     <div class="vazio-card">
-                        Nenhuma solicitação de divulgação regional no momento.
+                        Nenhuma divulgação regional no momento.
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+        <section id="vendedores" class="aba" style="display:none">
+
+            <div class="topo-secao">
+
+                <div>
+                    <h2>
+                        Vendedores
+                    </h2>
+
+                    <p>
+                        Cadastre vendedores freelancers e acompanhe indicações vinculadas à plataforma.
+                    </p>
+                </div>
+
+            </div>
+
+            <article class="card-clinica">
+
+                <div class="card-topo">
+
+                    <div>
+                        <h3>
+                            Cadastrar vendedor
+                        </h3>
+
+                        <p>
+                            O sistema gera automaticamente um código de indicação para cada vendedor.
+                        </p>
+                    </div>
+
+                </div>
+
+                <form method="post" class="form-vendedor-admin">
+
+                    <input type="text"
+                           asp-for="NovoVendedorNome"
+                           placeholder="Nome do vendedor" />
+
+                    <input type="email"
+                           asp-for="NovoVendedorEmail"
+                           placeholder="Email do vendedor" />
+
+                    <input type="text"
+                           asp-for="NovoVendedorTelefone"
+                           placeholder="Telefone / WhatsApp" />
+
+                    <input type="password"
+                           asp-for="NovoVendedorSenha"
+                           placeholder="Senha inicial" />
+
+                    <div class="campo-vendedor">
+                        <label>Comissão (%)</label>
+
+                        <input type="number"
+                               asp-for="NovoVendedorComissao"
+                               min="1"
+                               max="100"
+                               step="1" />
+                    </div>
+
+                    <input type="text"
+                           asp-for="NovoVendedorPix"
+                           placeholder="Chave Pix" />
+
+                    <button type="submit"
+                            name="acao"
+                            value="cadastrarVendedor"
+                            class="btn-acao aprovar">
+                        Cadastrar vendedor
+                    </button>
+
+                </form>
+
+            </article>
+
+            <div class="lista-clinicas" style="margin-top: 22px;">
+
+                @foreach (var vendedor in Model.Vendedores)
+                {
+                    <article class="card-clinica">
+
+                        <div class="card-topo">
+
+                            <div>
+                                <h3>
+                                    @vendedor.Nome
+                                </h3>
+
+                                <p>
+                                    @vendedor.Email
+                                </p>
+                            </div>
+
+                            <div class="status-tags">
+
+                                @if (vendedor.Ativo)
+                                {
+                                    <span class="tag pago">
+                                        Ativo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag cancelado">
+                                        Inativo
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <div class="info-grid">
+
+                            <div>
+                                <span>Código</span>
+                                <strong>@vendedor.CodigoIndicacao</strong>
+                            </div>
+
+                            <div>
+                                <span>Comissão</span>
+                                <strong>@vendedor.PercentualComissao%</strong>
+                            </div>
+
+                            <div>
+                                <span>Telefone</span>
+                                <strong>@(string.IsNullOrWhiteSpace(vendedor.Telefone) ? "Não informado" : vendedor.Telefone)</strong>
+                            </div>
+
+                            <div>
+                                <span>Pix</span>
+                                <strong>@(string.IsNullOrWhiteSpace(vendedor.ChavePix) ? "Não informado" : vendedor.ChavePix)</strong>
+                            </div>
+
+                            <div>
+                                <span>Cadastrado em</span>
+                                <strong>@vendedor.DataCadastro.ToString("dd/MM/yyyy")</strong>
+                            </div>
+
+                            <div>
+                                <span>Link de indicação</span>
+                                <strong>/CadastroConta?vendedor=@vendedor.CodigoIndicacao</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="acoes-card-admin">
+
+                            <form method="post">
+
+                                <input type="hidden" name="id" value="@vendedor.Id" />
+
+                                @if (vendedor.Ativo)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="desativarVendedor"
+                                            class="btn-acao suspender"
+                                            onclick='return confirmarAcao(this, "desativar este vendedor?")'>
+                                        Desativar
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="ativarVendedor"
+                                            class="btn-acao aprovar"
+                                            onclick='return confirmarAcao(this, "ativar este vendedor?")'>
+                                        Ativar
+                                    </button>
+                                }
+
+                            </form>
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.Vendedores.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhum vendedor cadastrado ainda.
                     </div>
                 }
 
@@ -1721,6 +1990,34 @@
             box-shadow: 0 0 0 4px rgba(14,165,233,.10);
         }
 
+    .resumo-receita-linha {
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+        margin-top: 4px !important;
+    }
+
+    .tag.substituido {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .clube-card.destaque {
+        background: linear-gradient(135deg,#ecfeff,#eff6ff);
+        border-color: #7dd3fc;
+    }
+
+    .campo-vendedor {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .campo-vendedor label {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
     @@media(max-width: 1200px) {
 
         .cards-dashboard,
@@ -1732,6 +2029,42 @@
         .pagamento-box {
             grid-template-columns: repeat(2,1fr);
         }
+    }
+
+    .form-vendedor-admin {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+        .form-vendedor-admin input {
+            width: 100%;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 14px;
+            background: #f8fafc;
+            outline: none;
+        }
+
+            .form-vendedor-admin input:focus {
+                border-color: #0ea5e9;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+            }
+
+        .form-vendedor-admin button {
+            min-height: 48px;
+        }
+
+    @@media(max - width: 900px)
+
+    {
+        .form-vendedor-admin
+
+    {
+        grid-template-columns: 1fr;
+    }
+
     }
 
     @@media(max-width: 900px) {

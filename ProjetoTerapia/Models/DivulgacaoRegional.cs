@@ -35,5 +35,13 @@ namespace ProjetoTerapia.Models
         public DateTime? DataFim { get; set; }
 
         public string Status { get; set; } = "Pendente";
+
+        public string? MercadoPagoPreferenceId { get; set; }
+
+        public string? MercadoPagoPaymentId { get; set; }
+
+        public string? MercadoPagoStatus { get; set; }
+
+        public string? LinkPagamento { get; set; }
     }
 }

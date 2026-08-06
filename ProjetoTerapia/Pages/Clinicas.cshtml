@@ -48,25 +48,44 @@
             com cuidado, responsabilidade e acolhimento.
         </p>
 
-        <form method="get" class="busca-clinica">
+        <form method="get" class="busca-clinica busca-clinica-avancada">
 
             <input type="text"
                    name="busca"
                    value="@Model.Busca"
-                   placeholder="Buscar por profissional, especialidade, cidade ou região..." />
+                   placeholder="Buscar por nome, especialidade ou palavra-chave..." />
+
+            <input type="text"
+                   name="cidade"
+                   value="@Model.Cidade"
+                   placeholder="Cidade ou região..." />
 
             <select name="perfil">
                 <option value="">Todas as especialidades</option>
-                <option value="Ansiedade">Ansiedade</option>
-                <option value="Depressão">Depressão</option>
-                <option value="Autoestima">Autoestima</option>
-                <option value="Relacionamentos">Relacionamentos</option>
-                <option value="Terapia">Terapia</option>
+                <option value="Ansiedade" selected="@(Model.Perfil == "Ansiedade")">Ansiedade</option>
+                <option value="Depressão" selected="@(Model.Perfil == "Depressão")">Depressão</option>
+                <option value="Autoestima" selected="@(Model.Perfil == "Autoestima")">Autoestima</option>
+                <option value="Relacionamentos" selected="@(Model.Perfil == "Relacionamentos")">Relacionamentos</option>
+                <option value="Terapia" selected="@(Model.Perfil == "Terapia")">Terapia</option>
+                <option value="Burnout" selected="@(Model.Perfil == "Burnout")">Burnout</option>
+                <option value="Estresse" selected="@(Model.Perfil == "Estresse")">Estresse</option>
             </select>
 
+            <select name="atendimento">
+                <option value="">Online/Presencial</option>
+                <option value="Online" selected="@(Model.Atendimento == "Online")">Online</option>
+                <option value="Presencial" selected="@(Model.Atendimento == "Presencial")">Presencial</option>
+            </select>
+
+            
+
             <button type="submit">
-                Buscar profissionais
+                Buscar
             </button>
+
+            <a href="/Clinicas" class="btn-limpar-filtros">
+                Limpar
+            </a>
 
         </form>
 
@@ -470,13 +489,14 @@
     .busca-clinica {
         margin: 36px auto 0;
         display: grid;
-        grid-template-columns: 1.4fr .8fr auto;
-        gap: 14px;
+        grid-template-columns: 1.3fr 1fr 1fr .8fr auto auto;
+        gap: 12px;
         background: white;
         padding: 16px;
         border-radius: 24px;
         box-shadow: 0 20px 55px rgba(15,23,42,.08);
         border: 1px solid #e2e8f0;
+        align-items: stretch;
     }
 
         .busca-clinica input,
@@ -514,6 +534,26 @@
                 transform: translateY(-2px);
                 box-shadow: 0 14px 28px rgba(14,165,233,.20);
             }
+
+    .btn-limpar-filtros {
+        border-radius: 16px;
+        padding: 0 20px;
+        background: #f8fafc;
+        color: #0ea5e9;
+        border: 1px solid #dbeafe;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        transition: .25s;
+    }
+
+        .btn-limpar-filtros:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 14px 28px rgba(15,23,42,.08);
+        }
 
     /* =========================================================
            RESULTADO

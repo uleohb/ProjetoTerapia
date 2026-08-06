@@ -1,21 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProjetoTerapia.Pages
 {
     public class SolicitarDivulgacaoModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
 
-        public SolicitarDivulgacaoModel(AppDbContext context)
+        public SolicitarDivulgacaoModel(
+            AppDbContext context,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration config)
         {
             _context = context;
+            _httpClientFactory = httpClientFactory;
+            _config = config;
         }
 
         public Clinica? Clinica { get; set; }
@@ -63,7 +70,6 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnGet()
         {
-
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
             if (id == null)
@@ -88,7 +94,7 @@ namespace ProjetoTerapia.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             var id = HttpContext.Session.GetString("ClinicaLogada");
 
@@ -152,13 +158,30 @@ namespace ProjetoTerapia.Pages
                 Aprovado = false,
                 Ativo = false,
                 DataSolicitacao = DateTime.Now,
-                Status = "Aguardando pagamento"
+                Status = "Aguardando pagamento",
+                MercadoPagoStatus = "pending"
             };
 
             _context.DivulgacoesRegionais.Add(divulgacao);
             _context.SaveChanges();
 
-            TempData["Sucesso"] = "Solicitação enviada com sucesso. Aguarde a confirmação da administração.";
+            try
+            {
+                await GerarPreferenciaMercadoPago(divulgacao);
+
+                _context.SaveChanges();
+
+                if (!string.IsNullOrWhiteSpace(divulgacao.LinkPagamento))
+                {
+                    return Redirect(divulgacao.LinkPagamento);
+                }
+
+                TempData["Sucesso"] = "Solicitação criada. O link de pagamento ficará disponível em instantes.";
+            }
+            catch
+            {
+                TempData["Erro"] = "Solicitação criada, mas não foi possível gerar o pagamento agora. Tente novamente em instantes ou fale com o suporte.";
+            }
 
             return RedirectToPage("/SolicitarDivulgacao");
         }
@@ -174,6 +197,100 @@ namespace ProjetoTerapia.Pages
         public bool CidadeSelecionada(string cidade)
         {
             return CidadesEscolhidas.Any(c => TextosIguais(c, cidade));
+        }
+
+        private async Task GerarPreferenciaMercadoPago(DivulgacaoRegional divulgacao)
+        {
+            var accessToken = _config["MercadoPago:AccessToken"];
+
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                throw new Exception("Access token do Mercado Pago não configurado.");
+            }
+
+            var baseUrl = _config["App:BaseUrl"];
+
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                baseUrl = $"{Request.Scheme}://{Request.Host}";
+            }
+
+            var notificationUrl = _config["MercadoPago:NotificationUrl"];
+
+            var preference = new Dictionary<string, object>
+            {
+                ["items"] = new[]
+                {
+                    new
+                    {
+                        id = $"divulgacao-{divulgacao.Id}",
+                        title = $"AlinhaMente - {divulgacao.NomePlano}",
+                        description = $"Divulgação regional: {divulgacao.CidadesSelecionadas}",
+                        quantity = 1,
+                        currency_id = "BRL",
+                        unit_price = divulgacao.Valor
+                    }
+                },
+                ["statement_descriptor"] = "ALINHAMENTE",
+                ["external_reference"] = $"DIVULGACAO-{divulgacao.Id}",
+                ["back_urls"] = new
+                {
+                    success = $"{baseUrl}/SolicitarDivulgacao?pagamento=sucesso",
+                    pending = $"{baseUrl}/SolicitarDivulgacao?pagamento=pendente",
+                    failure = $"{baseUrl}/SolicitarDivulgacao?pagamento=falha"
+                },
+                ["auto_return"] = "approved"
+            };
+
+            if (!string.IsNullOrWhiteSpace(notificationUrl))
+            {
+                preference["notification_url"] = notificationUrl;
+            }
+
+            var json = JsonSerializer.Serialize(preference);
+
+            var client = _httpClientFactory.CreateClient();
+
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://api.mercadopago.com/checkout/preferences"
+            );
+
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", accessToken);
+
+            request.Content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            using var response = await client.SendAsync(request);
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Erro ao criar preferência Mercado Pago: " + responseJson);
+            }
+
+            var preferenceResponse = JsonSerializer.Deserialize<MercadoPagoPreferenceResponse>(
+                responseJson
+            );
+
+            if (preferenceResponse == null ||
+                string.IsNullOrWhiteSpace(preferenceResponse.Id))
+            {
+                throw new Exception("Resposta inválida do Mercado Pago.");
+            }
+
+            divulgacao.MercadoPagoPreferenceId = preferenceResponse.Id;
+            divulgacao.LinkPagamento =
+                preferenceResponse.InitPoint ??
+                preferenceResponse.SandboxInitPoint;
+
+            divulgacao.Status = "Aguardando pagamento";
+            divulgacao.MercadoPagoStatus = "pending";
         }
 
         private List<string> LimparCidadesSelecionadas()
@@ -217,6 +334,7 @@ namespace ProjetoTerapia.Pages
                 var expirou = !item.Pago &&
                               !item.Aprovado &&
                               item.Status != "Cancelado" &&
+                              item.Status != "Expirado" &&
                               item.DataSolicitacao.AddHours(72) < DateTime.Now;
 
                 if (expirou)
@@ -264,6 +382,18 @@ namespace ProjetoTerapia.Pages
                 .ToArray();
 
             return new string(caracteres).Normalize(NormalizationForm.FormC);
+        }
+
+        private class MercadoPagoPreferenceResponse
+        {
+            [JsonPropertyName("id")]
+            public string? Id { get; set; }
+
+            [JsonPropertyName("init_point")]
+            public string? InitPoint { get; set; }
+
+            [JsonPropertyName("sandbox_init_point")]
+            public string? SandboxInitPoint { get; set; }
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoTerapia.Models;
 
@@ -11,9 +12,11 @@ using ProjetoTerapia.Models;
 namespace ProjetoTerapia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260729200717_CriandoAlteracaoClinica")]
+    partial class CriandoAlteracaoClinica
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,9 +267,6 @@ namespace ProjetoTerapia.Migrations
                     b.Property<int>("CliquesWhatsapp")
                         .HasColumnType("int");
 
-                    b.Property<string>("CodigoVendedorIndicacao")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("DataAprovacao")
                         .HasColumnType("datetime2");
 
@@ -333,15 +333,10 @@ namespace ProjetoTerapia.Migrations
                     b.Property<decimal?>("ValorPlano")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("VendedorId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Visualizacoes")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("VendedorId");
 
                     b.ToTable("Clinicas");
                 });
@@ -441,18 +436,6 @@ namespace ProjetoTerapia.Migrations
 
                     b.Property<DateTime>("DataSolicitacao")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("LinkPagamento")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MercadoPagoPaymentId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MercadoPagoPreferenceId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MercadoPagoStatus")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NomePlano")
                         .IsRequired()
@@ -615,120 +598,6 @@ namespace ProjetoTerapia.Migrations
                     b.ToTable("ResultadosTestePacientes");
                 });
 
-            modelBuilder.Entity("ProjetoTerapia.Models.VendaVendedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ClinicaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodigoIndicacao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("ComissaoPaga")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ComprovanteNotaFiscal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DataConfirmacaoVenda")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DataPagamentoComissao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailClinica")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NomeClinica")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ObservacaoAdmin")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PercentualComissao")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ValorComissao")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ValorVenda")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("VendaConfirmada")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("VendedorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClinicaId");
-
-                    b.HasIndex("VendedorId");
-
-                    b.ToTable("VendasVendedores");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Vendedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ChavePix")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodigoIndicacao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PercentualComissao")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("SenhaHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Vendedores");
-                });
-
             modelBuilder.Entity("RecuperacaoSenha", b =>
                 {
                     b.Property<int>("Id")
@@ -780,15 +649,6 @@ namespace ProjetoTerapia.Migrations
                         .IsRequired();
 
                     b.Navigation("Clinica");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
-                {
-                    b.HasOne("ProjetoTerapia.Models.Vendedor", "Vendedor")
-                        .WithMany()
-                        .HasForeignKey("VendedorId");
-
-                    b.Navigation("Vendedor");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Consulta", b =>
@@ -867,23 +727,6 @@ namespace ProjetoTerapia.Migrations
                     b.Navigation("Paciente");
                 });
 
-            modelBuilder.Entity("ProjetoTerapia.Models.VendaVendedor", b =>
-                {
-                    b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
-                        .WithMany()
-                        .HasForeignKey("ClinicaId");
-
-                    b.HasOne("ProjetoTerapia.Models.Vendedor", "Vendedor")
-                        .WithMany("Vendas")
-                        .HasForeignKey("VendedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Clinica");
-
-                    b.Navigation("Vendedor");
-                });
-
             modelBuilder.Entity("RecuperacaoSenha", b =>
                 {
                     b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
@@ -898,11 +741,6 @@ namespace ProjetoTerapia.Migrations
             modelBuilder.Entity("ProjetoTerapia.Models.Paciente", b =>
                 {
                     b.Navigation("RegistrosHumor");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Vendedor", b =>
-                {
-                    b.Navigation("Vendas");
                 });
 #pragma warning restore 612, 618
         }

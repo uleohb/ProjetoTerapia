@@ -7,7 +7,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-
 namespace ProjetoTerapia.Pages
 {
     public class CadastroContaModel : PageModel
@@ -28,24 +27,40 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public string ConfirmarSenha { get; set; } = "";
 
+        [BindProperty]
+        public string CodigoVendedor { get; set; } = "";
+
+        public string NomeVendedorAtual { get; set; } = "";
+
+        public IActionResult OnGet(string? vendedor)
+        {
+            CapturarCodigoVendedor(vendedor);
+            CarregarVendedorAtual();
+
+            return Page();
+        }
+
         public IActionResult OnPost()
         {
+            CapturarCodigoVendedor(CodigoVendedor);
+
             if (Senha != ConfirmarSenha)
             {
                 ModelState.AddModelError("", "As senhas não coincidem.");
+                CarregarVendedorAtual();
                 return Page();
             }
 
+            var emailNormalizado = Email.Trim().ToLower();
 
-            if (_context.Clinicas.Any(c => c.Email == Email))
+            if (_context.Clinicas.Any(c => c.Email.ToLower() == emailNormalizado))
             {
                 ModelState.AddModelError("", "Email já cadastrado.");
+                CarregarVendedorAtual();
                 return Page();
             }
 
-
             var salt = RandomNumberGenerator.GetBytes(128 / 8);
-
 
             var hash = Convert.ToBase64String(
                 KeyDerivation.Pbkdf2(
@@ -57,29 +72,28 @@ namespace ProjetoTerapia.Pages
                 )
             );
 
+            var vendedorIndicacao = BuscarVendedorDaSessao();
 
             var clinica = new Clinica
             {
-                Email = Email,
-
+                Email = emailNormalizado,
                 SenhaHash = Convert.ToBase64String(salt) + "." + hash,
-
                 Aprovado = false,
+                Pago = false,
+                PerfilCompleto = false,
+                ClinicaAlteracaoPendente = false,
 
-                Pago = false
+                VendedorId = vendedorIndicacao?.Id,
+                CodigoVendedorIndicacao = vendedorIndicacao?.CodigoIndicacao
             };
-
 
             _context.Clinicas.Add(clinica);
             _context.SaveChanges();
 
-
-            // cria login da clínica
             HttpContext.Session.SetString(
                 "ClinicaLogada",
                 clinica.Id.ToString()
             );
-
 
             return RedirectToPage("/PainelClinica");
         }
@@ -92,6 +106,66 @@ namespace ProjetoTerapia.Pages
             };
 
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        private void CapturarCodigoVendedor(string? codigo)
+        {
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                return;
+            }
+
+            var codigoNormalizado = codigo.Trim().ToUpper();
+
+            var vendedor = _context.Vendedores
+                .FirstOrDefault(v =>
+                    v.CodigoIndicacao == codigoNormalizado &&
+                    v.Ativo
+                );
+
+            if (vendedor == null)
+            {
+                return;
+            }
+
+            HttpContext.Session.SetString(
+                "CodigoVendedorIndicacao",
+                vendedor.CodigoIndicacao
+            );
+
+            CodigoVendedor = vendedor.CodigoIndicacao;
+            NomeVendedorAtual = vendedor.Nome;
+        }
+
+        private Vendedor? BuscarVendedorDaSessao()
+        {
+            var codigo = HttpContext.Session.GetString("CodigoVendedorIndicacao");
+
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                return null;
+            }
+
+            return _context.Vendedores
+                .FirstOrDefault(v =>
+                    v.CodigoIndicacao == codigo &&
+                    v.Ativo
+                );
+        }
+
+        private void CarregarVendedorAtual()
+        {
+            var vendedor = BuscarVendedorDaSessao();
+
+            if (vendedor == null)
+            {
+                CodigoVendedor = "";
+                NomeVendedorAtual = "";
+                return;
+            }
+
+            CodigoVendedor = vendedor.CodigoIndicacao;
+            NomeVendedorAtual = vendedor.Nome;
         }
     }
 }

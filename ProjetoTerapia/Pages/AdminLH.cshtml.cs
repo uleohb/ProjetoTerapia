@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using ProjetoTerapia.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+
 
 namespace ProjetoTerapia.Pages
 {
@@ -47,6 +50,16 @@ namespace ProjetoTerapia.Pages
 
         public string ReceitaPrevistaFormatada { get; set; } = "R$ 0,00";
 
+        public decimal ReceitaPlanosPrincipais { get; set; }
+
+        public decimal ReceitaDivulgacaoRegional { get; set; }
+
+        public string ReceitaPlanosPrincipaisFormatada { get; set; } = "R$ 0,00";
+
+        public string ReceitaDivulgacaoRegionalFormatada { get; set; } = "R$ 0,00";
+
+        public int DivulgacoesAtivas { get; set; }
+
         [BindProperty(SupportsGet = true)]
         public string Busca { get; set; } = "";
 
@@ -55,6 +68,26 @@ namespace ProjetoTerapia.Pages
         public List<DivulgacaoRegional> DivulgacoesRegionais { get; set; } = new();
         public int DivulgacoesPendentes { get; set; }
         public List<AdminLog> AdminLogs { get; set; } = new();
+        public List<Vendedor> Vendedores { get; set; } = new();
+        public List<VendaVendedor> VendasVendedores { get; set; } = new();
+
+        [BindProperty]
+        public string NovoVendedorNome { get; set; } = "";
+
+        [BindProperty]
+        public string NovoVendedorEmail { get; set; } = "";
+
+        [BindProperty]
+        public string NovoVendedorTelefone { get; set; } = "";
+
+        [BindProperty]
+        public string NovoVendedorSenha { get; set; } = "";
+
+        [BindProperty]
+        public decimal NovoVendedorComissao { get; set; } = 20;
+
+        [BindProperty]
+        public string NovoVendedorPix { get; set; } = "";
 
         public IActionResult OnGet()
         {
@@ -74,6 +107,95 @@ namespace ProjetoTerapia.Pages
             }
 
             AtualizarDivulgacoesExpiradas();
+
+            if (acao == "cadastrarVendedor")
+            {
+                if (string.IsNullOrWhiteSpace(NovoVendedorNome) ||
+                    string.IsNullOrWhiteSpace(NovoVendedorEmail) ||
+                    string.IsNullOrWhiteSpace(NovoVendedorSenha))
+                {
+                    TempData["MensagemErro"] = "Preencha nome, email e senha do vendedor.";
+                    return RedirectToPage(new { aba = "vendedores" });
+                }
+
+                var emailNormalizado = NovoVendedorEmail.Trim().ToLower();
+
+                var vendedorExiste = _context.Vendedores
+                    .Any(v => v.Email.ToLower() == emailNormalizado);
+
+                if (vendedorExiste)
+                {
+                    TempData["MensagemErro"] = "Já existe um vendedor cadastrado com este email.";
+                    return RedirectToPage(new { aba = "vendedores" });
+                }
+
+                var vendedor = new Vendedor
+                {
+                    Nome = NovoVendedorNome.Trim(),
+                    Email = emailNormalizado,
+                    Telefone = NovoVendedorTelefone?.Trim() ?? "",
+                    CodigoIndicacao = GerarCodigoIndicacao(NovoVendedorNome),
+                    PercentualComissao = NovoVendedorComissao <= 0 ? 20 : NovoVendedorComissao,
+                    ChavePix = NovoVendedorPix?.Trim(),
+                    Ativo = true,
+                    DataCadastro = DateTime.Now
+                };
+
+                var passwordHasher = new PasswordHasher<Vendedor>();
+                vendedor.SenhaHash = passwordHasher.HashPassword(vendedor, NovoVendedorSenha);
+
+                _context.Vendedores.Add(vendedor);
+
+                RegistrarLog(
+                    "Cadastro de vendedor",
+                    $"{HttpContext.Session.GetString("AdminNome")} cadastrou o vendedor {vendedor.Nome} com o código {vendedor.CodigoIndicacao}."
+                );
+
+                _context.SaveChanges();
+
+                TempData["MensagemSucesso"] = "Vendedor cadastrado com sucesso.";
+
+                return RedirectToPage(new { aba = "vendedores" });
+            }
+
+            if (acao == "ativarVendedor" || acao == "desativarVendedor")
+            {
+                var vendedor = _context.Vendedores.FirstOrDefault(v => v.Id == id);
+
+                if (vendedor == null)
+                {
+                    TempData["MensagemErro"] = "Vendedor não encontrado.";
+                    return RedirectToPage(new { aba = "vendedores" });
+                }
+
+                if (acao == "ativarVendedor")
+                {
+                    vendedor.Ativo = true;
+
+                    RegistrarLog(
+                        "Ativação de vendedor",
+                        $"{HttpContext.Session.GetString("AdminNome")} ativou o vendedor {vendedor.Nome}."
+                    );
+
+                    TempData["MensagemSucesso"] = "Vendedor ativado com sucesso.";
+                }
+
+                if (acao == "desativarVendedor")
+                {
+                    vendedor.Ativo = false;
+
+                    RegistrarLog(
+                        "Desativação de vendedor",
+                        $"{HttpContext.Session.GetString("AdminNome")} desativou o vendedor {vendedor.Nome}."
+                    );
+
+                    TempData["MensagemSucesso"] = "Vendedor desativado.";
+                }
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "vendedores" });
+            }
 
             if (acao == "aprovarAlteracao" || acao == "recusarAlteracao")
             {
@@ -98,7 +220,6 @@ namespace ProjetoTerapia.Pages
                 if (acao == "aprovarAlteracao")
                 {
                     clinicaAlterada.Nome = alteracao.Nome;
-                    clinicaAlterada.Email = alteracao.Email;
                     clinicaAlterada.Telefone = alteracao.Telefone;
                     clinicaAlterada.CEP = alteracao.CEP;
                     clinicaAlterada.Cidade = alteracao.Cidade;
@@ -163,9 +284,9 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage(new { aba = "alteracoes" });
             }
 
-            if (acao == "confirmarPagamentoDivulgacao" ||
-              acao == "aprovarDivulgacao" ||
-              acao == "cancelarDivulgacao")
+            if (acao == "ativarDivulgacao" ||
+                acao == "cancelarDivulgacao" ||
+                acao == "excluirDivulgacao")
             {
                 var divulgacao = _context.DivulgacoesRegionais
                     .Include(d => d.Clinica)
@@ -173,59 +294,44 @@ namespace ProjetoTerapia.Pages
 
                 if (divulgacao == null)
                 {
-                    TempData["MensagemErro"] = "Solicitação de divulgação não encontrada.";
+                    TempData["MensagemErro"] = "Divulgação regional não encontrada.";
                     return RedirectToPage(new { aba = "divulgacao" });
                 }
 
-                if (acao == "confirmarPagamentoDivulgacao")
+                if (acao == "ativarDivulgacao")
                 {
-                    if (divulgacao.Status == "Expirado")
-                    {
-                        TempData["MensagemErro"] = "Esta solicitação expirou. O profissional precisa criar uma nova solicitação.";
-                        return RedirectToPage(new { aba = "divulgacao" });
-                    }
-
-                    divulgacao.Pago = true;
-                    divulgacao.DataPagamento = DateTime.Now;
-                    divulgacao.Status = "Pagamento confirmado";
-
-                    RegistrarLog(
-                     "Confirmação de pagamento de divulgação",
-                     $"{HttpContext.Session.GetString("AdminNome")} confirmou o pagamento " +
-                     $"da divulgação regional de {divulgacao.Clinica?.Nome} no plano {divulgacao.NomePlano}."
-                    );
-
-                    TempData["MensagemSucesso"] = "Pagamento da divulgação confirmado.";
-                }
-
-                if (acao == "aprovarDivulgacao")
-                {
-                    if (divulgacao.Status == "Expirado")
-                    {
-                        TempData["MensagemErro"] = "Esta solicitação expirou e não pode mais ser aprovada.";
-                        return RedirectToPage(new { aba = "divulgacao" });
-                    }
-
                     if (!divulgacao.Pago)
                     {
-                        TempData["MensagemErro"] = "Confirme o pagamento antes de aprovar a divulgação.";
+                        TempData["MensagemErro"] = "Esta divulgação ainda não possui pagamento confirmado.";
                         return RedirectToPage(new { aba = "divulgacao" });
+                    }
+
+                    var divulgacoesAntigas = _context.DivulgacoesRegionais
+                        .Where(d =>
+                            d.ClinicaId == divulgacao.ClinicaId &&
+                            d.Id != divulgacao.Id &&
+                            d.Ativo)
+                        .ToList();
+
+                    foreach (var antiga in divulgacoesAntigas)
+                    {
+                        antiga.Ativo = false;
+                        antiga.Status = "Substituído";
                     }
 
                     divulgacao.Aprovado = true;
                     divulgacao.Ativo = true;
+                    divulgacao.Status = "Ativo";
                     divulgacao.DataAprovacao = DateTime.Now;
                     divulgacao.DataInicio = DateTime.Now;
                     divulgacao.DataFim = DateTime.Now.AddMonths(1);
-                    divulgacao.Status = "Ativo";
 
                     RegistrarLog(
-                     "Aprovação de divulgação regional",
-                     $"{HttpContext.Session.GetString("AdminNome")} aprovou a " +
-                     $"divulgação regional de {divulgacao.Clinica?.Nome}. Cidades: {divulgacao.CidadesSelecionadas}."
+                        "Ativação de divulgação regional",
+                        $"{HttpContext.Session.GetString("AdminNome")} ativou a divulgação regional de {divulgacao.Clinica?.Nome}. Cidades: {divulgacao.CidadesSelecionadas}."
                     );
 
-                    TempData["MensagemSucesso"] = "Divulgação regional aprovada e ativada.";
+                    TempData["MensagemSucesso"] = "Divulgação regional ativada com sucesso.";
                 }
 
                 if (acao == "cancelarDivulgacao")
@@ -234,11 +340,24 @@ namespace ProjetoTerapia.Pages
                     divulgacao.Status = "Cancelado";
 
                     RegistrarLog(
-                     "Cancelamento de divulgação regional",
-                     $"{HttpContext.Session.GetString("AdminNome")} cancelou a divulgação regional de {divulgacao.Clinica?.Nome}."
+                        "Cancelamento de divulgação regional",
+                        $"{HttpContext.Session.GetString("AdminNome")} cancelou a divulgação regional de {divulgacao.Clinica?.Nome}."
                     );
 
                     TempData["MensagemSucesso"] = "Divulgação regional cancelada.";
+                }
+
+                if (acao == "excluirDivulgacao")
+                {
+                    divulgacao.Ativo = false;
+                    divulgacao.Status = "Excluído";
+
+                    RegistrarLog(
+                        "Exclusão de registro de divulgação regional",
+                        $"{HttpContext.Session.GetString("AdminNome")} ocultou o registro de divulgação regional de {divulgacao.Clinica?.Nome}."
+                    );
+
+                    TempData["MensagemSucesso"] = "Registro de divulgação removido da listagem.";
                 }
 
                 _context.SaveChanges();
@@ -261,8 +380,8 @@ namespace ProjetoTerapia.Pages
                 clinica.DataAprovacao = DateTime.Now;
 
                 RegistrarLog(
-                 "Aprovação de profissional",
-                 $"{HttpContext.Session.GetString("AdminNome")} aprovou o cadastro do profissional {clinica.Nome}."
+                    "Aprovação de profissional",
+                    $"{HttpContext.Session.GetString("AdminNome")} aprovou o cadastro do profissional {clinica.Nome}."
                 );
 
                 TempData["MensagemSucesso"] =
@@ -285,13 +404,54 @@ namespace ProjetoTerapia.Pages
 
                 clinica.Pago = true;
                 clinica.NomePlano = "Plano Profissional Anual";
-                clinica.ValorPlano = 360;
+                clinica.ValorPlano = 450;
                 clinica.DataPagamento = DateTime.Now;
                 clinica.DataVencimento = DateTime.Now.AddYears(1);
 
+                if (clinica.VendedorId.HasValue)
+                {
+                    var vendaJaExiste = _context.VendasVendedores
+                        .Any(v => v.ClinicaId == clinica.Id && v.VendaConfirmada);
+
+                    if (!vendaJaExiste)
+                    {
+                        var vendedor = _context.Vendedores
+                            .FirstOrDefault(v => v.Id == clinica.VendedorId.Value && v.Ativo);
+
+                        if (vendedor != null)
+                        {
+                            var valorVenda = clinica.ValorPlano ?? 450;
+                            var percentualComissao = vendedor.PercentualComissao;
+                            var valorComissao = valorVenda * percentualComissao / 100;
+
+                            _context.VendasVendedores.Add(new VendaVendedor
+                            {
+                                VendedorId = vendedor.Id,
+                                ClinicaId = clinica.Id,
+                                CodigoIndicacao = vendedor.CodigoIndicacao,
+                                NomeClinica = clinica.Nome,
+                                EmailClinica = clinica.Email,
+                                ValorVenda = valorVenda,
+                                PercentualComissao = percentualComissao,
+                                ValorComissao = valorComissao,
+                                VendaConfirmada = true,
+                                ComissaoPaga = false,
+                                Status = "Venda confirmada - aguardando nota",
+                                DataCadastro = DateTime.Now,
+                                DataConfirmacaoVenda = DateTime.Now
+                            });
+
+                            RegistrarLog(
+                                "Venda vinculada ao vendedor",
+                                $"{HttpContext.Session.GetString("AdminNome")} confirmou venda de {clinica.Nome} para o vendedor {vendedor.Nome}. Comissão: {valorComissao.ToString("C", new System.Globalization.CultureInfo("pt-BR"))}."
+                            );
+                        }
+                    }
+                }
+
                 RegistrarLog(
-                 "Confirmação de pagamento",
-                 $"{HttpContext.Session.GetString("AdminNome")} confirmou o pagamento do plano profissional de {clinica.Nome}."
+                    "Confirmação de pagamento",
+                    $"{HttpContext.Session.GetString("AdminNome")} confirmou o pagamento do plano profissional de {clinica.Nome}."
                 );
 
                 TempData["MensagemSucesso"] =
@@ -307,8 +467,8 @@ namespace ProjetoTerapia.Pages
                 clinica.Pago = false;
 
                 RegistrarLog(
-                 "Suspensão de plano",
-                 $"{HttpContext.Session.GetString("AdminNome")} suspendeu o plano do profissional {clinica.Nome}."
+                    "Suspensão de plano",
+                    $"{HttpContext.Session.GetString("AdminNome")} suspendeu o plano do profissional {clinica.Nome}."
                 );
 
                 TempData["MensagemSucesso"] =
@@ -324,8 +484,8 @@ namespace ProjetoTerapia.Pages
                 try
                 {
                     RegistrarLog(
-                     "Exclusão de profissional",
-                     $"{HttpContext.Session.GetString("AdminNome")} excluiu o profissional {clinica.Nome}."
+                        "Exclusão de profissional",
+                        $"{HttpContext.Session.GetString("AdminNome")} excluiu o profissional {clinica.Nome}."
                     );
 
                     _context.Clinicas.Remove(clinica);
@@ -346,6 +506,38 @@ namespace ProjetoTerapia.Pages
             TempData["MensagemErro"] = "Ação inválida.";
 
             return RedirectToPage(new { aba = "clinicas" });
+        }
+
+        public IActionResult OnPostExcluirDivulgacao(int id)
+        {
+            if (!AdminEstaLogado())
+            {
+                return RedirectToPage("/LoginAdmin");
+            }
+
+            var divulgacao = _context.DivulgacoesRegionais
+                .Include(d => d.Clinica)
+                .FirstOrDefault(d => d.Id == id);
+
+            if (divulgacao == null)
+            {
+                TempData["MensagemErro"] = "Registro de divulgação não encontrado.";
+                return RedirectToPage(new { aba = "divulgacao" });
+            }
+
+            divulgacao.Ativo = false;
+            divulgacao.Status = "Excluído";
+
+            RegistrarLog(
+                "Exclusão de registro de divulgação regional",
+                $"{HttpContext.Session.GetString("AdminNome")} removeu da listagem a divulgação regional de {divulgacao.Clinica?.Nome}."
+            );
+
+            _context.SaveChanges();
+
+            TempData["MensagemSucesso"] = "Registro de divulgação removido da listagem.";
+
+            return RedirectToPage(new { aba = "divulgacao" });
         }
 
         public IActionResult OnPostLogout()
@@ -381,7 +573,10 @@ namespace ProjetoTerapia.Pages
 
             DivulgacoesRegionais = _context.DivulgacoesRegionais
              .Include(d => d.Clinica)
-             .OrderByDescending(d => d.DataSolicitacao)
+             .Where(d => d.Status != "Excluído")
+             .OrderByDescending(d => d.Ativo)
+             .ThenByDescending(d => d.Pago)
+             .ThenByDescending(d => d.DataSolicitacao)
              .ToList();
 
             AdminLogs = _context.AdminLogs
@@ -389,12 +584,23 @@ namespace ProjetoTerapia.Pages
              .Take(100)
              .ToList();
 
+            Vendedores = _context.Vendedores
+             .OrderByDescending(v => v.Ativo)
+             .ThenBy(v => v.Nome)
+             .ToList();
+
+            VendasVendedores = _context.VendasVendedores
+                .Include(v => v.Vendedor)
+                .Include(v => v.Clinica)
+                .OrderByDescending(v => v.DataCadastro)
+                .Take(100)
+                .ToList();
+
             DivulgacoesPendentes = DivulgacoesRegionais
-             .Count(d =>
-              d.Status != "Expirado" &&
-              d.Status != "Cancelado" &&
-              (!d.Aprovado || !d.Pago)
-             );
+                .Count(d => !d.Pago && d.Status == "Aguardando pagamento");
+
+            DivulgacoesAtivas = DivulgacoesRegionais
+                .Count(d => d.Pago && d.Aprovado && d.Ativo);
 
             ClinicasComAlteracao = AlteracoesClinicasPendentes
              .Where(a => a.Clinica != null)
@@ -412,9 +618,24 @@ namespace ProjetoTerapia.Pages
             TotalVisualizacoes = todasClinicas.Sum(c => c.Visualizacoes);
             TotalCliquesWhatsapp = todasClinicas.Sum(c => c.CliquesWhatsapp);
 
-            ReceitaPrevista = todasClinicas
-                .Where(c => c.Pago)
-                .Sum(c => c.ValorPlano ?? 360);
+            ReceitaPlanosPrincipais = todasClinicas
+              .Where(c => c.Pago)
+              .Sum(c => c.ValorPlano ?? 450);
+
+            ReceitaDivulgacaoRegional = DivulgacoesRegionais
+                .Where(d =>
+                    d.Pago &&
+                    d.Status != "Pagamento estornado" &&
+                    d.Status != "Pagamento recusado")
+                .Sum(d => d.Valor);
+
+            ReceitaPrevista = ReceitaPlanosPrincipais + ReceitaDivulgacaoRegional;
+
+            ReceitaPlanosPrincipaisFormatada =
+                ReceitaPlanosPrincipais.ToString("C", new CultureInfo("pt-BR"));
+
+            ReceitaDivulgacaoRegionalFormatada =
+                ReceitaDivulgacaoRegional.ToString("C", new CultureInfo("pt-BR"));
 
             ReceitaPrevistaFormatada =
                 ReceitaPrevista.ToString("C", new CultureInfo("pt-BR"));
@@ -471,17 +692,19 @@ namespace ProjetoTerapia.Pages
 
         private void AtualizarDivulgacoesExpiradas()
         {
-            var divulgacoesPendentes = _context.DivulgacoesRegionais
-                .Where(d =>
-                    !d.Pago &&
-                    !d.Aprovado &&
-                    d.Status != "Cancelado" &&
-                    d.Status != "Expirado")
-                .ToList();
-
             var houveAlteracao = false;
 
-            foreach (var divulgacao in divulgacoesPendentes)
+            var divulgacoesSemPagamento = _context.DivulgacoesRegionais
+               .Where(d =>
+                !d.Pago &&
+                !d.Aprovado &&
+                 d.Status != "Cancelado" &&
+                 d.Status != "Expirado" &&
+                 d.Status != "Excluído" &&
+                 d.Status != "Substituído")
+               .ToList();
+
+            foreach (var divulgacao in divulgacoesSemPagamento)
             {
                 var prazoExpirado = divulgacao.DataSolicitacao.AddHours(72) < DateTime.Now;
 
@@ -491,6 +714,20 @@ namespace ProjetoTerapia.Pages
                     divulgacao.Ativo = false;
                     houveAlteracao = true;
                 }
+            }
+
+            var divulgacoesAtivasVencidas = _context.DivulgacoesRegionais
+                .Where(d =>
+                    d.Ativo &&
+                    d.DataFim.HasValue &&
+                    d.DataFim.Value.Date < DateTime.Today)
+                .ToList();
+
+            foreach (var divulgacao in divulgacoesAtivasVencidas)
+            {
+                divulgacao.Ativo = false;
+                divulgacao.Status = "Expirado";
+                houveAlteracao = true;
             }
 
             if (houveAlteracao)
@@ -520,6 +757,19 @@ namespace ProjetoTerapia.Pages
                 Descricao = descricao,
                 DataAcao = DateTime.Now
             });
+        }
+
+        private string GerarCodigoIndicacao(string nome)
+        {
+            string codigo;
+
+            do
+            {
+                codigo = "VEN" + RandomNumberGenerator.GetInt32(100000, 999999);
+            }
+            while (_context.Vendedores.Any(v => v.CodigoIndicacao == codigo));
+
+            return codigo;
         }
 
     }

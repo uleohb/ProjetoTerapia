@@ -13,6 +13,8 @@ namespace ProjetoTerapia.Models
         public DbSet<Agendamento> Agendamentos { get; set; }
         public DbSet<Consulta> Consultas { get; set; }
         public DbSet<DivulgacaoRegional> DivulgacoesRegionais { get; set; }
+        public DbSet<Vendedor> Vendedores { get; set; }
+        public DbSet<VendaVendedor> VendasVendedores { get; set; }
         public DbSet<AdminUsuario> AdminUsuarios { get; set; }
         public DbSet<AdminLog> AdminLogs { get; set; }
         public DbSet<AlteracaoClinica> AlteracoesClinicas { get; set; }

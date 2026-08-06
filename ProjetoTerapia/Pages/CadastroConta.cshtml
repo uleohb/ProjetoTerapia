@@ -127,6 +127,15 @@
                     Criar conta
                 </button>
 
+                <input type="hidden" asp-for="CodigoVendedor" />
+
+                @if (!string.IsNullOrWhiteSpace(Model.NomeVendedorAtual))
+                {
+                    <div class="alerta-vendedor">
+                        Indicação vinculada ao vendedor: <strong>@Model.NomeVendedorAtual</strong>
+                    </div>
+                }
+
             </form>
 
             <p class="link-login">
@@ -364,6 +373,16 @@
             background: linear-gradient( 90deg, rgba(15,23,42,0.05), rgba(15,23,42,0.20) );
             z-index: 1;
         }
+
+    .alerta-vendedor {
+        background: #ecfeff;
+        border: 1px solid #bae6fd;
+        color: #0369a1;
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
 
 @@keyframes float {
 

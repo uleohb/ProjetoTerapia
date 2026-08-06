@@ -73,6 +73,12 @@ namespace ProjetoTerapia.Models
 
         public int CliquesWhatsapp { get; set; }
 
-        public string? FotoPerfil { get; set; } 
+        public string? FotoPerfil { get; set; }
+
+        public int? VendedorId { get; set; }
+
+        public Vendedor? Vendedor { get; set; }
+
+        public string? CodigoVendedorIndicacao { get; set; }
     }
 }

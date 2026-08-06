@@ -23,6 +23,15 @@ namespace ProjetoTerapia.Pages
         [BindProperty(SupportsGet = true)]
         public string Perfil { get; set; } = "";
 
+        [BindProperty(SupportsGet = true)]
+        public string Cidade { get; set; } = "";
+
+        [BindProperty(SupportsGet = true)]
+        public string Atendimento { get; set; } = "";
+
+        [BindProperty(SupportsGet = true)]
+        public string Ordenar { get; set; } = "";
+
         public bool PacienteLogado { get; set; }
 
         public void OnGet()
@@ -31,23 +40,10 @@ namespace ProjetoTerapia.Pages
                 HttpContext.Session.GetString("PacienteLogado")
             );
 
-            /*
-                Busca apenas profissionais aprovados e com plano ativo.
-                Ou seja: só aparece na vitrine quem foi aprovado e está pago.
-            */
             var clinicasAtivas = _context.Clinicas
                 .Where(c => c.Aprovado && c.Pago)
                 .ToList();
 
-            /*
-                Busca divulgações regionais realmente ativas.
-                A clínica só aparece em cidade extra se:
-                - a divulgação estiver ativa
-                - estiver aprovada
-                - estiver paga
-                - status for Ativo
-                - estiver dentro do período válido
-            */
             var divulgacoesAtivas = _context.DivulgacoesRegionais
                 .Where(d =>
                     d.Ativo &&
@@ -59,15 +55,6 @@ namespace ProjetoTerapia.Pages
                 )
                 .ToList();
 
-            /*
-                Busca geral:
-                - nome
-                - descrição
-                - endereço
-                - cidade principal
-                - especialidades
-                - cidades extras compradas no Clube de Descontos
-            */
             if (!string.IsNullOrWhiteSpace(Busca))
             {
                 var buscaNormalizada = Busca.Trim();
@@ -84,10 +71,6 @@ namespace ProjetoTerapia.Pages
                     .ToList();
             }
 
-            /*
-                Filtro por perfil/especialidade.
-                Exemplo: ansiedade, depressão, infantil, burnout etc.
-            */
             if (!string.IsNullOrWhiteSpace(Perfil))
             {
                 var perfilNormalizado = Perfil.Trim();
@@ -97,18 +80,63 @@ namespace ProjetoTerapia.Pages
                     .ToList();
             }
 
-            /*
-                Ordenação:
-                1. Quem comprou divulgação naquela cidade buscada aparece primeiro
-                2. Depois quem atende online
-                3. Depois ordem alfabética
-            */
-            Clinicas = clinicasAtivas
-                .OrderByDescending(c => TemCidadeExtraAtiva(c.Id, Busca, divulgacoesAtivas))
-                .ThenByDescending(c => TextoContem(c.Cidade, Busca))
-                .ThenByDescending(c => c.AtendimentoOnline)
-                .ThenBy(c => c.Nome)
-                .ToList();
+            if (!string.IsNullOrWhiteSpace(Cidade))
+            {
+                var cidadeNormalizada = Cidade.Trim();
+
+                clinicasAtivas = clinicasAtivas
+                    .Where(c =>
+                        TextoContem(c.Cidade, cidadeNormalizada) ||
+                        TextoContem(c.Endereco, cidadeNormalizada) ||
+                        TemCidadeExtraAtiva(c.Id, cidadeNormalizada, divulgacoesAtivas)
+                    )
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(Atendimento))
+            {
+                if (Atendimento == "online")
+                {
+                    clinicasAtivas = clinicasAtivas
+                        .Where(c => c.AtendimentoOnline)
+                        .ToList();
+                }
+
+                if (Atendimento == "presencial")
+                {
+                    clinicasAtivas = clinicasAtivas
+                        .Where(c => c.AtendimentoPresencial)
+                        .ToList();
+                }
+            }
+
+            var cidadeParaPriorizar = !string.IsNullOrWhiteSpace(Cidade)
+                ? Cidade
+                : Busca;
+
+            Clinicas = Ordenar switch
+            {
+                "menor-preco" => clinicasAtivas
+                    .OrderBy(c => c.Valor)
+                    .ThenBy(c => c.Nome)
+                    .ToList(),
+
+                "maior-preco" => clinicasAtivas
+                    .OrderByDescending(c => c.Valor)
+                    .ThenBy(c => c.Nome)
+                    .ToList(),
+
+                "nome" => clinicasAtivas
+                    .OrderBy(c => c.Nome)
+                    .ToList(),
+
+                _ => clinicasAtivas
+                    .OrderByDescending(c => TemCidadeExtraAtiva(c.Id, cidadeParaPriorizar, divulgacoesAtivas))
+                    .ThenByDescending(c => TextoContem(c.Cidade, cidadeParaPriorizar))
+                    .ThenByDescending(c => c.AtendimentoOnline)
+                    .ThenBy(c => c.Nome)
+                    .ToList()
+            };
         }
 
         private bool TemCidadeExtraAtiva(

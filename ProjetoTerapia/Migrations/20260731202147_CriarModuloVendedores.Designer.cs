@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoTerapia.Models;
 
@@ -11,9 +12,11 @@ using ProjetoTerapia.Models;
 namespace ProjetoTerapia.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260731202147_CriarModuloVendedores")]
+    partial class CriarModuloVendedores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,9 +267,6 @@ namespace ProjetoTerapia.Migrations
                     b.Property<int>("CliquesWhatsapp")
                         .HasColumnType("int");
 
-                    b.Property<string>("CodigoVendedorIndicacao")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("DataAprovacao")
                         .HasColumnType("datetime2");
 
@@ -333,15 +333,10 @@ namespace ProjetoTerapia.Migrations
                     b.Property<decimal?>("ValorPlano")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("VendedorId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Visualizacoes")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("VendedorId");
 
                     b.ToTable("Clinicas");
                 });
@@ -780,15 +775,6 @@ namespace ProjetoTerapia.Migrations
                         .IsRequired();
 
                     b.Navigation("Clinica");
-                });
-
-            modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
-                {
-                    b.HasOne("ProjetoTerapia.Models.Vendedor", "Vendedor")
-                        .WithMany()
-                        .HasForeignKey("VendedorId");
-
-                    b.Navigation("Vendedor");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Consulta", b =>
