@@ -1,0 +1,603 @@
+﻿@page
+@model ProjetoTerapia.Pages.PainelVendedorModel
+@using System.Globalization
+
+<div class="vendedor-page">
+
+    <aside class="sidebar-vendedor">
+
+        <div class="logo-box">
+            <img src="/imagem/logo.png" alt="AlinhaMente" />
+        </div>
+
+        <nav class="menu-vendedor">
+            <a class="ativo" href="/PainelVendedor">
+                Minhas vendas
+            </a>
+        </nav>
+
+        <form method="post" asp-page-handler="Sair" class="form-sair">
+            <button type="submit">
+                Sair
+            </button>
+        </form>
+
+    </aside>
+
+    <main class="conteudo-vendedor">
+
+        @if (TempData["MensagemSucesso"] != null)
+        {
+            <div class="alerta-sucesso">
+                @TempData["MensagemSucesso"]
+            </div>
+        }
+
+        @if (TempData["MensagemErro"] != null)
+        {
+            <div class="alerta-erro">
+                @TempData["MensagemErro"]
+            </div>
+        }
+
+        <section class="topo-vendedor">
+
+            <div class="topo-texto">
+                <span>Portal de Vendas</span>
+
+                <h1>
+                    Olá, @Model.Vendedor.Nome
+                </h1>
+
+                <p>
+                    Acompanhe suas indicações, comissões e envie sua nota ou comprovante para conferência.
+                </p>
+            </div>
+
+            <div class="codigo-card">
+                <span>Seu código de indicação</span>
+                <strong>@Model.Vendedor.CodigoIndicacao</strong>
+                <p>
+                    Use esse código para identificar suas vendas.
+                </p>
+            </div>
+
+        </section>
+
+        <section class="resumo-grid">
+
+            <div class="resumo-card">
+                <span>Vendas confirmadas</span>
+                <strong>@Model.Vendas.Count</strong>
+                <p>Total de vendas vinculadas ao seu código.</p>
+            </div>
+
+            <div class="resumo-card pendente">
+                <span>Comissões pendentes</span>
+                <strong>
+                    @(Model.Vendas
+                                        .Where(v => !v.ComissaoPaga)
+                                        .Sum(v => v.ValorComissao)
+                                        .ToString("C", new CultureInfo("pt-BR")))
+                </strong>
+                <p>Aguardando conferência ou pagamento.</p>
+            </div>
+
+            <div class="resumo-card pago">
+                <span>Comissões pagas</span>
+                <strong>
+                    @(Model.Vendas
+                                        .Where(v => v.ComissaoPaga)
+                                        .Sum(v => v.ValorComissao)
+                                        .ToString("C", new CultureInfo("pt-BR")))
+                </strong>
+                <p>Valores já pagos pela administração.</p>
+            </div>
+
+        </section>
+
+        <section class="lista-vendas">
+
+            @foreach (var venda in Model.Vendas)
+            {
+                <article class="venda-card">
+
+                    <div class="venda-topo">
+
+                        <div>
+                            <span>Venda</span>
+
+                            <h3>
+                                @venda.NomeClinica
+                            </h3>
+
+                            <p>
+                                @venda.EmailClinica
+                            </p>
+                        </div>
+
+                        <div class="status-venda @(venda.ComissaoPaga ? "pago" : "pendente")">
+                            @(venda.ComissaoPaga ? "Comissão paga" : venda.Status)
+                        </div>
+
+                    </div>
+
+                    <div class="info-grid">
+
+                        <div>
+                            <span>Valor da venda</span>
+                            <strong>@venda.ValorVenda.ToString("C", new CultureInfo("pt-BR"))</strong>
+                        </div>
+
+                        <div>
+                            <span>Comissão</span>
+                            <strong>@venda.PercentualComissao%</strong>
+                        </div>
+
+                        <div>
+                            <span>Valor da comissão</span>
+                            <strong>@venda.ValorComissao.ToString("C", new CultureInfo("pt-BR"))</strong>
+                        </div>
+
+                        <div>
+                            <span>Data da venda</span>
+                            <strong>
+                                @(venda.DataConfirmacaoVenda.HasValue
+                                                            ? venda.DataConfirmacaoVenda.Value.ToString("dd/MM/yyyy")
+                                                            : venda.DataCadastro.ToString("dd/MM/yyyy"))
+                        </strong>
+                    </div>
+
+                    </div>
+
+                    <div class="comprovante-box">
+
+                        <div>
+                            <h4>Nota fiscal ou comprovante</h4>
+
+                            <p>
+                                Envie o documento para a administração conferir e liberar o pagamento da comissão.
+                            </p>
+                        </div>
+
+                    @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                        {
+                            <a href="@venda.ComprovanteNotaFiscal"
+                               target="_blank"
+                               class="btn-ver-comprovante">
+                                Ver documento enviado
+                            </a>
+                        }
+                        else
+                        {
+                            <form method="post"
+                                  asp-page-handler="EnviarComprovante"
+                                  enctype="multipart/form-data">
+
+                                <input type="hidden" name="vendaId" value="@venda.Id" />
+
+                                <input type="file"
+                                       name="ArquivoComprovante"
+                                       accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                       required />
+
+                                <button type="submit">
+                                    Enviar documento
+                                </button>
+
+                            </form>
+                        }
+
+                    </div>
+
+                </article>
+            }
+
+            @if (!Model.Vendas.Any())
+            {
+                <div class="vazio-card">
+                    <h3>Nenhuma venda encontrada</h3>
+                    <p>
+                        Quando uma clínica indicada por você pagar o plano, a venda aparecerá aqui.
+                    </p>
+                </div>
+            }
+
+        </section>
+
+    </main>
+
+</div>
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #ecfeff;
+        color: #0f172a;
+    }
+
+    .vendedor-page {
+        min-height: 100vh;
+        display: flex;
+        background: radial-gradient(circle at top left, rgba(20,184,166,.14), transparent 32%), linear-gradient(135deg,#ecfeff,#f8fafc,#eef2ff);
+    }
+
+    .sidebar-vendedor {
+        width: 286px;
+        min-height: 100vh;
+        padding: 28px 22px;
+        background: linear-gradient(180deg,#0f766e,#0ea5e9);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        box-shadow: 14px 0 35px rgba(15,23,42,.08);
+    }
+
+    .logo-box {
+        background: white;
+        border-radius: 24px;
+        padding: 18px;
+        text-align: center;
+        margin-bottom: 32px;
+        box-shadow: 0 18px 38px rgba(15,23,42,.10);
+    }
+
+        .logo-box img {
+            width: 220px;
+            max-width: 100%;
+            display: block;
+            margin: auto;
+        }
+
+    .menu-vendedor {
+        display: grid;
+        gap: 10px;
+    }
+
+        .menu-vendedor a {
+            color: white;
+            padding: 15px 18px;
+            border-radius: 16px;
+            background: rgba(255,255,255,.16);
+            font-weight: 900;
+            text-decoration: none;
+            display: block;
+        }
+
+    .form-sair {
+        margin-top: auto;
+    }
+
+        .form-sair button {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 900;
+            cursor: pointer;
+            transition: .25s;
+        }
+
+            .form-sair button:hover {
+                background: #ef4444;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+    .conteudo-vendedor {
+        flex: 1;
+        padding: 42px;
+        min-width: 0;
+    }
+
+    .topo-vendedor {
+        background: rgba(255,255,255,.94);
+        border-radius: 32px;
+        padding: 34px;
+        box-shadow: 0 24px 60px rgba(15,23,42,.08);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .topo-texto span,
+    .resumo-card span,
+    .codigo-card span,
+    .venda-topo span,
+    .info-grid span {
+        color: #0ea5e9;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .topo-texto h1 {
+        margin: 8px 0;
+        font-size: 38px;
+        letter-spacing: -1px;
+    }
+
+    .topo-texto p {
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+        max-width: 620px;
+    }
+
+    .codigo-card {
+        min-width: 260px;
+        padding: 22px;
+        border-radius: 24px;
+        background: #ecfeff;
+        border: 1px solid #bae6fd;
+    }
+
+        .codigo-card strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 30px;
+            color: #0f766e;
+            letter-spacing: 1px;
+        }
+
+        .codigo-card p {
+            color: #64748b;
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+    .resumo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .resumo-card,
+    .venda-card,
+    .vazio-card {
+        background: rgba(255,255,255,.95);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 18px 45px rgba(15,23,42,.06);
+        border: 1px solid #e2e8f0;
+        transition: .25s;
+    }
+
+        .resumo-card:hover,
+        .venda-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 60px rgba(15,23,42,.10);
+        }
+
+        .resumo-card strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 30px;
+            color: #0f172a;
+        }
+
+        .resumo-card p {
+            color: #64748b;
+            line-height: 1.5;
+            margin: 8px 0 0;
+            font-size: 13px;
+        }
+
+        .resumo-card.pendente {
+            background: linear-gradient(135deg,#fff7ed,#ffffff);
+        }
+
+        .resumo-card.pago {
+            background: linear-gradient(135deg,#ecfdf5,#ffffff);
+        }
+
+    .lista-vendas {
+        display: grid;
+        gap: 18px;
+    }
+
+    .venda-topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+    }
+
+        .venda-topo h3 {
+            margin: 8px 0 4px;
+            font-size: 24px;
+        }
+
+        .venda-topo p {
+            color: #64748b;
+            margin: 0;
+        }
+
+    .status-venda {
+        height: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #fef3c7;
+        color: #92400e;
+        font-size: 12px;
+        font-weight: 900;
+        max-width: 260px;
+        text-align: center;
+    }
+
+        .status-venda.pago {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+        .info-grid div {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 15px;
+        }
+
+        .info-grid strong {
+            display: block;
+            margin-top: 6px;
+            color: #0f172a;
+        }
+
+    .comprovante-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 22px;
+        padding: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+
+        .comprovante-box h4 {
+            margin: 0 0 6px;
+            color: #0f172a;
+        }
+
+        .comprovante-box p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .comprovante-box form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .comprovante-box input {
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 12px;
+            background: white;
+            max-width: 280px;
+        }
+
+        .comprovante-box button,
+        .btn-ver-comprovante {
+            border: none;
+            border-radius: 14px;
+            padding: 13px 16px;
+            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+            color: white;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+            transition: .25s;
+        }
+
+            .comprovante-box button:hover,
+            .btn-ver-comprovante:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 14px 28px rgba(14,165,233,.18);
+            }
+
+    .alerta-sucesso,
+    .alerta-erro {
+        padding: 15px 18px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+        font-weight: 800;
+    }
+
+    .alerta-sucesso {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alerta-erro {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .vazio-card h3 {
+        margin: 0 0 8px;
+        color: #0f172a;
+    }
+
+    .vazio-card p {
+        color: #64748b;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    @@media(max-width: 950px) {
+        .vendedor-page {
+            display: block;
+        }
+
+        .sidebar-vendedor {
+            width: auto;
+            min-height: auto;
+            position: relative;
+        }
+
+        .conteudo-vendedor {
+            padding: 22px;
+        }
+
+        .topo-vendedor,
+        .venda-topo {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .resumo-grid,
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .codigo-card {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .comprovante-box {
+            align-items: stretch;
+        }
+
+            .comprovante-box form,
+            .comprovante-box input,
+            .comprovante-box button,
+            .btn-ver-comprovante {
+                width: 100%;
+                max-width: 100%;
+            }
+    }
+</style>
