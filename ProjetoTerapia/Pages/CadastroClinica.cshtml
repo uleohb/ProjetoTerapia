@@ -301,7 +301,11 @@
                 <input type="text"
                        asp-for="NovaClinica.Instagram"
                        placeholder="@@usuario ou link completo" />
+
+                <span asp-validation-for="NovaClinica.Instagram" class="campo-erro"></span>
             </div>
+
+
 
             <div class="campo">
                 <label>
@@ -468,6 +472,21 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoComErro = document.querySelector(".field-validation-error, .validation-summary-errors, .campo-erro:not(:empty)");
+
+        if (campoComErro) {
+            setTimeout(function () {
+                campoComErro.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }, 150);
+        }
+    });
+</script>
 
 <style>
 
@@ -807,6 +826,14 @@
         font-size: 14px;
         font-weight: 600;
         line-height: 1.5;
+    }
+
+    .campo-erro {
+        display: block;
+        color: #dc2626;
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 6px;
     }
 
     @@media(max-width:900px) {

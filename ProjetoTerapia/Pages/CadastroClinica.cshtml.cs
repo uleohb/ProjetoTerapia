@@ -33,7 +33,7 @@ namespace ProjetoTerapia.Pages
         public string? FotoFinal { get; set; }
 
         [BindProperty]
-        public string CodigoVendedor { get; set; } = "";
+        public string? CodigoVendedor { get; set; } = "";
 
         public IActionResult OnGet(string? vendedor)
         {
@@ -66,6 +66,9 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
+            ModelState.Remove(nameof(CodigoVendedor));
+
+            CapturarCodigoVendedor(CodigoVendedor);
 
             CapturarCodigoVendedor(CodigoVendedor);
 
@@ -522,7 +525,53 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
+            var instagramAtual = NormalizarInstagramParaComparacao(NovaClinica.Instagram);
+
+            if (!string.IsNullOrWhiteSpace(instagramAtual))
+            {
+                var instagramJaExiste = clinicasExistentes.Any(c =>
+                    NormalizarInstagramParaComparacao(c.Instagram) == instagramAtual
+                );
+
+                if (instagramJaExiste)
+                {
+                    ModelState.AddModelError("NovaClinica.Instagram", "Este Instagram já está em uso.");
+                    valido = false;
+                }
+            }
+
+
+
             return valido;
+        }
+
+        private string NormalizarInstagramParaComparacao(string? instagram)
+        {
+            if (string.IsNullOrWhiteSpace(instagram))
+            {
+                return "";
+            }
+
+            var valor = instagram.Trim().ToLower();
+
+            valor = valor.Replace("https://", "");
+            valor = valor.Replace("http://", "");
+            valor = valor.Replace("www.", "");
+
+            if (valor.StartsWith("instagram.com/"))
+            {
+                valor = valor.Replace("instagram.com/", "");
+            }
+
+            if (valor.StartsWith("@"))
+            {
+                valor = valor.Substring(1);
+            }
+
+            valor = valor.Split("?")[0];
+            valor = valor.Trim().Trim('/');
+
+            return valor;
         }
 
         private bool TelefoneValido(string telefone)

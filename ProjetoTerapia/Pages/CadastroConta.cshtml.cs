@@ -42,6 +42,10 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
+            ModelState.Remove(nameof(CodigoVendedor));
+
+            CapturarCodigoVendedor(CodigoVendedor);
+
             CapturarCodigoVendedor(CodigoVendedor);
 
             if (Senha != ConfirmarSenha)

@@ -198,6 +198,51 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage(new { aba = "vendedores" });
             }
 
+            if (acao == "marcarComissaoPaga" || acao == "reabrirComissao")
+            {
+                var venda = _context.VendasVendedores
+                    .Include(v => v.Vendedor)
+                    .FirstOrDefault(v => v.Id == id);
+
+                if (venda == null)
+                {
+                    TempData["MensagemErro"] = "Venda não encontrada.";
+                    return RedirectToPage(new { aba = "vendedores" });
+                }
+
+                if (acao == "marcarComissaoPaga")
+                {
+                    venda.ComissaoPaga = true;
+                    venda.DataPagamentoComissao = DateTime.Now;
+                    venda.Status = "Comissão paga";
+
+                    RegistrarLog(
+                        "Pagamento de comissão",
+                        $"{HttpContext.Session.GetString("AdminNome")} marcou como paga a comissão de {venda.Vendedor?.Nome}. Valor: {venda.ValorComissao.ToString("C", new System.Globalization.CultureInfo("pt-BR"))}."
+                    );
+
+                    TempData["MensagemSucesso"] = "Comissão marcada como paga.";
+                }
+
+                if (acao == "reabrirComissao")
+                {
+                    venda.ComissaoPaga = false;
+                    venda.DataPagamentoComissao = null;
+                    venda.Status = "Venda confirmada - aguardando nota";
+
+                    RegistrarLog(
+                        "Reabertura de comissão",
+                        $"{HttpContext.Session.GetString("AdminNome")} reabriu a comissão de {venda.Vendedor?.Nome}."
+                    );
+
+                    TempData["MensagemSucesso"] = "Comissão reaberta.";
+                }
+
+                _context.SaveChanges();
+
+                return RedirectToPage(new { aba = "vendedores" });
+            }
+
             if (acao == "aprovarAlteracao" || acao == "recusarAlteracao")
             {
                 var alteracao = _context.AlteracoesClinicas
@@ -586,9 +631,9 @@ namespace ProjetoTerapia.Pages
              .ToList();
 
             Vendedores = _context.Vendedores
-             .OrderByDescending(v => v.Ativo)
-             .ThenBy(v => v.Nome)
-             .ToList();
+                 .OrderByDescending(v => v.Ativo)
+                 .ThenBy(v => v.Nome)
+                 .ToList();
 
             VendasVendedores = _context.VendasVendedores
                 .Include(v => v.Vendedor)

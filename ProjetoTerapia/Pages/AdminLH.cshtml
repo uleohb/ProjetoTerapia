@@ -1142,6 +1142,185 @@
 
             </div>
 
+            <div class="topo-secao" style="margin-top: 34px;">
+
+                <div>
+                    <h2>
+                        Vendas e comissões
+                    </h2>
+
+                    <p>
+                        Acompanhe vendas vinculadas aos vendedores, comprovantes enviados e pagamentos de comissão.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="lista-clinicas">
+
+                @foreach (var venda in Model.VendasVendedores)
+                {
+                    <article class="card-clinica">
+
+                        <div class="card-topo">
+
+                            <div>
+                                <h3>
+                                    @venda.NomeClinica
+                                </h3>
+
+                                <p>
+                                    Vendedor: @(venda.Vendedor?.Nome ?? "Não encontrado")
+                                </p>
+                            </div>
+
+                            <div class="status-tags">
+
+                                @if (venda.ComissaoPaga)
+                                {
+                                    <span class="tag pago">
+                                        Comissão paga
+                                    </span>
+                                }
+                                else if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                                {
+                                    <span class="tag aprovado">
+                                        Documento enviado
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tag pendente">
+                                        Aguardando documento
+                                    </span>
+                                }
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-grid">
+
+                        <div>
+                            <span>Email da clínica</span>
+                            <strong>@venda.EmailClinica</strong>
+                        </div>
+
+                        <div>
+                            <span>Código vendedor</span>
+                            <strong>@venda.CodigoIndicacao</strong>
+                        </div>
+
+                        <div>
+                            <span>Valor da venda</span>
+                            <strong>@venda.ValorVenda.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+
+                        <div>
+                            <span>Comissão</span>
+                            <strong>@venda.PercentualComissao%</strong>
+                        </div>
+
+                        <div>
+                            <span>Valor comissão</span>
+                            <strong>@venda.ValorComissao.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                        </div>
+
+                        <div>
+                            <span>Status</span>
+                            <strong>@venda.Status</strong>
+                        </div>
+
+                        <div>
+                            <span>Venda confirmada em</span>
+                            <strong>
+                                @(venda.DataConfirmacaoVenda.HasValue
+                                                                ? venda.DataConfirmacaoVenda.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                : venda.DataCadastro.ToString("dd/MM/yyyy HH:mm"))
+                                                                                                              </strong>
+                                                                                                          </div>
+
+                        <div>
+                            <span>Comissão paga em</span>
+                            <strong>
+                                @(venda.DataPagamentoComissao.HasValue
+                                                                ? venda.DataPagamentoComissao.Value.ToString("dd/MM/yyyy HH:mm")
+                                                                : "Pendente")
+                                                                         </strong>
+                                                                     </div>
+
+                        <div>
+                            <span>Documento</span>
+                            <strong>
+                                @(string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal)
+                                                                ? "Não enviado"
+                                                                : "Enviado")
+                            </strong>
+                        </div>
+
+                        </div>
+
+                        <div class="acoes-card-admin">
+
+                        @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                            {
+                                <a href="@venda.ComprovanteNotaFiscal"
+                                   target="_blank"
+                                   class="btn-ver-perfil">
+                                    Ver documento
+                                </a>
+                            }
+
+                            @if (venda.ClinicaId.HasValue)
+                            {
+                                <a href="/PerfilClinica?id=@venda.ClinicaId"
+                                   target="_blank"
+                                   class="btn-ver-perfil">
+                                    Ver clínica
+                                </a>
+                            }
+
+                            <form method="post">
+
+                                <input type="hidden" name="id" value="@venda.Id" />
+
+                                @if (!venda.ComissaoPaga)
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="marcarComissaoPaga"
+                                            class="btn-acao pagar"
+                                            onclick='return confirmarAcao(this, "marcar esta comissão como paga?")'>
+                                        Marcar como paga
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit"
+                                            name="acao"
+                                            value="reabrirComissao"
+                                            class="btn-acao suspender"
+                                            onclick='return confirmarAcao(this, "reabrir esta comissão?")'>
+                                        Reabrir comissão
+                                    </button>
+                                }
+
+                            </form>
+
+                        </div>
+
+                    </article>
+                }
+
+                @if (!Model.VendasVendedores.Any())
+                {
+                    <div class="vazio-card">
+                        Nenhuma venda vinculada a vendedores ainda.
+                    </div>
+                }
+
+            </div>
+
         </section>
 
         <section id="historico" class="aba" style="display:none">
