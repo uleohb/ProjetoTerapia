@@ -29,6 +29,8 @@ namespace ProjetoTerapia.Pages
 
         public List<DivulgacaoRegional> MinhasSolicitacoes { get; set; } = new();
 
+        // Lista completa que aparece na tela.
+        // As cidades não liberadas ainda vão aparecer como "Em breve" no front.
         public List<string> CidadesDisponiveis { get; set; } = new()
         {
             "São Paulo",
@@ -60,6 +62,15 @@ namespace ProjetoTerapia.Pages
             "Itanhaém",
             "Mongaguá",
             "Peruíbe"
+        };
+
+        // Cidades liberadas neste momento.
+        // Só essas podem ser escolhidas e salvas.
+        public List<string> CidadesLiberadasAgora { get; set; } = new()
+        {
+            "Osasco",
+            "Barueri",
+            "São Paulo"
         };
 
         [BindProperty]
@@ -124,11 +135,37 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
+            // Evita selecionar plano maior do que a quantidade real de cidades liberadas agora.
+            var limiteAtualDeCidadesAdicionais = ObterCidadesLiberadasAdicionais().Count;
+
+            if (QuantidadeCidades > limiteAtualDeCidadesAdicionais)
+            {
+                TempData["Erro"] =
+                    $"No momento, a divulgação regional está disponível apenas para Osasco, Barueri e São Paulo. " +
+                    $"Para o seu perfil, você pode escolher até {limiteAtualDeCidadesAdicionais} cidade(s) adicional(is).";
+
+                CarregarSolicitacoes(Clinica.Id);
+                return Page();
+            }
+
             var cidades = LimparCidadesSelecionadas();
 
             if (!cidades.Any())
             {
                 TempData["Erro"] = "Selecione pelo menos uma cidade adicional.";
+                CarregarSolicitacoes(Clinica.Id);
+                return Page();
+            }
+
+            // Bloqueio real no backend.
+            // Mesmo que alguém altere o HTML pelo navegador, não consegue salvar cidade em breve.
+            var cidadesBloqueadas = cidades
+                .Where(c => !CidadeLiberada(c))
+                .ToList();
+
+            if (cidadesBloqueadas.Any())
+            {
+                TempData["Erro"] = "No momento, a divulgação regional está disponível apenas para Osasco, Barueri e São Paulo.";
                 CarregarSolicitacoes(Clinica.Id);
                 return Page();
             }
@@ -186,6 +223,7 @@ namespace ProjetoTerapia.Pages
             return RedirectToPage("/SolicitarDivulgacao");
         }
 
+        // Usado no front para saber se a cidade é a cidade principal da clínica.
         public bool EhCidadePrincipal(string cidade)
         {
             if (Clinica == null)
@@ -194,9 +232,33 @@ namespace ProjetoTerapia.Pages
             return TextosIguais(cidade, Clinica.Cidade);
         }
 
+        // Usado no front para manter marcada uma cidade após erro de validação.
         public bool CidadeSelecionada(string cidade)
         {
             return CidadesEscolhidas.Any(c => TextosIguais(c, cidade));
+        }
+
+        // Usado no front para liberar ou bloquear o card da cidade.
+        public bool CidadeLiberada(string cidade)
+        {
+            return CidadesLiberadasAgora.Any(c => TextosIguais(c, cidade));
+        }
+
+        // Usado no front para mostrar o selo "Em breve".
+        public bool CidadeEmBreve(string cidade)
+        {
+            return !CidadeLiberada(cidade);
+        }
+
+        // Retorna só as cidades liberadas que não são a cidade principal da clínica.
+        private List<string> ObterCidadesLiberadasAdicionais()
+        {
+            if (Clinica == null)
+                return CidadesLiberadasAgora;
+
+            return CidadesLiberadasAgora
+                .Where(c => !TextosIguais(c, Clinica.Cidade))
+                .ToList();
         }
 
         private async Task GerarPreferenciaMercadoPago(DivulgacaoRegional divulgacao)
@@ -285,6 +347,7 @@ namespace ProjetoTerapia.Pages
             }
 
             divulgacao.MercadoPagoPreferenceId = preferenceResponse.Id;
+
             divulgacao.LinkPagamento =
                 preferenceResponse.InitPoint ??
                 preferenceResponse.SandboxInitPoint;
@@ -305,17 +368,19 @@ namespace ProjetoTerapia.Pages
 
                 var cidadeTratada = cidade.Trim();
 
-                var cidadeExisteNaLista = CidadesDisponiveis
-                    .Any(c => TextosIguais(c, cidadeTratada));
+                // Aqui a gente busca o nome oficial da cidade dentro da lista.
+                // Exemplo: se vier "sao paulo", salva como "São Paulo".
+                var cidadeOficial = CidadesDisponiveis
+                    .FirstOrDefault(c => TextosIguais(c, cidadeTratada));
 
-                if (!cidadeExisteNaLista)
+                if (string.IsNullOrWhiteSpace(cidadeOficial))
                     continue;
 
-                var chave = NormalizarTexto(cidadeTratada);
+                var chave = NormalizarTexto(cidadeOficial);
 
                 if (usadas.Add(chave))
                 {
-                    cidadesLimpas.Add(cidadeTratada);
+                    cidadesLimpas.Add(cidadeOficial);
                 }
             }
 
@@ -354,6 +419,7 @@ namespace ProjetoTerapia.Pages
             return quantidade switch
             {
                 1 => ("+1 cidade adicional", 30),
+                2 => ("+2 cidades adicionais", 35),
                 3 => ("+3 cidades adicionais", 35),
                 5 => ("+5 cidades adicionais", 40),
                 8 => ("+8 cidades adicionais", 45),

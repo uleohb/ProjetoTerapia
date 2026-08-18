@@ -58,6 +58,13 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage("/PainelVendedor");
             }
 
+            // Depois que o admin marcou como paga, o vendedor não pode trocar o documento
+            if (venda.ComissaoPaga)
+            {
+                TempData["MensagemErro"] = "Esta comissão já foi paga. Não é possível reenviar o documento.";
+                return RedirectToPage("/PainelVendedor");
+            }
+
             if (ArquivoComprovante == null || ArquivoComprovante.Length == 0)
             {
                 TempData["MensagemErro"] = "Selecione um arquivo para enviar.";
@@ -68,8 +75,8 @@ namespace ProjetoTerapia.Pages
 
             var extensoesPermitidas = new[]
             {
-                ".pdf", ".jpg", ".jpeg", ".png", ".webp"
-            };
+        ".pdf", ".jpg", ".jpeg", ".png", ".webp"
+    };
 
             if (!extensoesPermitidas.Contains(extensao))
             {
@@ -94,8 +101,25 @@ namespace ProjetoTerapia.Pages
                 Directory.CreateDirectory(pasta);
             }
 
-            var nomeArquivo = $"venda-{venda.Id}-{Guid.NewGuid()}{extensao}";
+            var tinhaDocumentoAnterior = !string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal);
 
+            // Se já tinha documento, apaga o arquivo antigo para não acumular lixo no servidor
+            if (tinhaDocumentoAnterior)
+            {
+                var caminhoAntigo = Path.Combine(
+                    _environment.WebRootPath,
+                    venda.ComprovanteNotaFiscal!
+                        .TrimStart('/')
+                        .Replace("/", Path.DirectorySeparatorChar.ToString())
+                );
+
+                if (System.IO.File.Exists(caminhoAntigo))
+                {
+                    System.IO.File.Delete(caminhoAntigo);
+                }
+            }
+
+            var nomeArquivo = $"venda-{venda.Id}-{Guid.NewGuid()}{extensao}";
             var caminhoCompleto = Path.Combine(pasta, nomeArquivo);
 
             using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
@@ -106,11 +130,15 @@ namespace ProjetoTerapia.Pages
             venda.ComprovanteNotaFiscal =
                 "/uploads/comprovantes-vendedores/" + nomeArquivo;
 
-            venda.Status = "Nota enviada - aguardando conferência";
+            venda.Status = tinhaDocumentoAnterior
+                ? "Documento reenviado - aguardando conferência"
+                : "Nota enviada - aguardando conferência";
 
             _context.SaveChanges();
 
-            TempData["MensagemSucesso"] = "Comprovante enviado com sucesso.";
+            TempData["MensagemSucesso"] = tinhaDocumentoAnterior
+                ? "Documento reenviado com sucesso."
+                : "Documento enviado com sucesso.";
 
             return RedirectToPage("/PainelVendedor");
         }

@@ -2,8 +2,14 @@
 @model ProjetoTerapia.Pages.PainelVendedorModel
 @using System.Globalization
 
+@{
+    // Cultura usada para formatar valores em Real
+    var cultura = new CultureInfo("pt-BR");
+}
+
 <div class="vendedor-page">
 
+    <!-- MENU LATERAL -->
     <aside class="sidebar-vendedor">
 
         <div class="logo-box">
@@ -24,6 +30,7 @@
 
     </aside>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="conteudo-vendedor">
 
         @if (TempData["MensagemSucesso"] != null)
@@ -40,6 +47,7 @@
             </div>
         }
 
+        <!-- TOPO -->
         <section class="topo-vendedor">
 
             <div class="topo-texto">
@@ -56,7 +64,11 @@
 
             <div class="codigo-card">
                 <span>Seu código de indicação</span>
-                <strong>@Model.Vendedor.CodigoIndicacao</strong>
+
+                <strong>
+                    @Model.Vendedor.CodigoIndicacao
+                </strong>
+
                 <p>
                     Use esse código para identificar suas vendas.
                 </p>
@@ -64,44 +76,61 @@
 
         </section>
 
+        <!-- RESUMO -->
         <section class="resumo-grid">
 
             <div class="resumo-card">
                 <span>Vendas confirmadas</span>
-                <strong>@Model.Vendas.Count</strong>
-                <p>Total de vendas vinculadas ao seu código.</p>
+
+                <strong>
+                    @Model.Vendas.Count
+                </strong>
+
+                <p>
+                    Total de vendas vinculadas ao seu código.
+                </p>
             </div>
 
             <div class="resumo-card pendente">
                 <span>Comissões pendentes</span>
+
                 <strong>
                     @(Model.Vendas
                                         .Where(v => !v.ComissaoPaga)
                                         .Sum(v => v.ValorComissao)
-                                        .ToString("C", new CultureInfo("pt-BR")))
+                                        .ToString("C", cultura))
                 </strong>
-                <p>Aguardando conferência ou pagamento.</p>
+
+                <p>
+                    Aguardando conferência ou pagamento.
+                </p>
             </div>
 
             <div class="resumo-card pago">
                 <span>Comissões pagas</span>
+
                 <strong>
                     @(Model.Vendas
                                         .Where(v => v.ComissaoPaga)
                                         .Sum(v => v.ValorComissao)
-                                        .ToString("C", new CultureInfo("pt-BR")))
+                                        .ToString("C", cultura))
                 </strong>
-                <p>Valores já pagos pela administração.</p>
+
+                <p>
+                    Valores já pagos pela administração.
+                </p>
             </div>
 
         </section>
 
+        <!-- LISTA DE VENDAS -->
         <section class="lista-vendas">
 
             @foreach (var venda in Model.Vendas)
             {
                 <article class="venda-card">
 
+                    <!-- TOPO DO CARD DA VENDA -->
                     <div class="venda-topo">
 
                         <div>
@@ -122,25 +151,36 @@
 
                     </div>
 
+                    <!-- INFORMAÇÕES DA VENDA -->
                     <div class="info-grid">
 
                         <div>
                             <span>Valor da venda</span>
-                            <strong>@venda.ValorVenda.ToString("C", new CultureInfo("pt-BR"))</strong>
+
+                            <strong>
+                                @venda.ValorVenda.ToString("C", cultura)
+                            </strong>
                         </div>
 
                         <div>
                             <span>Comissão</span>
-                            <strong>@venda.PercentualComissao%</strong>
+
+                            <strong>
+                                @venda.PercentualComissao.ToString("0.##")%
+                            </strong>
                         </div>
 
                         <div>
                             <span>Valor da comissão</span>
-                            <strong>@venda.ValorComissao.ToString("C", new CultureInfo("pt-BR"))</strong>
+
+                            <strong>
+                                @venda.ValorComissao.ToString("C", cultura)
+                            </strong>
                         </div>
 
                         <div>
                             <span>Data da venda</span>
+
                             <strong>
                                 @(venda.DataConfirmacaoVenda.HasValue
                                                             ? venda.DataConfirmacaoVenda.Value.ToString("dd/MM/yyyy")
@@ -150,9 +190,10 @@
 
                     </div>
 
+                    <!-- DOCUMENTO / COMPROVANTE -->
                     <div class="comprovante-box">
 
-                        <div>
+                        <div class="texto-comprovante">
                             <h4>Nota fiscal ou comprovante</h4>
 
                             <p>
@@ -160,33 +201,49 @@
                             </p>
                         </div>
 
-                    @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
-                        {
-                            <a href="@venda.ComprovanteNotaFiscal"
-                               target="_blank"
-                               class="btn-ver-comprovante">
-                                Ver documento enviado
-                            </a>
-                        }
-                        else
-                        {
-                            <form method="post"
-                                  asp-page-handler="EnviarComprovante"
-                                  enctype="multipart/form-data">
+                        <div class="area-documento-vendedor">
 
-                                <input type="hidden" name="vendaId" value="@venda.Id" />
+                        @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                            {
+                                <a href="@venda.ComprovanteNotaFiscal"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="btn-ver-comprovante">
+                                    Ver documento enviado
+                                </a>
+                            }
+
+                            @if (!venda.ComissaoPaga)
+                            {
+                                <form method="post"
+                                      asp-page-handler="EnviarComprovante"
+                                      enctype="multipart/form-data"
+                                      class="form-documento-vendedor">
+
+                                    <input type="hidden" name="vendaId" value="@venda.Id" />
+
+                                    <label class="btn-selecionar-arquivo">
+                                        @(string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal)
+                                                                        ? "Selecionar documento"
+                                                                        : "Reenviar documento")
 
                                 <input type="file"
                                        name="ArquivoComprovante"
                                        accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                       class="input-documento"
                                        required />
+                            </label>
 
-                                <button type="submit">
-                                    Enviar documento
-                                </button>
+                                </form>
+                                                }
+                            else
+                            {
+                                <span class="documento-bloqueado">
+                                    Comissão paga. Reenvio bloqueado.
+                                </span>
+                            }
 
-                            </form>
-                        }
+                        </div>
 
                     </div>
 
@@ -197,6 +254,7 @@
             {
                 <div class="vazio-card">
                     <h3>Nenhuma venda encontrada</h3>
+
                     <p>
                         Quando uma clínica indicada por você pagar o plano, a venda aparecerá aqui.
                     </p>
@@ -206,6 +264,55 @@
         </section>
 
     </main>
+
+</div>
+
+<!-- MODAL DE PRÉ-VISUALIZAÇÃO DO DOCUMENTO -->
+<div id="modalPreviewDocumento" class="modal-preview-documento">
+
+    <div class="preview-box">
+
+        <div class="preview-topo">
+
+            <div>
+                <span>Pré-visualização</span>
+
+                <h3>
+                    Confirmar envio do documento?
+                </h3>
+            </div>
+
+            <button type="button" id="fecharPreviewDocumento">
+                ×
+            </button>
+
+        </div>
+
+        <div id="previewConteudoDocumento" class="preview-conteudo">
+        </div>
+
+        <div class="preview-info">
+            <strong id="previewNomeArquivo"></strong>
+            <span id="previewTamanhoArquivo"></span>
+        </div>
+
+        <div class="preview-acoes">
+
+            <button type="button"
+                    id="cancelarEnvioDocumento"
+                    class="btn-preview-cancelar">
+                Cancelar
+            </button>
+
+            <button type="button"
+                    id="confirmarEnvioDocumento"
+                    class="btn-preview-confirmar">
+                Confirmar envio
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -228,6 +335,8 @@
         display: flex;
         background: radial-gradient(circle at top left, rgba(20,184,166,.14), transparent 32%), linear-gradient(135deg,#ecfeff,#f8fafc,#eef2ff);
     }
+
+    /* MENU LATERAL */
 
     .sidebar-vendedor {
         width: 286px;
@@ -294,6 +403,8 @@
                 color: white;
                 transform: translateY(-2px);
             }
+
+    /* CONTEÚDO */
 
     .conteudo-vendedor {
         flex: 1;
@@ -362,6 +473,8 @@
             line-height: 1.5;
         }
 
+    /* CARDS DE RESUMO */
+
     .resumo-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -408,6 +521,8 @@
             background: linear-gradient(135deg,#ecfdf5,#ffffff);
         }
 
+    /* LISTA DE VENDAS */
+
     .lista-vendas {
         display: grid;
         gap: 18px;
@@ -439,7 +554,7 @@
         color: #92400e;
         font-size: 12px;
         font-weight: 900;
-        max-width: 260px;
+        max-width: 280px;
         text-align: center;
     }
 
@@ -468,6 +583,8 @@
             color: #0f172a;
         }
 
+    /* COMPROVANTE */
+
     .comprovante-box {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
@@ -480,51 +597,72 @@
         flex-wrap: wrap;
     }
 
-        .comprovante-box h4 {
-            margin: 0 0 6px;
-            color: #0f172a;
+    .texto-comprovante {
+        max-width: 520px;
+    }
+
+    .comprovante-box h4 {
+        margin: 0 0 6px;
+        color: #0f172a;
+    }
+
+    .comprovante-box p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .area-documento-vendedor {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .form-documento-vendedor {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-ver-comprovante,
+    .btn-selecionar-arquivo {
+        border: none;
+        border-radius: 14px;
+        padding: 13px 16px;
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        font-weight: 900;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .25s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-ver-comprovante:hover,
+        .btn-selecionar-arquivo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(14,165,233,.18);
         }
 
-        .comprovante-box p {
-            margin: 0;
-            color: #64748b;
-            line-height: 1.5;
-            font-size: 14px;
+        .btn-selecionar-arquivo input {
+            display: none;
         }
 
-        .comprovante-box form {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+    .documento-bloqueado {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 13px;
+        font-weight: 800;
+    }
 
-        .comprovante-box input {
-            border: 1px solid #dbeafe;
-            border-radius: 14px;
-            padding: 12px;
-            background: white;
-            max-width: 280px;
-        }
-
-        .comprovante-box button,
-        .btn-ver-comprovante {
-            border: none;
-            border-radius: 14px;
-            padding: 13px 16px;
-            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-            color: white;
-            font-weight: 900;
-            text-decoration: none;
-            cursor: pointer;
-            transition: .25s;
-        }
-
-            .comprovante-box button:hover,
-            .btn-ver-comprovante:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 14px 28px rgba(14,165,233,.18);
-            }
+    /* ALERTAS */
 
     .alerta-sucesso,
     .alerta-erro {
@@ -556,6 +694,144 @@
         margin: 0;
         line-height: 1.6;
     }
+
+    /* MODAL DE PRÉ-VISUALIZAÇÃO */
+
+    .modal-preview-documento {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(15,23,42,.62);
+        align-items: center;
+        justify-content: center;
+        padding: 22px;
+    }
+
+    .preview-box {
+        width: 720px;
+        max-width: 100%;
+        background: white;
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: 0 30px 80px rgba(15,23,42,.25);
+    }
+
+    .preview-topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-start;
+        margin-bottom: 18px;
+    }
+
+        .preview-topo span {
+            color: #0ea5e9;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .preview-topo h3 {
+            margin: 6px 0 0;
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .preview-topo button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #0f172a;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+    .preview-conteudo {
+        min-height: 330px;
+        max-height: 520px;
+        overflow: hidden;
+        border-radius: 22px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .preview-conteudo img {
+            max-width: 100%;
+            max-height: 520px;
+            object-fit: contain;
+        }
+
+        .preview-conteudo iframe {
+            width: 100%;
+            height: 520px;
+            border: none;
+        }
+
+    .preview-arquivo-generico {
+        text-align: center;
+        color: #64748b;
+        padding: 30px;
+    }
+
+        .preview-arquivo-generico strong {
+            display: block;
+            color: #0f172a;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+    .preview-info {
+        margin-top: 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+        .preview-info strong {
+            color: #0f172a;
+        }
+
+    .preview-acoes {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .btn-preview-cancelar,
+    .btn-preview-confirmar {
+        border: none;
+        border-radius: 14px;
+        padding: 13px 18px;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    .btn-preview-cancelar {
+        background: #f1f5f9;
+        color: #334155;
+    }
+
+    .btn-preview-confirmar {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+    }
+
+        .btn-preview-confirmar:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+    /* RESPONSIVO */
 
     @@media(max-width: 950px) {
         .vendedor-page {
@@ -592,12 +868,176 @@
             align-items: stretch;
         }
 
-            .comprovante-box form,
-            .comprovante-box input,
-            .comprovante-box button,
-            .btn-ver-comprovante {
-                width: 100%;
-                max-width: 100%;
-            }
+        .area-documento-vendedor,
+        .form-documento-vendedor,
+        .btn-ver-comprovante,
+        .btn-selecionar-arquivo {
+            width: 100%;
+        }
+    }
+
+    @@media(max-width: 650px) {
+        .preview-acoes {
+            flex-direction: column;
+        }
+
+        .btn-preview-cancelar,
+        .btn-preview-confirmar {
+            width: 100%;
+        }
+
+        .preview-conteudo,
+        .preview-conteudo iframe {
+            height: 360px;
+        }
     }
 </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Guarda qual formulário será enviado depois da confirmação
+        let formSelecionado = null;
+
+        // Guarda a URL temporária do arquivo para liberar memória depois
+        let urlPreviewAtual = null;
+
+        const modal = document.getElementById("modalPreviewDocumento");
+        const previewConteudo = document.getElementById("previewConteudoDocumento");
+        const previewNome = document.getElementById("previewNomeArquivo");
+        const previewTamanho = document.getElementById("previewTamanhoArquivo");
+
+        const btnFechar = document.getElementById("fecharPreviewDocumento");
+        const btnCancelar = document.getElementById("cancelarEnvioDocumento");
+        const btnConfirmar = document.getElementById("confirmarEnvioDocumento");
+
+        // Segurança: se algum elemento do modal não existir, não executa o script
+        if (!modal || !previewConteudo || !previewNome || !previewTamanho || !btnFechar || !btnCancelar || !btnConfirmar) {
+            return;
+        }
+
+        function formatarTamanho(bytes) {
+            if (bytes < 1024) {
+                return bytes + " bytes";
+            }
+
+            if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(1) + " KB";
+            }
+
+            return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        function limparPreview() {
+            if (urlPreviewAtual) {
+                URL.revokeObjectURL(urlPreviewAtual);
+                urlPreviewAtual = null;
+            }
+
+            previewConteudo.innerHTML = "";
+            previewNome.textContent = "";
+            previewTamanho.textContent = "";
+            btnConfirmar.disabled = false;
+            btnConfirmar.textContent = "Confirmar envio";
+        }
+
+        function fecharModal(limparInput) {
+            modal.style.display = "none";
+            limparPreview();
+
+            if (limparInput && formSelecionado) {
+                const input = formSelecionado.querySelector(".input-documento");
+
+                if (input) {
+                    input.value = "";
+                }
+            }
+
+            formSelecionado = null;
+        }
+
+        document.querySelectorAll(".input-documento").forEach(function (input) {
+            input.addEventListener("change", function () {
+                const arquivo = this.files[0];
+
+                if (!arquivo) {
+                    return;
+                }
+
+                const extensoesPermitidas = ["pdf", "jpg", "jpeg", "png", "webp"];
+                const partesNome = arquivo.name.split(".");
+                const extensao = partesNome.length > 1 ? partesNome.pop().toLowerCase() : "";
+
+                if (!extensoesPermitidas.includes(extensao)) {
+                    alert("Envie um arquivo PDF, JPG, PNG ou WEBP.");
+                    this.value = "";
+                    return;
+                }
+
+                if (arquivo.size > 5 * 1024 * 1024) {
+                    alert("O arquivo deve ter no máximo 5 MB.");
+                    this.value = "";
+                    return;
+                }
+
+                formSelecionado = this.closest("form");
+
+                limparPreview();
+
+                urlPreviewAtual = URL.createObjectURL(arquivo);
+
+                previewNome.textContent = arquivo.name;
+                previewTamanho.textContent = formatarTamanho(arquivo.size);
+
+                // Pré-visualização para imagem
+                if (arquivo.type.startsWith("image/")) {
+                    previewConteudo.innerHTML =
+                        '<img src="' + urlPreviewAtual + '" alt="Pré-visualização do documento" />';
+                }
+                // Pré-visualização para PDF
+                else if (arquivo.type === "application/pdf") {
+                    previewConteudo.innerHTML =
+                        '<iframe src="' + urlPreviewAtual + '"></iframe>';
+                }
+                // Fallback
+                else {
+                    previewConteudo.innerHTML =
+                        '<div class="preview-arquivo-generico">' +
+                            '<strong>Arquivo selecionado</strong>' +
+                            '<span>Pré-visualização indisponível para este formato.</span>' +
+                        '</div>';
+                }
+
+                modal.style.display = "flex";
+            });
+        });
+
+        btnConfirmar.addEventListener("click", function () {
+            if (formSelecionado) {
+                btnConfirmar.disabled = true;
+                btnConfirmar.textContent = "Enviando...";
+                formSelecionado.submit();
+            }
+        });
+
+        btnCancelar.addEventListener("click", function () {
+            fecharModal(true);
+        });
+
+        btnFechar.addEventListener("click", function () {
+            fecharModal(true);
+        });
+
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
+                fecharModal(true);
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && modal.style.display === "flex") {
+                fecharModal(true);
+            }
+        });
+    });
+</script>

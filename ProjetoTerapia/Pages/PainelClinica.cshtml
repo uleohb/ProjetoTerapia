@@ -468,137 +468,153 @@
                             </div>
                         </div>
 
-                        <div class="clube-info-box">
-                            <h3>Cidades adicionais</h3>
-
-                            <p>
-                                Os planos abaixo adicionam novas cidades ao seu perfil,
-                                além da cidade principal cadastrada.
-                            </p>
-                        </div>
-
-                        <div class="clube-grid">
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+1 cidade</span>
-                                <strong>R$ 30</strong>
-                                <small>Cidade principal + 1 adicional</small>
-
-                                @if (PlanoRegionalAtivo(1))
+                        @{
+                            /*
+                            Cidades liberadas neste momento para o Clube de Descontos.
+                            A cidade principal da clínica já está inclusa no plano profissional,
+                            então ela não entra como cidade adicional.
+                            */
+                            var cidadesLiberadasClube = new List<string>
                                 {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
+                                "Osasco",
+                                "Barueri",
+                                "São Paulo"
+                                };
+
+                            var cidadePrincipalClube = Model.Clinica?.Cidade?.Trim() ?? "";
+
+                            var cidadesAdicionaisDisponiveis = cidadesLiberadasClube
+                            .Where(c => !string.Equals(c, cidadePrincipalClube, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+
+                            var quantidadeAdicionaisDisponiveis = cidadesAdicionaisDisponiveis.Count;
+                        }
+
+                        <div class="clube-info-compacto">
+
+                            <div>
+                                <h3>Cidades adicionais</h3>
+
+                                <p>
+                                    Disponível agora para Osasco, Barueri e São Paulo.
+                                    Sua cidade principal já está inclusa no plano profissional.
+                                </p>
                             </div>
 
-                            <div class="clube-item">
-                                <span class="clube-qtd">+3 cidades</span>
-                                <strong>R$ 35</strong>
-                                <small>Cidade principal + 3 adicionais</small>
+                            <div class="cidades-liberadas-mini">
 
-                                @if (PlanoRegionalAtivo(3))
+                                @foreach (var cidade in cidadesLiberadasClube)
                                 {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
+                                    if (string.Equals(cidade, cidadePrincipalClube, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="cidade-mini principal">
+                                            @cidade
+                                            <small>Principal</small>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="cidade-mini">
+                                            @cidade
+                                        </span>
+                                    }
                                 }
-                            </div>
 
-                            <div class="clube-item">
-                                <span class="clube-qtd">+5 cidades</span>
-                                <strong>R$ 40</strong>
-                                <small>Cidade principal + 5 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(5))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+8 cidades</span>
-                                <strong>R$ 45</strong>
-                                <small>Cidade principal + 8 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(8))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+10 cidades</span>
-                                <strong>R$ 50</strong>
-                                <small>Cidade principal + 10 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(50))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+15 cidades</span>
-                                <strong>R$ 55</strong>
-                                <small>Cidade principal + 15 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(15))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+20 cidades</span>
-                                <strong>R$ 60</strong>
-                                <small>Cidade principal + 20 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(20))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+25 cidades</span>
-                                <strong>R$ 65</strong>
-                                <small>Cidade principal + 25 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(25))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
-                            </div>
-
-                            <div class="clube-item">
-                                <span class="clube-qtd">+27 cidades</span>
-                                <strong>R$ 70</strong>
-                                <small>Cidade principal + 27 adicionais</small>
-
-                                @if (PlanoRegionalAtivo(27))
-                                {
-                                    <em class="tag-regional-ativo">
-                                        Ativo até @Model.DataFimPlanoRegionalFormatada
-                                    </em>
-                                }
                             </div>
 
                         </div>
 
-                        <a href="/SolicitarDivulgacao" class="btn-clube-descontos">
+                        <div class="clube-grid-compacto">
+
+                            @if (quantidadeAdicionaisDisponiveis >= 1)
+                            {
+                                <div class="clube-item compacto @(PlanoRegionalAtivo(1) ? "ativo" : "")">
+
+                                    <div>
+                                        <span class="clube-qtd">+1 cidade</span>
+
+                                        <strong>R$ 30</strong>
+
+                                        <small>
+                                            Escolha 1 cidade adicional.
+                                        </small>
+                                    </div>
+
+                                    @if (PlanoRegionalAtivo(1))
+                                    {
+                                        <em class="tag-regional-ativo">
+                                            Ativo até @Model.DataFimPlanoRegionalFormatada
+                                        </em>
+                                    }
+
+                                </div>
+                            }
+
+                            @if (quantidadeAdicionaisDisponiveis >= 2)
+                            {
+                                <div class="clube-item compacto @(PlanoRegionalAtivo(2) ? "ativo" : "")">
+
+                                    <div>
+                                        <span class="clube-qtd">+2 cidades</span>
+
+                                        <strong>R$ 35</strong>
+
+                                        <small>
+                                            Escolha 2 cidades adicionais.
+                                        </small>
+                                    </div>
+
+                                    @if (PlanoRegionalAtivo(2))
+                                    {
+                                        <em class="tag-regional-ativo">
+                                            Ativo até @Model.DataFimPlanoRegionalFormatada
+                                        </em>
+                                    }
+
+                                </div>
+                            }
+
+                            @if (quantidadeAdicionaisDisponiveis >= 3)
+                            {
+                                <div class="clube-item compacto @(PlanoRegionalAtivo(3) ? "ativo" : "")">
+
+                                    <div>
+                                        <span class="clube-qtd">+3 cidades</span>
+
+                                        <strong>R$ 35</strong>
+
+                                        <small>
+                                            Escolha 3 cidades adicionais.
+                                        </small>
+                                    </div>
+
+                                    @if (PlanoRegionalAtivo(3))
+                                    {
+                                        <em class="tag-regional-ativo">
+                                            Ativo até @Model.DataFimPlanoRegionalFormatada
+                                        </em>
+                                    }
+
+                                </div>
+                            }
+
+                            <div class="clube-item compacto bloqueado">
+
+                                <div>
+                                    <span class="clube-qtd">Mais regiões</span>
+
+                                    <strong>Em breve</strong>
+
+                                    <small>
+                                        Novas cidades serão liberadas depois.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <a href="/SolicitarDivulgacao" class="btn-clube-descontos compacto">
                             Solicitar divulgação regional
                         </a>
 
@@ -1857,6 +1873,179 @@
         font-size: 11px;
         font-weight: 900;
         font-style: normal;
+    }
+
+    /* =========================================================
+       CLUBE DE DESCONTOS COMPACTO
+    ========================================================= */
+
+    .clube-info-compacto {
+        background: white;
+        border: 1px solid #dbeafe;
+        border-radius: 22px;
+        padding: 18px 20px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+    }
+
+        .clube-info-compacto h3 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .clube-info-compacto p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+    .cidades-liberadas-mini {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        min-width: 230px;
+    }
+
+    .cidade-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 11px;
+        border-radius: 999px;
+        background: #ecfeff;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .cidade-mini.principal {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+
+        .cidade-mini small {
+            font-size: 10px;
+            font-weight: 900;
+            opacity: .85;
+        }
+
+    .clube-grid-compacto {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .clube-item.compacto {
+        background: white;
+        border: 1px solid #dbeafe;
+        border-radius: 18px;
+        padding: 16px;
+        min-height: 128px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: .25s;
+        box-shadow: 0 10px 25px rgba(15,23,42,.04);
+    }
+
+        .clube-item.compacto:hover {
+            transform: translateY(-3px);
+            border-color: #0ea5e9;
+            box-shadow: 0 16px 28px rgba(14,165,233,.10);
+        }
+
+        .clube-item.compacto.ativo {
+            background: linear-gradient(135deg,#ecfdf5,#ffffff);
+            border-color: #86efac;
+        }
+
+        .clube-item.compacto.bloqueado {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            opacity: .82;
+        }
+
+            .clube-item.compacto.bloqueado:hover {
+                transform: none;
+                box-shadow: 0 10px 25px rgba(15,23,42,.04);
+                border-color: #e2e8f0;
+            }
+
+        .clube-item.compacto .clube-qtd {
+            color: #0ea5e9;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .clube-item.compacto strong {
+            display: block;
+            color: #0f172a;
+            font-size: 25px;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .clube-item.compacto small {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .clube-item.compacto.bloqueado .clube-qtd,
+        .clube-item.compacto.bloqueado strong,
+        .clube-item.compacto.bloqueado small {
+            color: #94a3b8;
+        }
+
+    .btn-clube-descontos.compacto {
+        min-height: 54px;
+        border-radius: 17px;
+        font-size: 15px;
+    }
+
+    @@media(max-width: 1050px)
+
+    {
+        .clube-grid-compacto
+
+    {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .clube-info-compacto {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cidades-liberadas-mini {
+        justify-content: flex-start;
+        min-width: 0;
+    }
+
+    }
+
+    @@media(max-width: 650px)
+
+    {
+        .clube-grid-compacto
+
+    {
+        grid-template-columns: 1fr;
+    }
+
     }
 
     /* =========================================================

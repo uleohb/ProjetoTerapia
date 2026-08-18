@@ -2,11 +2,44 @@
 @model ProjetoTerapia.Pages.SolicitarDivulgacaoModel
 @using System.Globalization
 
+@{
+    var cultura = new CultureInfo("pt-BR");
+
+    /*
+        Quantidade de cidades realmente disponíveis agora.
+        Exemplo:
+        - Se a clínica for de Osasco, sobram Barueri e São Paulo = 2 cidades adicionais.
+        - Se a clínica for de Cotia, sobram Osasco, Barueri e São Paulo = 3 cidades adicionais.
+    */
+    var limiteAtualCidades = Model.CidadesDisponiveis
+        .Count(c => Model.CidadeLiberada(c) && !Model.EhCidadePrincipal(c));
+
+    /*
+        Planos exibidos na tela.
+        Os planos maiores continuam aparecendo como "Em breve".
+    */
+    var planos = new[]
+    {
+        new { Quantidade = 1, Nome = "+1 cidade", Valor = 30m },
+        new { Quantidade = 2, Nome = "+2 cidades", Valor = 35m },
+        new { Quantidade = 3, Nome = "+3 cidades", Valor = 35m },
+        new { Quantidade = 5, Nome = "+5 cidades", Valor = 40m },
+        new { Quantidade = 8, Nome = "+8 cidades", Valor = 45m },
+        new { Quantidade = 10, Nome = "+10 cidades", Valor = 50m },
+        new { Quantidade = 15, Nome = "+15 cidades", Valor = 55m },
+        new { Quantidade = 20, Nome = "+20 cidades", Valor = 60m },
+        new { Quantidade = 25, Nome = "+25 cidades", Valor = 65m },
+        new { Quantidade = 27, Nome = "+27 cidades", Valor = 70m }
+    };
+}
+
 <div class="divulgacao-page">
 
     <div class="divulgacao-card">
 
-        <img src="/imagem/logo.png" class="logo-divulgacao" />
+        <img src="/imagem/logo.png"
+             class="logo-divulgacao"
+             alt="AlinhaMente" />
 
         <span class="badge">
             Clube de Descontos
@@ -50,98 +83,97 @@
             </div>
         }
 
+        @if (limiteAtualCidades <= 0)
+        {
+            <div class="alerta-erro">
+                No momento, não há cidades adicionais disponíveis para sua região.
+            </div>
+        }
+
         <form method="post">
 
+            <!-- ETAPA 1: PLANOS -->
             <div class="secao-form">
 
                 <div class="secao-titulo">
                     <span>Etapa 1</span>
-                    <h2>Escolha o plano</h2>
-                    <p>O limite de cidades será definido pelo plano selecionado.</p>
+
+                    <h2>
+                        Escolha o plano
+                    </h2>
+
+                    <p>
+                        No momento, a divulgação regional está disponível apenas para Osasco, Barueri e São Paulo.
+                    </p>
                 </div>
 
                 <div class="planos-grid">
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="1" required
-                               checked="@(Model.QuantidadeCidades == 1 ? "checked" : null)" />
-                        <span>+1 cidade</span>
-                        <strong>R$ 30,00</strong>
-                    </label>
+                    @foreach (var plano in planos)
+                    {
+                        var planoDisponivel = plano.Quantidade <= limiteAtualCidades;
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="3"
-                               checked="@(Model.QuantidadeCidades == 3 ? "checked" : null)" />
-                        <span>+3 cidades</span>
-                        <strong>R$ 35,00</strong>
-                    </label>
+                        <label class="plano-card @(planoDisponivel ? "" : "plano-bloqueado") @(plano.Quantidade == 3 && planoDisponivel ? "destaque" : "")">
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="5"
-                               checked="@(Model.QuantidadeCidades == 5 ? "checked" : null)" />
-                        <span>+5 cidades</span>
-                        <strong>R$ 40,00</strong>
-                    </label>
+                            @if (planoDisponivel)
+                            {
+                                <input type="radio"
+                                       name="QuantidadeCidades"
+                                       value="@plano.Quantidade"
+                                       class="plano-check"
+                                       required
+                                       checked="@(Model.QuantidadeCidades == plano.Quantidade ? "checked" : null)" />
+                            }
+                            else
+                            {
+                                <input type="radio"
+                                       name="QuantidadeCidades"
+                                       value="@plano.Quantidade"
+                                       disabled />
+                            }
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="8"
-                               checked="@(Model.QuantidadeCidades == 8 ? "checked" : null)" />
-                        <span>+8 cidades</span>
-                        <strong>R$ 45,00</strong>
-                    </label>
+                            <span>@plano.Nome</span>
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="10"
-                               checked="@(Model.QuantidadeCidades == 10 ? "checked" : null)" />
-                        <span>+10 cidades</span>
-                        <strong>R$ 50,00</strong>
-                    </label>
+                            <strong>
+                                @plano.Valor.ToString("C", cultura)
+                            </strong>
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="15"
-                               checked="@(Model.QuantidadeCidades == 15 ? "checked" : null)" />
-                        <span>+15 cidades</span>
-                        <strong>R$ 55,00</strong>
-                    </label>
+                            @if (!planoDisponivel)
+                            {
+                                <small class="selo-em-breve">
+                                    Em breve
+                                </small>
+                            }
 
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="20"
-                               checked="@(Model.QuantidadeCidades == 20 ? "checked" : null)" />
-                        <span>+20 cidades</span>
-                        <strong>R$ 60,00</strong>
-                    </label>
-
-                    <label class="plano-card">
-                        <input type="radio" name="QuantidadeCidades" value="25"
-                               checked="@(Model.QuantidadeCidades == 25 ? "checked" : null)" />
-                        <span>+25 cidades</span>
-                        <strong>R$ 65,00</strong>
-                    </label>
-
-                    <label class="plano-card destaque">
-                        <input type="radio" name="QuantidadeCidades" value="27"
-                               checked="@(Model.QuantidadeCidades == 27 ? "checked" : null)" />
-                        <span>+27 cidades</span>
-                        <strong>R$ 70,00</strong>
-                    </label>
+                        </label>
+                    }
 
                 </div>
 
             </div>
 
+            <!-- ETAPA 2: CIDADES -->
             <div class="secao-form">
 
                 <div class="secao-titulo linha">
+
                     <div>
                         <span>Etapa 2</span>
-                        <h2>Selecione as cidades</h2>
-                        <p>Escolha apenas cidades adicionais. A cidade principal não precisa ser selecionada.</p>
+
+                        <h2>
+                            Selecione as cidades
+                        </h2>
+
+                        <p>
+                            Escolha apenas cidades adicionais. A cidade principal não precisa ser selecionada.
+                        </p>
                     </div>
 
                     <div class="contador-cidades">
                         <strong id="contadorSelecionadas">0</strong>
                         <span id="contadorLimite">/ 0 cidades</span>
                     </div>
+
                 </div>
 
                 <div class="cidades-grid">
@@ -153,22 +185,47 @@
                             continue;
                         }
 
-                        <label class="cidade-opcao">
-                            <input type="checkbox"
-                                   name="CidadesEscolhidas"
-                                   value="@cidade"
-                                   class="cidade-check"
-                                   checked="@(Model.CidadeSelecionada(cidade) ? "checked" : null)" />
+                        var cidadeLiberada = Model.CidadeLiberada(cidade);
 
-                            <span>@cidade</span>
-                        </label>
+                        if (cidadeLiberada)
+                        {
+                            <label class="cidade-opcao cidade-disponivel">
+
+                                <input type="checkbox"
+                                       name="CidadesEscolhidas"
+                                       value="@cidade"
+                                       class="cidade-check"
+                                       checked="@(Model.CidadeSelecionada(cidade) ? "checked" : null)" />
+
+                                <span>@cidade</span>
+
+                                <small class="selo-disponivel">
+                                    Disponível
+                                </small>
+
+                            </label>
+                        }
+                        else
+                        {
+                            <div class="cidade-opcao cidade-bloqueada">
+
+                                <span>@cidade</span>
+
+                                <small class="selo-em-breve">
+                                    Em breve
+                                </small>
+
+                            </div>
+                        }
                     }
 
                 </div>
 
             </div>
 
-            <button type="submit" class="btn-principal">
+            <button type="submit"
+                    class="btn-principal"
+                    @(limiteAtualCidades <= 0 ? "disabled" : null)>
                 Ir para pagamento
             </button>
 
@@ -180,6 +237,7 @@
 
     </div>
 
+    <!-- HISTÓRICO -->
     <div class="historico-card">
 
         <h2>
@@ -204,10 +262,12 @@
                             <span>@item.NomePlano</span>
 
                             <strong>
-                                @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                                @item.Valor.ToString("C", cultura)
                             </strong>
 
-                            <p>@item.CidadesSelecionadas</p>
+                            <p>
+                                @item.CidadesSelecionadas
+                            </p>
 
                             @if (!item.Pago && item.Status != "Expirado")
                             {
@@ -228,12 +288,13 @@
                             }
 
                             @if (!item.Pago &&
-                                 item.Status != "Expirado" &&
-                                 item.Status != "Cancelado" &&
-                                 !string.IsNullOrWhiteSpace(item.LinkPagamento))
+                                                item.Status != "Expirado" &&
+                                                item.Status != "Cancelado" &&
+                                                !string.IsNullOrWhiteSpace(item.LinkPagamento))
                             {
                                 <a href="@item.LinkPagamento"
                                    target="_blank"
+                                   rel="noopener noreferrer"
                                    class="btn-pagar-agora">
                                     Pagar agora
                                 </a>
@@ -257,8 +318,13 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
+        // Radios dos planos disponíveis
         var radiosPlano = document.querySelectorAll("input[name='QuantidadeCidades']");
+
+        // Checkboxes apenas das cidades liberadas
         var cidades = document.querySelectorAll(".cidade-check");
+
         var contadorSelecionadas = document.getElementById("contadorSelecionadas");
         var contadorLimite = document.getElementById("contadorLimite");
 
@@ -289,6 +355,7 @@
                 return cidade.checked;
             });
 
+            // Se trocar para um plano menor, remove seleções extras
             if (limite > 0 && selecionadas.length > limite) {
                 selecionadas.slice(limite).forEach(function (cidade) {
                     cidade.checked = false;
@@ -338,7 +405,6 @@
 </script>
 
 <style>
-
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
     * {
@@ -515,6 +581,7 @@
         padding: 18px;
         cursor: pointer;
         transition: .25s;
+        position: relative;
     }
 
         .plano-card:hover,
@@ -546,6 +613,25 @@
             background: linear-gradient(135deg,#f8fafc,#ecfeff);
         }
 
+    .plano-bloqueado {
+        background: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+        opacity: .78;
+    }
+
+        .plano-bloqueado:hover {
+            transform: none;
+            border-color: #e2e8f0;
+            box-shadow: none;
+            background: #f1f5f9;
+        }
+
+        .plano-bloqueado span,
+        .plano-bloqueado strong {
+            color: #94a3b8;
+        }
+
     .cidades-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -562,7 +648,8 @@
         gap: 10px;
         cursor: pointer;
         transition: .25s;
-        min-height: 52px;
+        min-height: 58px;
+        position: relative;
     }
 
         .cidade-opcao:hover,
@@ -585,6 +672,50 @@
             font-weight: 700;
         }
 
+    .cidade-disponivel {
+        justify-content: flex-start;
+    }
+
+    .cidade-bloqueada {
+        background: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+        opacity: .82;
+        justify-content: space-between;
+    }
+
+        .cidade-bloqueada:hover {
+            border-color: #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .cidade-bloqueada span {
+            color: #94a3b8;
+        }
+
+    .selo-disponivel,
+    .selo-em-breve {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .selo-disponivel {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .selo-em-breve {
+        background: #e2e8f0;
+        color: #64748b;
+    }
+
     .btn-principal,
     .btn-voltar {
         display: inline-flex;
@@ -605,6 +736,11 @@
         cursor: pointer;
         font-size: 16px;
     }
+
+        .btn-principal:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
 
     .btn-voltar {
         margin-top: 14px;
@@ -677,11 +813,6 @@
             box-shadow: 0 12px 24px rgba(34,197,94,.18);
         }
 
-    .status.pago {
-        background: #dcfce7;
-        color: #166534;
-    }
-
     .status {
         align-self: start;
         padding: 8px 12px;
@@ -692,6 +823,16 @@
         font-size: 12px;
         white-space: nowrap;
     }
+
+        .status.pago {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.expirado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
 
     .alerta-sucesso,
     .alerta-erro {
@@ -713,11 +854,6 @@
 
     .vazio {
         color: #64748b;
-    }
-
-    .status.expirado {
-        background: #fee2e2;
-        color: #991b1b;
     }
 
     .prazo-pagamento,
@@ -796,6 +932,10 @@
             justify-content: center;
             text-align: center;
         }
-    }
 
+        .selo-disponivel,
+        .selo-em-breve {
+            margin-left: 0;
+        }
+    }
 </style>

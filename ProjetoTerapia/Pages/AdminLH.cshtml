@@ -1,6 +1,28 @@
 ﻿@page
 @model ProjetoTerapia.Pages.AdminLHModel
 
+@functions {
+    string TraduzirStatusMercadoPago(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return "Sem retorno";
+        }
+
+        return status.ToLower() switch
+        {
+            "approved" => "Aprovado",
+            "pending" => "Pendente",
+            "in_process" => "Em análise",
+            "rejected" => "Recusado",
+            "cancelled" => "Cancelado",
+            "refunded" => "Estornado",
+            "charged_back" => "Contestação",
+            _ => status
+        };
+    }
+}
+
 <div class="admin-page">
 
     <aside class="sidebar-admin">
@@ -866,9 +888,7 @@
                         <div>
                             <span>Mercado Pago</span>
                             <strong>
-                                @(string.IsNullOrWhiteSpace(item.MercadoPagoStatus)
-                                                                ? "Sem retorno"
-                                                                : item.MercadoPagoStatus)
+                                    @TraduzirStatusMercadoPago(item.MercadoPagoStatus)
                             </strong>
                         </div>
 
