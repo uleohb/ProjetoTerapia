@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net;
-using System.Net.Mail;
 using System.Text;
 
 namespace ProjetoTerapia.Pages
@@ -22,6 +21,12 @@ namespace ProjetoTerapia.Pages
         public string Email { get; set; } = "";
 
         [BindProperty]
+        public string TemCadastro { get; set; } = "";
+
+        [BindProperty]
+        public string CPF { get; set; } = "";
+
+        [BindProperty]
         public string TipoUsuario { get; set; } = "";
 
         [BindProperty]
@@ -36,8 +41,11 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnPost()
         {
+            // Validação dos campos obrigatórios principais
             if (string.IsNullOrWhiteSpace(Nome) ||
                 string.IsNullOrWhiteSpace(Email) ||
+                string.IsNullOrWhiteSpace(TemCadastro) ||
+                string.IsNullOrWhiteSpace(TipoUsuario) ||
                 string.IsNullOrWhiteSpace(Assunto) ||
                 string.IsNullOrWhiteSpace(Mensagem))
             {
@@ -45,60 +53,69 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
-            try
+            // Se o usuário marcou que já tem cadastro, o CPF passa a ser obrigatório
+            if (TemCadastro == "Sim" && string.IsNullOrWhiteSpace(CPF))
             {
-                var host = _config["Email:Servidor"];
-                var port = int.Parse(_config["Email:Porta"] ?? "587");
-                var usuario = _config["Email:Usuario"];
-                var senha = _config["Email:Senha"];
-                var destino = _config["Email:Destino"];
-
-                if (string.IsNullOrWhiteSpace(host) ||
-                    string.IsNullOrWhiteSpace(usuario) ||
-                    string.IsNullOrWhiteSpace(senha) ||
-                    string.IsNullOrWhiteSpace(destino))
-                {
-                    TempData["Erro"] = "Configuração de email incompleta.";
-                    return Page();
-                }
-
-                var corpo = new StringBuilder();
-
-                corpo.AppendLine("<h2>Novo chamado de suporte - AlinhaMente</h2>");
-                corpo.AppendLine("<hr />");
-                corpo.AppendLine($"<p><strong>Nome:</strong> {Nome}</p>");
-                corpo.AppendLine($"<p><strong>Email:</strong> {Email}</p>");
-                corpo.AppendLine($"<p><strong>Tipo de usuário:</strong> {TipoUsuario}</p>");
-                corpo.AppendLine($"<p><strong>Assunto:</strong> {Assunto}</p>");
-                corpo.AppendLine("<hr />");
-                corpo.AppendLine("<p><strong>Mensagem:</strong></p>");
-                corpo.AppendLine($"<p>{Mensagem.Replace("\n", "<br />")}</p>");
-
-                var email = new MailMessage();
-
-                email.From = new MailAddress(usuario, "Suporte AlinhaMente");
-                email.To.Add(destino);
-                email.ReplyToList.Add(new MailAddress(Email, Nome));
-                email.Subject = $"Suporte AlinhaMente - {Assunto}";
-                email.Body = corpo.ToString();
-                email.IsBodyHtml = true;
-
-                using var smtp = new SmtpClient(host, port);
-
-                smtp.Credentials = new NetworkCredential(usuario, senha);
-                smtp.EnableSsl = true;
-
-                smtp.Send(email);
-
-                TempData["Sucesso"] = "Mensagem enviada com sucesso. O suporte entrará em contato em breve.";
-
-                return RedirectToPage("/Suporte");
-            }
-            catch
-            {
-                TempData["Erro"] = "Não foi possível enviar sua mensagem agora. Verifique a configuração do email.";
+                TempData["Erro"] = "Informe o CPF cadastrado para facilitar o atendimento.";
                 return Page();
             }
+
+            var numeroWhatsapp = _config["Suporte:WhatsappNumero"];
+
+            if (string.IsNullOrWhiteSpace(numeroWhatsapp))
+            {
+                TempData["Erro"] = "Número de WhatsApp do suporte não configurado.";
+                return Page();
+            }
+
+            numeroWhatsapp = ApenasNumeros(numeroWhatsapp);
+
+            if (numeroWhatsapp.Length < 12)
+            {
+                TempData["Erro"] = "Número de WhatsApp do suporte inválido.";
+                return Page();
+            }
+
+            var cpfFormatado = "Não informado";
+
+            if (TemCadastro == "Sim" && !string.IsNullOrWhiteSpace(CPF))
+            {
+                cpfFormatado = CPF.Trim();
+            }
+
+            // Monta a mensagem que será enviada para o WhatsApp
+            var texto = new StringBuilder();
+
+            texto.AppendLine("Olá, suporte AlinhaMente! Preciso de atendimento.");
+            texto.AppendLine();
+            texto.AppendLine("Dados do chamado:");
+            texto.AppendLine($"Nome: {Nome.Trim()}");
+            texto.AppendLine($"Email: {Email.Trim()}");
+            texto.AppendLine($"Já tenho cadastro: {TemCadastro.Trim()}");
+
+            if (TemCadastro == "Sim")
+            {
+                texto.AppendLine($"CPF cadastrado: {cpfFormatado}");
+            }
+
+            texto.AppendLine($"Tipo de usuário: {TipoUsuario.Trim()}");
+            texto.AppendLine($"Assunto: {Assunto.Trim()}");
+            texto.AppendLine();
+            texto.AppendLine("Mensagem:");
+            texto.AppendLine(Mensagem.Trim());
+            texto.AppendLine();
+            texto.AppendLine("Enviado pelo formulário de suporte da plataforma AlinhaMente.");
+
+            var mensagemCodificada = WebUtility.UrlEncode(texto.ToString());
+
+            var linkWhatsapp = $"https://wa.me/{numeroWhatsapp}?text={mensagemCodificada}";
+
+            return Redirect(linkWhatsapp);
+        }
+
+        private string ApenasNumeros(string valor)
+        {
+            return new string(valor.Where(char.IsDigit).ToArray());
         }
     }
 }

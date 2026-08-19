@@ -12,7 +12,7 @@
                  alt="AlinhaMente" />
 
             <span class="badge-suporte">
-                Central de suporte
+                Suporte via WhatsApp
             </span>
 
             <h1>
@@ -20,7 +20,7 @@
             </h1>
 
             <p>
-                Envie sua dúvida, problema ou solicitação. Nossa equipe receberá sua mensagem pelo email oficial de suporte.
+                Preencha as informações abaixo. Ao confirmar, abriremos uma conversa no WhatsApp oficial do suporte com sua mensagem pronta.
             </p>
 
         </div>
@@ -41,26 +41,82 @@
 
         <form method="post" class="form-suporte">
 
+            <!-- Nome e email -->
             <div class="grid-campos">
 
                 <div class="campo">
                     <label>Nome</label>
-                    <input asp-for="Nome" placeholder="Seu nome" required />
+
+                    <input asp-for="Nome"
+                           placeholder="Seu nome"
+                           required />
                 </div>
 
                 <div class="campo">
                     <label>Email</label>
-                    <input asp-for="Email" type="email" placeholder="seuemail@gmail.com" required />
+
+                    <input asp-for="Email"
+                           type="email"
+                           placeholder="seuemail@gmail.com"
+                           required />
                 </div>
 
             </div>
 
+            <!-- Pergunta se já tem cadastro -->
+            <div class="campo">
+
+                <label>Você já tem cadastro na plataforma?</label>
+
+                <div class="opcoes-cadastro">
+
+                    <label class="opcao-radio">
+                        <input type="radio"
+                               asp-for="TemCadastro"
+                               value="Sim"
+                               class="radio-tem-cadastro"
+                               required />
+
+                        <span>Sim, já tenho cadastro</span>
+                    </label>
+
+                    <label class="opcao-radio">
+                        <input type="radio"
+                               asp-for="TemCadastro"
+                               value="Não"
+                               class="radio-tem-cadastro"
+                               required />
+
+                        <span>Não tenho cadastro</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- CPF só aparece se marcar que já tem cadastro -->
+            <div class="campo campo-cpf-suporte" id="campoCpfSuporte">
+
+                <label>
+                    CPF cadastrado
+                    <span class="opcional">(necessário para localizar sua conta)</span>
+                </label>
+
+                <input asp-for="CPF"
+                       id="cpfSuporte"
+                       placeholder="000.000.000-00"
+                       maxlength="14" />
+
+            </div>
+
+            <!-- Tipo e assunto -->
             <div class="grid-campos">
 
                 <div class="campo">
                     <label>Tipo de usuário</label>
 
-                    <select asp-for="TipoUsuario">
+                    <select asp-for="TipoUsuario" required>
+                        <option value="">Selecione</option>
                         <option value="Paciente">Paciente</option>
                         <option value="Profissional">Profissional</option>
                         <option value="Clínica">Clínica</option>
@@ -86,6 +142,7 @@
 
             </div>
 
+            <!-- Mensagem -->
             <div class="campo">
                 <label>Mensagem</label>
 
@@ -95,7 +152,7 @@
             </div>
 
             <button type="submit" class="btn-enviar">
-                Enviar mensagem
+                Abrir conversa no WhatsApp
             </button>
 
         </form>
@@ -111,6 +168,55 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoCpf = document.getElementById("campoCpfSuporte");
+        const inputCpf = document.getElementById("cpfSuporte");
+        const radiosCadastro = document.querySelectorAll(".radio-tem-cadastro");
+
+        function atualizarCampoCpf() {
+            const selecionado = document.querySelector(".radio-tem-cadastro:checked");
+
+            if (!selecionado) {
+                campoCpf.style.display = "none";
+                inputCpf.required = false;
+                inputCpf.value = "";
+                return;
+            }
+
+            if (selecionado.value === "Sim") {
+                campoCpf.style.display = "block";
+                inputCpf.required = true;
+            }
+            else {
+                campoCpf.style.display = "none";
+                inputCpf.required = false;
+                inputCpf.value = "";
+            }
+        }
+
+        radiosCadastro.forEach(function (radio) {
+            radio.addEventListener("change", atualizarCampoCpf);
+        });
+
+        if (inputCpf) {
+            inputCpf.addEventListener("input", function () {
+                let valor = this.value.replace(/\D/g, "");
+
+                valor = valor.slice(0, 11);
+
+                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+                this.value = valor;
+            });
+        }
+
+        atualizarCampoCpf();
+    });
+</script>
 
 <style>
 
@@ -140,10 +246,7 @@
     .suporte-page {
         min-height: 100vh;
         padding: 45px 20px;
-        background:
-            radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%),
-            radial-gradient(circle at bottom right, rgba(124,58,237,.15), transparent 35%),
-            linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
+        background: radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%), radial-gradient(circle at bottom right, rgba(124,58,237,.15), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -232,12 +335,61 @@
         resize: vertical;
     }
 
-    .campo input:focus,
-    .campo select:focus,
-    .campo textarea:focus {
-        border-color: #0ea5e9;
-        background: white;
-        box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+        .campo input:focus,
+        .campo select:focus,
+        .campo textarea:focus {
+            border-color: #0ea5e9;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(14,165,233,.10);
+        }
+
+    .opcoes-cadastro {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .opcao-radio {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        border-radius: 16px;
+        border: 1px solid #dbeafe;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: .25s;
+    }
+
+        .opcao-radio:hover {
+            background: white;
+            border-color: #0ea5e9;
+            box-shadow: 0 10px 22px rgba(14,165,233,.08);
+        }
+
+        .opcao-radio input {
+            width: auto;
+            accent-color: #0ea5e9;
+        }
+
+        .opcao-radio span {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+    .campo-cpf-suporte {
+        display: none;
+        padding: 18px;
+        border-radius: 18px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
+
+    .opcional {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .btn-enviar {
@@ -253,9 +405,9 @@
         box-shadow: 0 14px 28px rgba(14,165,233,.18);
     }
 
-    .btn-enviar:hover {
-        transform: translateY(-2px);
-    }
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+        }
 
     .rodape-suporte {
         display: flex;
@@ -265,15 +417,15 @@
         margin-top: 22px;
     }
 
-    .rodape-suporte a {
-        color: #0ea5e9;
-        text-decoration: none;
-        font-weight: 800;
-        background: white;
-        border: 1px solid #dbeafe;
-        border-radius: 16px;
-        padding: 13px 18px;
-    }
+        .rodape-suporte a {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-weight: 800;
+            background: white;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            padding: 13px 18px;
+        }
 
     .alerta-sucesso,
     .alerta-erro {
@@ -300,7 +452,8 @@
             padding: 28px 20px;
         }
 
-        .grid-campos {
+        .grid-campos,
+        .opcoes-cadastro {
             grid-template-columns: 1fr;
         }
 
