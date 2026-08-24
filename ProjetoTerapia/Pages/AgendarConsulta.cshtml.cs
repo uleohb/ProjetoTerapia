@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
+using System.Net;
 
 namespace ProjetoTerapia.Pages
 {
@@ -19,11 +20,13 @@ namespace ProjetoTerapia.Pages
 
         public ResultadoTestePaciente? UltimoResultado { get; set; }
 
+        public string LinkWhatsappProfissional { get; set; } = "";
+
         [BindProperty]
         public int ClinicaId { get; set; }
 
         [BindProperty]
-        public DateTime DataConsulta { get; set; }
+        public string WhatsappPaciente { get; set; } = "";
 
         [BindProperty]
         public string TipoAtendimento { get; set; } = "";
@@ -40,7 +43,7 @@ namespace ProjetoTerapia.Pages
 
             if (string.IsNullOrEmpty(pacienteIdString))
             {
-                TempData["Erro"] = "Entre como paciente para agendar uma consulta.";
+                TempData["Erro"] = "Entre como paciente para solicitar contato com o profissional.";
                 return RedirectToPage("/LoginPaciente");
             }
 
@@ -53,7 +56,8 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage("/LoginPaciente");
             }
 
-            Clinica = _context.Clinicas.FirstOrDefault(c => c.Id == id && c.Aprovado && c.Pago)!;
+            Clinica = _context.Clinicas
+                .FirstOrDefault(c => c.Id == id && c.Aprovado && c.Pago)!;
 
             if (Clinica == null)
             {
@@ -67,6 +71,8 @@ namespace ProjetoTerapia.Pages
 
             ClinicaId = Clinica.Id;
 
+            MontarLinkWhatsappProfissional();
+
             return Page();
         }
 
@@ -76,7 +82,7 @@ namespace ProjetoTerapia.Pages
 
             if (string.IsNullOrEmpty(pacienteIdString))
             {
-                TempData["Erro"] = "Entre como paciente para agendar uma consulta.";
+                TempData["Erro"] = "Entre como paciente para solicitar contato com o profissional.";
                 return RedirectToPage("/LoginPaciente");
             }
 
@@ -89,19 +95,15 @@ namespace ProjetoTerapia.Pages
                 return RedirectToPage("/LoginPaciente");
             }
 
-            Clinica = _context.Clinicas.FirstOrDefault(c => c.Id == ClinicaId && c.Aprovado && c.Pago)!;
+            Clinica = _context.Clinicas
+                .FirstOrDefault(c => c.Id == ClinicaId && c.Aprovado && c.Pago)!;
 
             if (Clinica == null)
             {
                 return NotFound();
             }
 
-            if (DataConsulta <= DateTime.Now)
-            {
-                TempData["Erro"] = "Escolha uma data e horário futuros.";
-                CarregarResultado(pacienteId);
-                return Page();
-            }
+            MontarLinkWhatsappProfissional();
 
             if (string.IsNullOrWhiteSpace(TipoAtendimento))
             {
@@ -124,6 +126,16 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
+            var whatsappLimpo = ApenasNumeros(WhatsappPaciente);
+
+            if (!string.IsNullOrWhiteSpace(whatsappLimpo) &&
+                whatsappLimpo.Length < 10)
+            {
+                TempData["Erro"] = "Informe um WhatsApp válido com DDD ou deixe o campo em branco.";
+                CarregarResultado(pacienteId);
+                return Page();
+            }
+
             var ultimoResultado = _context.ResultadosTestePacientes
                 .Where(r => r.PacienteId == pacienteId)
                 .OrderByDescending(r => r.DataResultado)
@@ -136,8 +148,8 @@ namespace ProjetoTerapia.Pages
                 ResultadoTestePacienteId = CompartilharResultado ? ultimoResultado?.Id : null,
                 NomePaciente = Paciente.Nome,
                 EmailPaciente = Paciente.Email,
-                TelefonePaciente = "",
-                DataConsulta = DataConsulta,
+                TelefonePaciente = whatsappLimpo,
+                DataConsulta = DateTime.Now,
                 TipoAtendimento = TipoAtendimento,
                 Observacoes = Observacoes,
                 Status = "Pendente",
@@ -147,7 +159,7 @@ namespace ProjetoTerapia.Pages
             _context.Consultas.Add(consulta);
             _context.SaveChanges();
 
-            TempData["Sucesso"] = "Consulta solicitada com sucesso. Aguarde a confirmação do profissional.";
+            TempData["Sucesso"] = "Solicitação enviada com sucesso. O profissional poderá entrar em contato pelo WhatsApp, se você informou o número.";
 
             return RedirectToPage("/AgendarConsulta", new { id = Clinica.Id });
         }
@@ -158,6 +170,42 @@ namespace ProjetoTerapia.Pages
                 .Where(r => r.PacienteId == pacienteId)
                 .OrderByDescending(r => r.DataResultado)
                 .FirstOrDefault();
+        }
+
+        private void MontarLinkWhatsappProfissional()
+        {
+            var telefone = ApenasNumeros(Clinica.Telefone);
+
+            if (string.IsNullOrWhiteSpace(telefone))
+            {
+                LinkWhatsappProfissional = "";
+                return;
+            }
+
+            if ((telefone.Length == 10 || telefone.Length == 11) &&
+                !telefone.StartsWith("55"))
+            {
+                telefone = "55" + telefone;
+            }
+
+            var mensagem =
+$@"Olá, encontrei seu perfil no AlinhaMente e gostaria de conversar sobre uma consulta.
+
+Profissional: {Clinica.Nome}";
+
+            var mensagemCodificada = WebUtility.UrlEncode(mensagem);
+
+            LinkWhatsappProfissional = $"https://wa.me/{telefone}?text={mensagemCodificada}";
+        }
+
+        private string ApenasNumeros(string? valor)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+            {
+                return "";
+            }
+
+            return new string(valor.Where(char.IsDigit).ToArray());
         }
     }
 }

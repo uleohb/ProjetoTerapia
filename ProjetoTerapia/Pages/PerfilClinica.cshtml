@@ -5,8 +5,7 @@
 
     <div class="voltar-container">
         <a href="@(Model.EhDonoPerfil ? "/PainelClinica" : "/Clinicas")"
-           class="btn-voltar"
-           onclick="return voltarPagina(this)">
+           class="btn-voltar">
             ← Voltar
         </a>
     </div>
@@ -313,17 +312,6 @@
 
 </div>
 
-<script>
-    function voltarPagina(link) {
-        if (document.referrer && document.referrer.includes(window.location.origin)) {
-            window.history.back();
-            return false;
-        }
-
-        window.location.href = link.getAttribute("href");
-        return false;
-    }
-</script>
 
 <style>
 
@@ -332,6 +320,7 @@
         background: #ecfeff;
         font-family: 'Segoe UI', sans-serif;
     }
+
 
     /* TOPO MODERNO */
 

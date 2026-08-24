@@ -205,7 +205,7 @@
 
                         @if (!string.IsNullOrWhiteSpace(clinica.Endereco))
                         {
-                            <div class="detalhe-item">
+                            <div class="detalhe-item detalhe-endereco">
                                 <span>Endereço</span>
                                 <strong>@clinica.Endereco</strong>
                             </div>
@@ -871,64 +871,113 @@
             box-shadow: 0 14px 28px rgba(15,23,42,.10);
         }
 
-    /* =========================================================
+    /* ============================
            RESPONSIVO
-        ========================================================= */
+        ===========================*/
 
     @@media(max-width: 900px) {
 
+
         .header-clinicas {
             flex-direction: column;
-            align-items: stretch;
+            align-items: center;
+            padding: 18px 16px 0;
+            gap: 12px;
         }
 
-        .logo-header {
-            width: 100%;
+        .logo-header img {
+            width: 170px;
+            margin: auto;
         }
-
-            .logo-header img {
-                width: 190px;
-                margin: auto;
-            }
 
         .header-actions {
             width: 100%;
             justify-content: center;
             flex-wrap: wrap;
+            gap: 10px;
         }
 
         .header-link,
         .header-button {
+            width: 100%;
             text-align: center;
+            font-size: 14px;
         }
 
-        .hero-clinicas h1 {
-            font-size: 34px;
+        .hero-clinicas {
+            padding: 34px 16px 24px;
         }
+
+            .hero-clinicas h1 {
+                font-size: 30px;
+                line-height: 1.14;
+                max-width: 620px;
+            }
+
+            .hero-clinicas p {
+                font-size: 15px;
+                line-height: 1.55;
+                max-width: 560px;
+            }
 
         .busca-clinica {
             grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 22px;
+            margin-top: 26px;
         }
 
-            .busca-clinica button {
-                padding: 16px;
+            .busca-clinica input,
+            .busca-clinica select {
+                padding: 14px 15px;
+                font-size: 14px;
+                border-radius: 14px;
             }
 
-        .resultado-info,
+            .busca-clinica button,
+            .btn-limpar-filtros {
+                width: 100%;
+                min-height: 48px;
+                padding: 13px;
+                border-radius: 14px;
+                font-size: 15px;
+            }
+
+        .container-clinicas {
+            padding: 18px 16px;
+        }
+
+        .resultado-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+            .resultado-info h2 {
+                font-size: 28px;
+                line-height: 1.15;
+            }
+
+            .resultado-info p {
+                display: none;
+            }
+
+        .grid-clinicas {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
         .cta-paciente,
         .area-profissional {
             flex-direction: column;
             align-items: flex-start;
+            padding: 24px;
+            border-radius: 24px;
         }
 
-        .grid-clinicas {
-            grid-template-columns: 1fr;
-        }
-
-        .cta-actions {
-            width: 100%;
-        }
-
+        .cta-actions,
         .btn-criar-conta,
         .btn-login,
         .btn-cadastro {
@@ -936,52 +985,197 @@
         }
     }
 
+    /* =========================================================
+       MOBILE COMPACTO
+    ========================================================= */
+
     @@media(max-width: 768px) {
 
-        .acoes-card {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .btn-acao-card {
-            height: 56px;
-            font-size: 24px;
-        }
-    }
-
-    @@media(max-width: 520px) {
-
-        .hero-clinicas {
-            padding: 42px 20px 28px;
-        }
-
-            .hero-clinicas h1 {
-                font-size: 30px;
-            }
-
-            .hero-clinicas p {
-                font-size: 16px;
-            }
-
-        .container-clinicas {
-            padding: 18px;
-        }
-
         .card-clinica {
-            padding: 22px;
+            padding: 20px;
             border-radius: 24px;
         }
 
         .card-header {
             align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 14px;
         }
 
-            .card-header h3 {
-                font-size: 19px;
+        .avatar-clinica {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            font-size: 22px;
+        }
+
+        .card-header h3 {
+            font-size: 20px;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .selo-verificado {
+            font-size: 11px;
+            padding: 5px 9px;
+        }
+
+        .descricao {
+            font-size: 14px;
+            line-height: 1.55;
+            margin-bottom: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .lista-especialidades {
+            gap: 7px;
+            margin-bottom: 14px;
+            max-height: 74px;
+            overflow: hidden;
+        }
+
+        .tag-especialidade {
+            font-size: 11px;
+            padding: 6px 9px;
+        }
+
+        .detalhes-clinica {
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .detalhe-item {
+            padding: 12px 13px;
+            border-radius: 14px;
+        }
+
+            .detalhe-item span {
+                font-size: 11px;
+                margin-bottom: 4px;
             }
 
-        .acoes-card {
-            gap: 10px;
+            .detalhe-item strong {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+        /* No mobile, o endereço completo fica só no perfil */
+        .detalhe-endereco {
+            display: none;
         }
+
+        .acoes-card {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn-acao-card {
+            height: 52px;
+            border-radius: 15px;
+            font-size: 22px;
+        }
+        /* No mobile deixa só perfil e WhatsApp no card */
+        .btn-instagram,
+        .btn-site {
+            display: none;
+        }
+    }
+
+    /* =========================================================
+       CELULARES MENORES
+    ========================================================= */
+
+    @@media(max-width: 520px) {
+
+        .clinicas-page {
+            padding-bottom: 40px;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 7px 12px;
+            margin-bottom: 16px;
+        }
+
+        .hero-clinicas {
+            padding: 28px 14px 22px;
+        }
+
+            .hero-clinicas h1 {
+                font-size: 27px;
+                line-height: 1.16;
+                letter-spacing: -0.5px;
+            }
+
+            .hero-clinicas p {
+                font-size: 14px;
+                line-height: 1.55;
+            }
+
+        .busca-clinica {
+            margin-top: 22px;
+            padding: 12px;
+            border-radius: 20px;
+        }
+
+        .container-clinicas {
+            padding: 14px;
+        }
+
+        .resultado-info span {
+            font-size: 12px;
+        }
+
+        .resultado-info h2 {
+            font-size: 25px;
+        }
+
+        .card-clinica {
+            padding: 18px;
+            border-radius: 22px;
+            box-shadow: 0 14px 34px rgba(15,23,42,.07);
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+        }
+
+        .descricao {
+            -webkit-line-clamp: 2;
+        }
+
+        .lista-especialidades {
+            max-height: 68px;
+        }
+
+        .acoes-card {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .btn-acao-card {
+            height: 50px;
+            font-size: 21px;
+        }
+
+        .cta-paciente,
+        .area-profissional {
+            margin-top: 26px;
+            padding: 22px 18px;
+        }
+
+            .cta-paciente h2,
+            .area-profissional h3 {
+                font-size: 23px;
+                line-height: 1.2;
+            }
+
+            .cta-paciente p,
+            .area-profissional p {
+                font-size: 14px;
+            }
     }
 
 </style>
