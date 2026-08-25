@@ -367,13 +367,29 @@
         font-family: 'Poppins', sans-serif;
     }
 
+    html,
     body {
-        background: #f8fafc;
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #ecfeff;
         color: #0f172a;
+        overflow-x: hidden;
     }
 
     a {
         text-decoration: none;
+    }
+
+    /* Remove o container padrão do layout para a página ocupar a tela inteira */
+    .container,
+    .container-fluid {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
     }
 
     /* =========================================================
@@ -381,15 +397,17 @@
         ========================================================= */
 
     .clinicas-page {
+        width: 100%;
         min-height: 100vh;
         padding-bottom: 60px;
-        background: radial-gradient(circle at top left, rgba(20,184,166,.12), transparent 32%), linear-gradient(135deg,#ecfeff,#f8fafc,#eef2ff);
+        background: radial-gradient(circle at top left, rgba(20,184,166,.14), transparent 34%), radial-gradient(circle at bottom right, rgba(14,165,233,.10), transparent 36%), linear-gradient(135deg, #ecfeff 0%, #f8fcff 52%, #eef7ff 100%);
     }
 
     .container-clinicas {
-        max-width: 1180px;
-        margin: auto;
-        padding: 24px;
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 22px 24px;
     }
 
     /* =========================================================
@@ -491,12 +509,13 @@
         display: grid;
         grid-template-columns: 1.3fr 1fr 1fr .8fr auto auto;
         gap: 12px;
-        background: white;
+        background: rgba(255,255,255,.94);
         padding: 16px;
         border-radius: 24px;
         box-shadow: 0 20px 55px rgba(15,23,42,.08);
         border: 1px solid #e2e8f0;
         align-items: stretch;
+        backdrop-filter: blur(14px);
     }
 
         .busca-clinica input,
@@ -589,7 +608,7 @@
         }
 
     .alerta-vazio {
-        background: white;
+        background: rgba(255,255,255,.94);
         padding: 32px;
         border-radius: 24px;
         text-align: center;
@@ -612,16 +631,16 @@
 
     .grid-clinicas {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
+        gap: 18px;
     }
 
     .card-clinica {
         background: rgba(255,255,255,.96);
-        border-radius: 28px;
-        padding: 28px;
+        border-radius: 22px;
+        padding: 18px;
         cursor: pointer;
-        box-shadow: 0 20px 50px rgba(15,23,42,.08);
+        box-shadow: 0 14px 34px rgba(15,23,42,.06);
         border: 1px solid #e2e8f0;
         transition: .25s;
     }
@@ -638,14 +657,14 @@
     .card-header {
         display: flex;
         align-items: center;
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 12px;
+        margin-bottom: 14px;
     }
 
     .avatar-clinica {
-        width: 58px;
-        height: 58px;
-        border-radius: 20px;
+        width: 46px;
+        height: 46px;
+        border-radius: 16px;
         background: linear-gradient(135deg,#14b8a6,#0ea5e9);
         color: white;
         font-weight: 800;
@@ -669,7 +688,8 @@
         }
 
     .card-header h3 {
-        font-size: 22px;
+        font-size: 18px;
+        line-height: 1.2;
         color: #0f172a;
         margin-bottom: 7px;
     }
@@ -686,9 +706,13 @@
 
     .descricao {
         color: #475569;
-        font-size: 15px;
-        line-height: 1.7;
-        margin-bottom: 18px;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 13px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     /* =========================================================
@@ -698,18 +722,20 @@
     .lista-especialidades {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
+        gap: 6px;
+        margin-bottom: 13px;
+        max-height: 64px;
+        overflow: hidden;
     }
 
     .tag-especialidade {
         display: inline-block;
         background: #e0f2fe;
         color: #0369a1;
-        padding: 7px 11px;
+        padding: 5px 9px;
         border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 11px;
+        font-weight: 800;
     }
 
     /* =========================================================
@@ -718,15 +744,16 @@
 
     .detalhes-clinica {
         display: grid;
-        gap: 10px;
-        margin-bottom: 22px;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
     }
 
     .detalhe-item {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 14px;
+        border-radius: 14px;
+        padding: 10px 12px;
     }
 
         .detalhe-item span {
@@ -739,34 +766,29 @@
 
         .detalhe-item strong {
             color: #334155;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.35;
         }
 
     /* =========================================================
            AÇÕES DO CARD
-           Corrigido:
-           - removida duplicidade de .acoes-card
-           - removidas classes antigas .btn-card
-           - botões voltaram para ícones
-           - Ver Perfil alinhado com WhatsApp / Instagram / Site
         ========================================================= */
 
     .acoes-card {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 22px;
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+        flex-wrap: wrap;
     }
 
     .btn-acao-card {
-        width: 100%;
-        height: 58px;
+        width: 78px;
+        height: 44px;
         border-radius: 16px;
         border: none;
         text-decoration: none;
         font-weight: 800;
-        font-size: 25px;
+        font-size: 19px;
         transition: .25s;
         display: flex;
         align-items: center;
@@ -810,7 +832,7 @@
     .cta-paciente,
     .area-profissional {
         margin-top: 36px;
-        background: white;
+        background: rgba(255,255,255,.96);
         border-radius: 28px;
         padding: 34px;
         box-shadow: 0 20px 50px rgba(15,23,42,.08);
@@ -871,12 +893,15 @@
             box-shadow: 0 14px 28px rgba(15,23,42,.10);
         }
 
-    /* ============================
-           RESPONSIVO
-        ===========================*/
+    .detalhe-endereco {
+        display: none;
+    }
+
+    /* =========================================================
+           MOBILE / TABLET
+        ========================================================= */
 
     @@media(max-width: 900px) {
-
 
         .header-clinicas {
             flex-direction: column;
@@ -965,8 +990,8 @@
             }
 
         .grid-clinicas {
-            grid-template-columns: 1fr;
-            gap: 18px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
         }
 
         .cta-paciente,
@@ -986,8 +1011,8 @@
     }
 
     /* =========================================================
-       MOBILE COMPACTO
-    ========================================================= */
+           MOBILE COMPACTO
+        ========================================================= */
 
     @@media(max-width: 768px) {
 
@@ -1061,23 +1086,25 @@
                 font-size: 13px;
                 line-height: 1.4;
             }
-        /* No mobile, o endereço completo fica só no perfil */
+
         .detalhe-endereco {
             display: none;
         }
 
         .acoes-card {
+            display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
             margin-top: 14px;
         }
 
         .btn-acao-card {
+            width: 100%;
             height: 52px;
             border-radius: 15px;
             font-size: 22px;
         }
-        /* No mobile deixa só perfil e WhatsApp no card */
+
         .btn-instagram,
         .btn-site {
             display: none;
@@ -1085,8 +1112,8 @@
     }
 
     /* =========================================================
-       CELULARES MENORES
-    ========================================================= */
+           CELULARES MENORES
+        ========================================================= */
 
     @@media(max-width: 520px) {
 
@@ -1114,6 +1141,10 @@
                 font-size: 14px;
                 line-height: 1.55;
             }
+
+        .grid-clinicas {
+            grid-template-columns: 1fr;
+        }
 
         .busca-clinica {
             margin-top: 22px;
