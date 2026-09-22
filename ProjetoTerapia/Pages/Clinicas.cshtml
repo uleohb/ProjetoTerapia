@@ -7,7 +7,7 @@
     <header class="header-clinicas">
 
         <a href="/Teste" class="logo-header">
-            <img src="/imagem/logo.png" alt="AlinhaMente" />
+            <img src="/imagem/AlinhaVIDA.png" alt="AlinhaVida" />
         </a>
 
         <div class="header-actions">
@@ -96,11 +96,7 @@
         <div class="resultado-info">
 
             <div>
-                <span>Resultado</span>
-
-                <h2>
-                    @Model.Clinicas.Count profissional(is) encontrado(s)
-                </h2>
+                Lista de profissionais 
             </div>
 
             <p>
@@ -175,7 +171,7 @@
 
                 <p class="descricao">
                     @(string.IsNullOrWhiteSpace(clinica.Descricao)
-                                        ? "Profissional disponível para atendimento na plataforma AlinhaMente."
+                                        ? "Profissional disponível para atendimento na plataforma AlinhaVida."
                                         : clinica.Descricao)
                 </p>
 

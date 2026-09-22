@@ -4,25 +4,16 @@
 
 namespace ProjetoTerapia.Migrations
 {
-    /// <inheritdoc />
     public partial class AlterarSenhaParaHash : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Senha",
-                table: "Clinicas",
-                newName: "SenhaHash");
+            // A coluna SenhaHash já foi criada por uma migration anterior.
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "SenhaHash",
-                table: "Clinicas",
-                newName: "Senha");
+            // Nenhuma alteração necessária.
         }
     }
 }

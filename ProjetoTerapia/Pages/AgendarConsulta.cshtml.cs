@@ -189,7 +189,7 @@ namespace ProjetoTerapia.Pages
             }
 
             var mensagem =
-$@"Olá, encontrei seu perfil no AlinhaMente e gostaria de conversar sobre uma consulta.
+$@"Olá, encontrei seu perfil no AlinhaVida e gostaria de conversar sobre uma consulta.
 
 Profissional: {Clinica.Nome}";
 

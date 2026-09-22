@@ -79,7 +79,7 @@ public class RecuperarSenhaModel : PageModel
 
             clinica.Email,
 
-            "Recuperação de senha - AlinhaMente",
+            "Recuperação de senha - AlinhaVida",
 
             $@"
              Olá.
@@ -95,7 +95,7 @@ public class RecuperarSenhaModel : PageModel
 
              Caso não tenha solicitado, ignore esse email.
 
-             Equipe AlinhaMente
+             Equipe AlinhaVida
              "
         );
 

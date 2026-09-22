@@ -8,7 +8,7 @@
 
     <div class="pagamento-card">
 
-        <img src="/imagem/logo.png"
+        <img src="/imagem/AlinhaVIDA.png"
              class="logo-pagamento"
              alt="Logo" />
 
@@ -116,12 +116,11 @@
 
                 <div class="acoes-pagamento">
 
-                    <a href="https://mpago.la/33FgjZL"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="btn-principal">
-                        Pagar com Mercado Pago
-                    </a>
+                    <form method="post" asp-page-handler="Pagar">
+                        <button type="submit" class="btn-principal">
+                            Pagar com Mercado Pago
+                        </button>
+                    </form>
 
                     <a href="/PainelClinica" class="btn-secundario">
                         Voltar ao painel
@@ -315,6 +314,8 @@
         color: white;
         background: linear-gradient(135deg,#14b8a6,#0ea5e9);
         box-shadow: 0 14px 28px rgba(14,165,233,.18);
+        border: none;
+        cursor: pointer;
     }
 
     .btn-secundario {

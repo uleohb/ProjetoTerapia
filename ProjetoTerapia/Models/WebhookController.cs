@@ -52,8 +52,78 @@ namespace ProjetoTerapia.Controllers
             {
                 await ProcessarPagamentoDivulgacao(pagamento);
             }
+            else if (pagamento.ExternalReference.StartsWith("PLANO-CLINICA-"))
+            {
+                await ProcessarPagamentoPlanoClinica(pagamento);
+            }
 
             return Ok();
+        }
+
+        private async Task ProcessarPagamentoPlanoClinica(
+          MercadoPagoPaymentResponse pagamento)
+        {
+            var idTexto = pagamento.ExternalReference!
+                .Replace("PLANO-CLINICA-", "");
+
+            if (!int.TryParse(idTexto, out int clinicaId))
+            {
+                return;
+            }
+
+            var clinica = await _context.Clinicas
+                .FirstOrDefaultAsync(c => c.Id == clinicaId);
+
+            if (clinica == null)
+            {
+                return;
+            }
+
+            var paymentId = pagamento.Id.ToString();
+
+            // Evita processar duas vezes o mesmo pagamento aprovado.
+            if (clinica.MercadoPagoPlanoPaymentId == paymentId &&
+                clinica.MercadoPagoPlanoStatus == "approved")
+            {
+                return;
+            }
+
+            clinica.MercadoPagoPlanoStatus = pagamento.Status ?? "";
+
+            if (pagamento.Status == "approved")
+            {
+                clinica.MercadoPagoPlanoPaymentId = paymentId;
+
+                clinica.Pago = true;
+
+                clinica.NomePlano = "Plano Profissional Anual";
+
+                clinica.ValorPlano =
+                    pagamento.TransactionAmount > 0
+                        ? pagamento.TransactionAmount
+                        : 450m;
+
+                clinica.DataPagamento = DateTime.Now;
+
+                // Se estiver renovando antes do vencimento,
+                // acrescenta 1 ano ao vencimento atual.
+                if (clinica.DataVencimento.HasValue &&
+                    clinica.DataVencimento.Value.Date >= DateTime.Today)
+                {
+                    clinica.DataVencimento =
+                        clinica.DataVencimento.Value.AddYears(1);
+                }
+                else
+                {
+                    clinica.DataVencimento =
+                        DateTime.Now.AddYears(1);
+                }
+            }
+
+            // Pagamento recusado ou pendente NÃO derruba
+            // um plano antigo que ainda esteja válido.
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task ProcessarPagamentoDivulgacao(MercadoPagoPaymentResponse pagamento)
@@ -227,6 +297,11 @@ namespace ProjetoTerapia.Controllers
 
             [JsonPropertyName("external_reference")]
             public string? ExternalReference { get; set; }
+
+            [JsonPropertyName("transaction_amount")]
+            public decimal TransactionAmount { get; set; }
         }
+
+
     }
 }

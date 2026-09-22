@@ -286,14 +286,14 @@ namespace ProjetoTerapia.Pages
                     new
                     {
                         id = $"divulgacao-{divulgacao.Id}",
-                        title = $"AlinhaMente - {divulgacao.NomePlano}",
+                        title = $"AlinhaVida - {divulgacao.NomePlano}",
                         description = $"Divulgação regional: {divulgacao.CidadesSelecionadas}",
                         quantity = 1,
                         currency_id = "BRL",
                         unit_price = divulgacao.Valor
                     }
                 },
-                ["statement_descriptor"] = "ALINHAMENTE",
+                ["statement_descriptor"] = "ALINHAVIDA",
                 ["external_reference"] = $"DIVULGACAO-{divulgacao.Id}",
                 ["back_urls"] = new
                 {

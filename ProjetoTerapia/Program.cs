@@ -11,7 +11,17 @@ builder.Services.AddScoped<EmailService>();
 // BANCO
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        "Server=localhost;Database=ProjetoTerapiaDB;Trusted_Connection=True;TrustServerCertificate=True"));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null
+            );
+
+            sqlOptions.CommandTimeout(60);
+        }));
 
 // SESSÃO
 builder.Services.AddSession(options =>

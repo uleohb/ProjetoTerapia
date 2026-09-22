@@ -80,5 +80,9 @@ namespace ProjetoTerapia.Models
         public Vendedor? Vendedor { get; set; }
 
         public string? CodigoVendedorIndicacao { get; set; }
+
+        public string? MercadoPagoPlanoPaymentId { get; set; }
+        
+        public string? MercadoPagoPlanoStatus { get; set; }
     }
 }

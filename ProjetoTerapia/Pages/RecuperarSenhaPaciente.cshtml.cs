@@ -65,11 +65,11 @@ namespace ProjetoTerapia.Pages
 
             await _email.EnviarEmail(
                 paciente.Email,
-                "Recuperação de senha - AlinhaMente",
+                "Recuperação de senha - AlinhaVida",
                 $@"
                    Olá, {paciente.Nome}.
 
-                   Recebemos uma solicitação para redefinir sua senha no AlinhaMente.
+                   Recebemos uma solicitação para redefinir sua senha no AlinhaVida.
 
                    Acesse o link abaixo para criar uma nova senha:
 
@@ -79,7 +79,7 @@ namespace ProjetoTerapia.Pages
 
                    Caso você não tenha solicitado essa alteração, apenas ignore este email.
 
-                   Equipe AlinhaMente
+                   Equipe AlinhaVida
                 "
             );
 
