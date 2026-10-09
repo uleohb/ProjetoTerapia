@@ -38,34 +38,38 @@ namespace ProjetoTerapia.Pages
 
         public IActionResult OnGet()
         {
-            PrimeiroAdmin = !_context.AdminUsuarios.Any();
-
-            if (PrimeiroAdmin && !ChaveCadastroValida())
+            // Não está logado como administrador
+            if (HttpContext.Session.GetString("AdminLogado") != "true")
             {
                 return RedirectToPage("/LoginAdmin");
             }
 
-            if (!PrimeiroAdmin && !AdminPodeCadastrarAdmin())
+            // Está logado, mas não é Master
+            if (HttpContext.Session.GetString("AdminPerfil") != "Master")
             {
                 return RedirectToPage("/AdminLH");
             }
+
+            PrimeiroAdmin = false;
 
             return Page();
         }
 
         public IActionResult OnPost()
         {
-            PrimeiroAdmin = !_context.AdminUsuarios.Any();
-
-            if (PrimeiroAdmin && !ChaveCadastroValida())
+            // Só permite acessar se estiver logado como administrador
+            if (HttpContext.Session.GetString("AdminLogado") != "true")
             {
                 return RedirectToPage("/LoginAdmin");
             }
 
-            if (!PrimeiroAdmin && !AdminPodeCadastrarAdmin())
+            // Só administrador Master pode cadastrar outros administradores
+            if (HttpContext.Session.GetString("AdminPerfil") != "Master")
             {
                 return RedirectToPage("/AdminLH");
             }
+
+            PrimeiroAdmin = false;
 
             if (string.IsNullOrWhiteSpace(Nome) ||
                 string.IsNullOrWhiteSpace(Email) ||
@@ -99,12 +103,9 @@ namespace ProjetoTerapia.Pages
                 return Page();
             }
 
-            if (PrimeiroAdmin)
-            {
-                Perfil = "Master";
-            }
-
-            if (Perfil != "Master" && Perfil != "Gestor" && Perfil != "Operacional")
+            if (Perfil != "Master" &&
+                Perfil != "Gestor" &&
+                Perfil != "Operacional")
             {
                 Perfil = "Operacional";
             }
@@ -127,38 +128,28 @@ namespace ProjetoTerapia.Pages
             _context.AdminLogs.Add(new AdminLog
             {
                 AdminUsuarioId = admin.Id,
-                NomeAdmin = PrimeiroAdmin
-                    ? admin.Nome
-                    : HttpContext.Session.GetString("AdminNome") ?? admin.Nome,
 
-                PerfilAdmin = PrimeiroAdmin
-                    ? admin.Perfil
-                    : HttpContext.Session.GetString("AdminPerfil") ?? admin.Perfil,
+                NomeAdmin =
+                    HttpContext.Session.GetString("AdminNome")
+                    ?? "Administrador",
 
-                Acao = PrimeiroAdmin ? "Criação do primeiro admin" : "Cadastro de admin",
+                PerfilAdmin =
+                    HttpContext.Session.GetString("AdminPerfil")
+                    ?? "Master",
 
-                Descricao = PrimeiroAdmin
-                    ? $"Primeiro administrador Master criado: {admin.Nome}."
-                    : $"Administrador criado: {admin.Nome} ({admin.Perfil}).",
+                Acao = "Cadastro de admin",
+
+                Descricao =
+                    $"{HttpContext.Session.GetString("AdminNome")} cadastrou o administrador {admin.Nome} ({admin.Perfil}).",
 
                 DataAcao = DateTime.Now
             });
 
             _context.SaveChanges();
 
-            if (PrimeiroAdmin)
-            {
-                HttpContext.Session.SetString("AdminLogado", "true");
-                HttpContext.Session.SetString("AdminId", admin.Id.ToString());
-                HttpContext.Session.SetString("AdminNome", admin.Nome);
-                HttpContext.Session.SetString("AdminEmail", admin.Email);
-                HttpContext.Session.SetString("AdminPerfil", admin.Perfil);
+            TempData["MensagemSucesso"] =
+                "Administrador cadastrado com sucesso.";
 
-                TempData["MensagemSucesso"] = "Administrador cadastrado com sucesso.";
-                return RedirectToPage("/AdminLH");
-            }
-
-            TempData["MensagemSucesso"] = "Administrador cadastrado com sucesso.";
             return RedirectToPage("/AdminLH");
         }
 

@@ -91,9 +91,9 @@ namespace ProjetoTerapia.Pages
             }
 
             var pasta = Path.Combine(
-                _environment.WebRootPath,
-                "uploads",
-                "comprovantes-vendedores"
+               _environment.ContentRootPath,
+               "App_Data",
+               "comprovantes-vendedores"
             );
 
             if (!Directory.Exists(pasta))
@@ -106,11 +106,14 @@ namespace ProjetoTerapia.Pages
             // Se já tinha documento, apaga o arquivo antigo para não acumular lixo no servidor
             if (tinhaDocumentoAnterior)
             {
+                var nomeArquivoAntigo =
+                    Path.GetFileName(venda.ComprovanteNotaFiscal!);
+
                 var caminhoAntigo = Path.Combine(
-                    _environment.WebRootPath,
-                    venda.ComprovanteNotaFiscal!
-                        .TrimStart('/')
-                        .Replace("/", Path.DirectorySeparatorChar.ToString())
+                    _environment.ContentRootPath,
+                    "App_Data",
+                    "comprovantes-vendedores",
+                    nomeArquivoAntigo
                 );
 
                 if (System.IO.File.Exists(caminhoAntigo))
@@ -127,8 +130,7 @@ namespace ProjetoTerapia.Pages
                 ArquivoComprovante.CopyTo(stream);
             }
 
-            venda.ComprovanteNotaFiscal =
-                "/uploads/comprovantes-vendedores/" + nomeArquivo;
+            venda.ComprovanteNotaFiscal = nomeArquivo;
 
             venda.Status = tinhaDocumentoAnterior
                 ? "Documento reenviado - aguardando conferência"
@@ -151,7 +153,29 @@ namespace ProjetoTerapia.Pages
 
         private bool VendedorEstaLogado()
         {
-            return HttpContext.Session.GetString("VendedorLogado") == "true";
+            if (HttpContext.Session.GetString("VendedorLogado") != "true")
+            {
+                return false;
+            }
+
+            var vendedorIdTexto = HttpContext.Session.GetString("VendedorId");
+
+            if (!int.TryParse(vendedorIdTexto, out int vendedorId))
+            {
+                HttpContext.Session.Clear();
+                return false;
+            }
+
+            var vendedorAtivo = _context.Vendedores
+                .Any(v => v.Id == vendedorId && v.Ativo);
+
+            if (!vendedorAtivo)
+            {
+                HttpContext.Session.Clear();
+                return false;
+            }
+
+            return true;
         }
 
         private void CarregarDados()

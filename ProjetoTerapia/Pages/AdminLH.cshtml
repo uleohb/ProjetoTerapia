@@ -1282,14 +1282,17 @@
 
                         <div class="acoes-card-admin">
 
-                        @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
-                            {
-                                <a href="@venda.ComprovanteNotaFiscal"
+                       @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                       {
+                                <a asp-page="/AdminLH"
+                                   asp-page-handler="ComprovanteVendedor"
+                                   asp-route-vendaId="@venda.Id"
                                    target="_blank"
+                                   rel="noopener noreferrer"
                                    class="btn-ver-perfil">
                                     Ver documento
                                 </a>
-                            }
+                       }
 
                             @if (venda.ClinicaId.HasValue)
                             {

@@ -17,11 +17,16 @@ namespace ProjetoTerapia.Pages
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _environment;
 
-        public AdminLHModel(AppDbContext context, IConfiguration config)
+        public AdminLHModel(
+           AppDbContext context,
+           IConfiguration config,
+           IWebHostEnvironment environment)
         {
             _context = context;
             _config = config;
+            _environment = environment;
         }
 
         public List<Clinica> Clinicas { get; set; } = new List<Clinica>();
@@ -98,6 +103,58 @@ namespace ProjetoTerapia.Pages
             CarregarDados();
 
             return Page();
+        }
+
+        public IActionResult OnGetComprovanteVendedor(int vendaId)
+        {
+            // Só administrador logado pode acessar
+            if (!AdminEstaLogado())
+            {
+                return RedirectToPage("/LoginAdmin");
+            }
+
+            var venda = _context.VendasVendedores
+                .FirstOrDefault(v => v.Id == vendaId);
+
+            if (venda == null ||
+                string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+            {
+                return NotFound();
+            }
+
+            // Segurança: aproveita somente o nome do arquivo
+            var nomeArquivo =
+                Path.GetFileName(venda.ComprovanteNotaFiscal);
+
+            var caminhoArquivo = Path.Combine(
+                _environment.ContentRootPath,
+                "App_Data",
+                "comprovantes-vendedores",
+                nomeArquivo
+            );
+
+            if (!System.IO.File.Exists(caminhoArquivo))
+            {
+                return NotFound();
+            }
+
+            var extensao = Path.GetExtension(nomeArquivo).ToLowerInvariant();
+
+            var contentType = extensao switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                _ => "application/octet-stream"
+            };
+
+            return PhysicalFile(
+                caminhoArquivo,
+                contentType,
+                enableRangeProcessing: true
+            );
         }
 
         public IActionResult OnPost(int id, string acao)

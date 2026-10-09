@@ -203,9 +203,11 @@
 
                         <div class="area-documento-vendedor">
 
-                        @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                            @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
                             {
-                                <a href="@venda.ComprovanteNotaFiscal"
+                                <a asp-page="/PainelVendedor"
+                                   asp-page-handler="Comprovante"
+                                   asp-route-vendaId="@venda.Id"
                                    target="_blank"
                                    rel="noopener noreferrer"
                                    class="btn-ver-comprovante">
