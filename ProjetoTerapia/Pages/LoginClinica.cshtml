@@ -1,12 +1,18 @@
 ﻿@page
 @model ProjetoTerapia.Pages.LoginClinicaModel
 
+@{
+    ViewData["Title"] = "Entrar";
+}
+
 <div class="container-auth">
 
     <div class="auth-wrapper">
 
-        <!-- LADO ESQUERDO -->
-        <div class="side-login">
+        <!-- =====================================================
+             LADO ESQUERDO
+        ====================================================== -->
+        <section class="side-login">
 
             <div class="gradient-circle circle-1"></div>
             <div class="gradient-circle circle-2"></div>
@@ -18,7 +24,7 @@
                 </span>
 
                 <h1>
-                    Bem-vindo de volta ao AlinhaVida.
+                    Bem-vindo de volta ao AlinhaVIDA.
                 </h1>
 
                 <p>
@@ -30,7 +36,8 @@
                 <div class="mini-cards">
 
                     <div class="mini-card">
-                        <span>🔒</span>
+                        <span class="mini-icon">🔒</span>
+
                         <div>
                             <strong>Ambiente Seguro</strong>
                             <small>Proteção e privacidade</small>
@@ -38,18 +45,20 @@
                     </div>
 
                     <div class="mini-card">
-                        <span>📅</span>
+                        <span class="mini-icon">📅</span>
+
                         <div>
                             <strong>Gestão Inteligente</strong>
-                            <small>Organize consultas</small>
+                            <small>Organize consultas e atendimentos</small>
                         </div>
                     </div>
 
                     <div class="mini-card">
-                        <span>💙</span>
+                        <span class="mini-icon">💙</span>
+
                         <div>
                             <strong>Conexões Humanas</strong>
-                            <small>Mais acolhimento</small>
+                            <small>Mais acolhimento e proximidade</small>
                         </div>
                     </div>
 
@@ -57,14 +66,18 @@
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- LADO DIREITO -->
-        <div class="card-auth">
 
-            <img src="/imagem/AlinhaVIDA.png"
+        <!-- =====================================================
+             LADO DIREITO
+        ====================================================== -->
+        <section class="card-auth">
+
+            <img src="~/imagem/AlinhaVIDA.png"
+                 asp-append-version="true"
                  class="logo-auth"
-                 alt="Logo AlinhaVida" />
+                 alt="AlinhaVIDA" />
 
             <h2>Entrar na plataforma</h2>
 
@@ -73,337 +86,959 @@
                 seu painel e seus atendimentos.
             </p>
 
-            <!-- GOOGLE -->
-            <a href="/LoginClinica?handler=LoginGoogle"
-               class="btn-google">
 
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-                     class="google-icon" />
+            <!-- =================================================
+                 GOOGLE
+            ================================================== -->
+            <a asp-page="/LoginClinica"
+               asp-page-handler="LoginGoogle"
+               class="btn-google"
+               id="btnGoogle">
+
+                <svg class="google-icon"
+                     xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 48 48"
+                     aria-hidden="true">
+
+                    <path fill="#FFC107"
+                          d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.195 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.84 1.154 7.955 3.045l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+
+                    <path fill="#FF3D00"
+                          d="M6.306 14.691l6.571 4.819C14.655 16.108 19.001 12 24 12c3.059 0 5.84 1.154 7.955 3.045l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+
+                    <path fill="#4CAF50"
+                          d="M24 44c5.104 0 9.784-1.947 13.331-5.118l-6.146-5.199C29.135 35.091 26.715 36 24 36c-5.176 0-9.623-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+
+                    <path fill="#1976D2"
+                          d="M43.611 20.083H42V20H24v8h11.303c-.793 2.237-2.231 4.166-4.118 5.683l.003-.002 6.146 5.199C36.897 39.245 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+
+                </svg>
 
                 <span>Continuar com Google</span>
 
             </a>
 
+
+            <!-- =================================================
+                 LOADING GOOGLE / BANCO AZURE
+            ================================================== -->
+            <div id="carregamentoGoogle"
+                 class="carregamento-google"
+                 aria-hidden="true">
+
+                <div class="carregamento-card"
+                     role="status"
+                     aria-live="polite">
+
+                    <div class="spinner-google"></div>
+
+                    <h3>Entrando na sua conta...</h3>
+
+                    <p>
+                        Estamos preparando seu acesso com segurança.
+                    </p>
+
+                    <span class="loading-info">
+                        Na primeira entrada, isso pode levar alguns segundos.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DIVISOR
+            ================================================== -->
             <div class="divider">
                 <span>ou</span>
             </div>
 
+
+            <!-- =================================================
+                 ERRO
+            ================================================== -->
             @if (!string.IsNullOrWhiteSpace(Model.Erro))
             {
-                <div class="validation-box">
+                <div class="validation-box"
+                     role="alert">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
                     <p>@Model.Erro</p>
+
                 </div>
             }
 
-            <!-- FORM -->
-            <form method="post">
 
-                <input type="email"
-                       asp-for="Email"
-                       placeholder="Email"
-                       required />
+            <!-- =================================================
+                 LOGIN EMAIL / SENHA
+            ================================================== -->
+            <form method="post"
+                  class="form-login">
 
-                <input type="password"
-                       asp-for="Senha"
-                       placeholder="Senha"
-                       required />
+                <div class="campo-login">
 
-                <button type="submit" class="btn-primary">
+                    <label for="Email">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           asp-for="Email"
+                           id="Email"
+                           placeholder="seuemail@exemplo.com"
+                           autocomplete="email"
+                           required />
+
+                </div>
+
+                <div class="campo-login">
+
+                    <label for="Senha">
+                        Senha
+                    </label>
+
+                    <input type="password"
+                           asp-for="Senha"
+                           id="Senha"
+                           placeholder="Digite sua senha"
+                           autocomplete="current-password"
+                           required />
+
+                </div>
+
+                <button type="submit"
+                        class="btn-primary">
+
                     Entrar
+
                 </button>
 
-                <a asp-page="/RecuperarSenha" class="link-recuperar">
+
+                <a asp-page="/RecuperarSenha"
+                   class="link-recuperar">
+
                     Esqueci minha senha
+
                 </a>
 
             </form>
 
+
+            <!-- =================================================
+                 CADASTRO
+            ================================================== -->
             <p class="link-login">
+
                 Ainda não possui conta?
-                <a href="/CadastroConta">Criar conta</a>
+
+                <a href="/CadastroConta">
+                    Criar conta
+                </a>
+
             </p>
 
-        </div>
+        </section>
 
     </div>
 
 </div>
 
+
 <style>
 
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+
+    /* =========================================================
+       BASE
+    ========================================================= */
+
     * {
-        margin: 0;
-        padding: 0;
         box-sizing: border-box;
         font-family: 'Poppins', sans-serif;
     }
 
     body {
+        margin: 0;
         overflow-x: hidden;
-        background: linear-gradient(135deg,#06121f,#0b1b2b,#10263a);
+        background:
+            radial-gradient(
+                circle at top left,
+                rgba(37, 99, 235, .12),
+                transparent 30%
+            ),
+            linear-gradient(
+                135deg,
+                #06121f,
+                #0b1b2b,
+                #10263a
+            );
     }
+
+
+    /* =========================================================
+       CONTAINER
+    ========================================================= */
 
     .container-auth {
         min-height: 100vh;
+
         display: flex;
-        justify-content: center;
         align-items: center;
-        padding: 40px;
+        justify-content: center;
+
+        padding: 40px 24px;
     }
 
     .auth-wrapper {
         width: 100%;
         max-width: 1400px;
-        min-height: 850px;
+
+        min-height: 780px;
+
         display: flex;
+
         overflow: hidden;
-        border-radius: 35px;
-        background: rgba(255,255,255,0.04);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+
+        border-radius: 32px;
+
+        background: rgba(255,255,255,.04);
+
+        border: 1px solid rgba(255,255,255,.06);
+
+        box-shadow:
+            0 30px 80px rgba(0,0,0,.35);
     }
+
+
+    /* =========================================================
+       LADO ESQUERDO
+    ========================================================= */
 
     .side-login {
         width: 55%;
+
         position: relative;
         overflow: hidden;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         padding: 70px;
-        background: linear-gradient( 135deg, #0f172a 0%, #111827 45%, #1e293b 100% );
+
+        background:
+            linear-gradient(
+                135deg,
+                #0f172a 0%,
+                #111827 45%,
+                #1e293b 100%
+            );
     }
 
     .content-side {
         position: relative;
         z-index: 2;
-        max-width: 520px;
+
+        width: 100%;
+        max-width: 540px;
     }
 
     .badge-side {
         display: inline-flex;
+
         padding: 10px 18px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.08);
-        color: #cbd5e1;
-        font-size: 14px;
+
         margin-bottom: 28px;
+
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.08);
+
+        border: 1px solid rgba(255,255,255,.08);
+
+        color: #cbd5e1;
+
+        font-size: 13px;
+        font-weight: 500;
+
         backdrop-filter: blur(12px);
     }
 
     .content-side h1 {
-        font-size: 58px;
-        line-height: 1.05;
+        margin: 0 0 24px;
+
         color: white;
+
+        font-size: clamp(42px, 4vw, 58px);
+
+        line-height: 1.08;
+
         font-weight: 700;
-        margin-bottom: 24px;
+
         letter-spacing: -2px;
     }
 
-    .content-side p {
+    .content-side > p {
+        margin: 0 0 40px;
+
         color: #cbd5e1;
-        font-size: 18px;
+
+        font-size: 17px;
+
         line-height: 1.8;
-        margin-bottom: 40px;
     }
+
+
+    /* =========================================================
+       MINI CARDS
+    ========================================================= */
 
     .mini-cards {
         display: flex;
         flex-direction: column;
-        gap: 18px;
+
+        gap: 14px;
     }
 
     .mini-card {
         display: flex;
         align-items: center;
-        gap: 18px;
-        padding: 18px;
-        border-radius: 22px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.08);
+
+        gap: 16px;
+
+        padding: 17px 18px;
+
+        border-radius: 20px;
+
+        background: rgba(255,255,255,.06);
+
+        border: 1px solid rgba(255,255,255,.08);
+
         backdrop-filter: blur(12px);
+
+        transition: .25s ease;
     }
 
-        .mini-card span {
-            font-size: 28px;
-        }
+    .mini-card:hover {
+        transform: translateX(4px);
 
-        .mini-card strong {
-            display: block;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .mini-card small {
-            color: #94a3b8;
-        }
-
-    .card-auth {
-        background: rgba(255,255,255,0.97);
-        width: 45%;
-        max-width: 520px;
-        margin: auto;
-        border-radius: 30px;
-        padding: 40px;
-        text-align: center;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+        background: rgba(255,255,255,.08);
     }
 
-    .logo-auth {
-        width: 280px;
-        max-width: 100%;
-        margin-bottom: 10px;
-    }
+    .mini-icon {
+        width: 42px;
+        height: 42px;
 
-    .card-auth h2 {
-        font-size: 28px;
-        color: #0f172a;
-        margin-bottom: 12px;
-    }
-
-    .sub {
-        color: #64748b;
-        line-height: 1.7;
-        margin-bottom: 28px;
-    }
-
-    .btn-google {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        padding: 14px;
-        border-radius: 14px;
-        border: 1px solid #e2e8f0;
-        background: white;
-        text-decoration: none;
-        color: #334155;
-        font-weight: 500;
-        transition: 0.25s;
-        margin-bottom: 18px;
+
+        flex-shrink: 0;
+
+        border-radius: 13px;
+
+        background: rgba(255,255,255,.07);
+
+        font-size: 22px;
     }
 
-        .btn-google:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
+    .mini-card strong {
+        display: block;
 
-    .google-icon {
-        width: 22px;
-        margin-right: 10px;
-    }
+        margin-bottom: 3px;
 
-    .divider {
-        position: relative;
-        margin: 25px 0;
-        text-align: center;
-    }
-
-        .divider::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            background: #e2e8f0;
-            left: 0;
-            top: 50%;
-        }
-
-        .divider span {
-            position: relative;
-            background: white;
-            padding: 0 14px;
-            color: #94a3b8;
-        }
-
-    input {
-        width: 100%;
-        padding: 16px;
-        margin-bottom: 14px;
-        border-radius: 14px;
-        border: 1px solid #dbeafe;
-        background: #f8fafc;
-        font-size: 15px;
-        transition: 0.2s;
-        outline: none;
-    }
-
-        input:focus {
-            border-color: #7c3aed;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(124,58,237,0.10);
-        }
-
-    .btn-primary {
-        width: 100%;
-        padding: 16px;
-        border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
         color: white;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.25s;
-        margin-top: 5px;
+
+        font-size: 15px;
     }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(37,99,235,0.25);
-        }
+    .mini-card small {
+        color: #94a3b8;
 
-    .link-login {
-        margin-top: 22px;
-        color: #64748b;
+        font-size: 13px;
     }
 
-        .link-login a {
-            color: #7c3aed;
-            text-decoration: none;
-            font-weight: 600;
-        }
 
-    .validation-box {
-        margin-bottom: 18px;
-        padding: 14px;
-        border-radius: 14px;
-        background: rgba(239,68,68,0.08);
-        border: 1px solid rgba(239,68,68,0.20);
-    }
-
-        .validation-box p {
-            color: #dc2626;
-            font-size: 14px;
-            font-weight: 500;
-        }
+    /* =========================================================
+       CÍRCULOS DECORATIVOS
+    ========================================================= */
 
     .gradient-circle {
         position: absolute;
+
         border-radius: 50%;
+
         filter: blur(90px);
+
+        pointer-events: none;
     }
 
     .circle-1 {
-        width: 350px;
-        height: 350px;
-        background: rgba(37,99,235,0.25);
-        top: -120px;
-        left: -120px;
+        width: 360px;
+        height: 360px;
+
+        top: -140px;
+        left: -140px;
+
+        background: rgba(37,99,235,.28);
     }
 
     .circle-2 {
-        width: 300px;
-        height: 300px;
-        background: rgba(14,165,233,0.20);
-        bottom: -100px;
-        right: -100px;
+        width: 320px;
+        height: 320px;
+
+        right: -120px;
+        bottom: -120px;
+
+        background: rgba(14,165,233,.22);
     }
 
-    @@media(max-width: 900px) {
+
+    /* =========================================================
+       CARD DE LOGIN
+    ========================================================= */
+
+    .card-auth {
+        width: 45%;
+
+        max-width: 540px;
+
+        margin: auto;
+
+        padding: 45px;
+
+        background: rgba(255,255,255,.98);
+
+        border-radius: 30px;
+
+        text-align: center;
+
+        box-shadow:
+            0 25px 60px rgba(0,0,0,.22);
+    }
+
+    .logo-auth {
+        width: 270px;
+
+        max-width: 90%;
+
+        height: auto;
+
+        margin-bottom: 12px;
+    }
+
+    .card-auth h2 {
+        margin: 0 0 10px;
+
+        color: #0f172a;
+
+        font-size: 28px;
+
+        font-weight: 700;
+
+        letter-spacing: -.5px;
+    }
+
+    .sub {
+        margin: 0 0 28px;
+
+        color: #64748b;
+
+        line-height: 1.7;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       GOOGLE
+    ========================================================= */
+
+    .btn-google {
+        width: 100%;
+        min-height: 58px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 12px;
+
+        padding: 0 20px;
+
+        margin-bottom: 22px;
+
+        background: white;
+
+        border: 1px solid #dbe2ea;
+
+        border-radius: 15px;
+
+        color: #334155;
+
+        text-decoration: none;
+
+        font-size: 15px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            border-color .2s ease,
+            box-shadow .2s ease,
+            background .2s ease;
+    }
+
+    .btn-google:hover {
+        color: #1e293b;
+
+        background: #f8fafc;
+
+        border-color: #cbd5e1;
+
+        text-decoration: none;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 10px 24px rgba(15,23,42,.07);
+    }
+
+    .btn-google:focus-visible {
+        outline: none;
+
+        box-shadow:
+            0 0 0 4px rgba(37,99,235,.13);
+    }
+
+    .btn-google.carregando {
+        pointer-events: none;
+
+        opacity: .7;
+    }
+
+    .google-icon {
+        width: 23px;
+        height: 23px;
+
+        display: block;
+
+        flex-shrink: 0;
+    }
+
+    .btn-google span {
+        display: inline-block;
+
+        line-height: 1;
+    }
+
+
+    /* =========================================================
+       DIVISOR
+    ========================================================= */
+
+    .divider {
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 24px 0;
+    }
+
+    .divider::before {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+
+        width: 100%;
+        height: 1px;
+
+        background: #e2e8f0;
+    }
+
+    .divider span {
+        position: relative;
+        z-index: 1;
+
+        padding: 0 14px;
+
+        background: white;
+
+        color: #94a3b8;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       FORM
+    ========================================================= */
+
+    .form-login {
+        width: 100%;
+    }
+
+    .campo-login {
+        margin-bottom: 15px;
+
+        text-align: left;
+    }
+
+    .campo-login label {
+        display: block;
+
+        margin: 0 0 7px 2px;
+
+        color: #475569;
+
+        font-size: 13px;
+
+        font-weight: 600;
+    }
+
+    .campo-login input {
+        width: 100%;
+
+        height: 54px;
+
+        padding: 0 16px;
+
+        border: 1px solid #dbe2ea;
+
+        border-radius: 14px;
+
+        background: #f8fafc;
+
+        color: #0f172a;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            background .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .campo-login input::placeholder {
+        color: #94a3b8;
+    }
+
+    .campo-login input:focus {
+        background: white;
+
+        border-color: #2563eb;
+
+        box-shadow:
+            0 0 0 4px rgba(37,99,235,.09);
+    }
+
+
+    /* =========================================================
+       BOTÃO ENTRAR
+    ========================================================= */
+
+    .btn-primary {
+        width: 100%;
+        min-height: 54px;
+
+        margin-top: 4px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #0ea5e9
+            );
+
+        color: white;
+
+        font-size: 15px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 10px 24px rgba(37,99,235,.18);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 15px 30px rgba(37,99,235,.27);
+    }
+
+
+    /* =========================================================
+       LINKS
+    ========================================================= */
+
+    .link-recuperar {
+        display: inline-block;
+
+        margin-top: 16px;
+
+        color: #2563eb;
+
+        text-decoration: none;
+
+        font-size: 13px;
+
+        font-weight: 600;
+    }
+
+    .link-recuperar:hover {
+        text-decoration: underline;
+    }
+
+    .link-login {
+        margin: 23px 0 0;
+
+        color: #64748b;
+
+        font-size: 13px;
+    }
+
+    .link-login a {
+        margin-left: 3px;
+
+        color: #2563eb;
+
+        text-decoration: none;
+
+        font-weight: 600;
+    }
+
+    .link-login a:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =========================================================
+       ERROS
+    ========================================================= */
+
+    .validation-box {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-bottom: 18px;
+
+        padding: 13px 15px;
+
+        border: 1px solid rgba(239,68,68,.18);
+
+        border-radius: 13px;
+
+        background: rgba(239,68,68,.07);
+
+        text-align: left;
+    }
+
+    .validation-box i {
+        color: #dc2626;
+
+        flex-shrink: 0;
+    }
+
+    .validation-box p {
+        margin: 0;
+
+        color: #b91c1c;
+
+        font-size: 13px;
+
+        font-weight: 500;
+    }
+
+
+    /* =========================================================
+       LOADING GOOGLE / AZURE
+    ========================================================= */
+
+    .carregamento-google {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 99999;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 25px;
+
+        background: rgba(15,23,42,.45);
+
+        backdrop-filter: blur(7px);
+        -webkit-backdrop-filter: blur(7px);
+
+        opacity: 0;
+
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+            opacity .22s ease,
+            visibility .22s ease;
+    }
+
+    .carregamento-google.ativo {
+        opacity: 1;
+
+        visibility: visible;
+
+        pointer-events: auto;
+    }
+
+    .carregamento-card {
+        width: 100%;
+        max-width: 430px;
+
+        padding: 38px 34px;
+
+        background: rgba(255,255,255,.98);
+
+        border: 1px solid rgba(255,255,255,.7);
+
+        border-radius: 25px;
+
+        text-align: center;
+
+        box-shadow:
+            0 30px 80px rgba(15,23,42,.25);
+
+        transform: translateY(8px) scale(.98);
+
+        transition: transform .22s ease;
+    }
+
+    .carregamento-google.ativo .carregamento-card {
+        transform: translateY(0) scale(1);
+    }
+
+    .spinner-google {
+        width: 54px;
+        height: 54px;
+
+        margin: 0 auto 22px;
+
+        border: 5px solid #e2e8f0;
+
+        border-top-color: #2563eb;
+
+        border-right-color: #0ea5e9;
+
+        border-radius: 50%;
+
+        animation:
+            girar .75s linear infinite;
+    }
+
+    .carregamento-card h3 {
+        margin: 0 0 9px;
+
+        color: #0f172a;
+
+        font-size: 21px;
+
+        font-weight: 700;
+    }
+
+    .carregamento-card p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+    }
+
+    .loading-info {
+        display: block;
+
+        margin-top: 8px;
+
+        color: #94a3b8;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================================================
+       ANIMAÇÃO
+    ========================================================= */
+
+    @@keyframes girar {
+
+        to {
+            transform: rotate(360deg);
+        }
+
+    }
+
+
+    /* =========================================================
+       RESPONSIVIDADE
+    ========================================================= */
+
+    @@media (max-width: 1050px) {
+
+        .side-login {
+            width: 50%;
+
+            padding: 45px;
+        }
+
+        .card-auth {
+            width: 50%;
+
+            margin: 25px;
+
+            padding: 35px;
+        }
+
+        .content-side h1 {
+            font-size: 42px;
+        }
+
+    }
+
+
+    @@media (max-width: 850px) {
+
+        .container-auth {
+            padding: 20px;
+        }
+
+        .auth-wrapper {
+            min-height: auto;
+
+            border-radius: 25px;
+        }
 
         .side-login {
             display: none;
@@ -411,20 +1046,114 @@
 
         .card-auth {
             width: 100%;
-            max-width: 100%;
+            max-width: 540px;
+
+            margin: auto;
+
+            padding: 35px 28px;
+
+            border-radius: 25px;
         }
 
-        .container-auth {
-            padding: 20px;
-        }
     }
 
-    .link-recuperar {
-        display: block;
-        margin-top: 15px;
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 600;
+
+    @@media (max-width: 480px) {
+
+        .container-auth {
+            padding: 12px;
+        }
+
+        .card-auth {
+            padding: 30px 20px;
+        }
+
+        .logo-auth {
+            width: 230px;
+        }
+
+        .card-auth h2 {
+            font-size: 24px;
+        }
+
+        .carregamento-card {
+            padding: 32px 24px;
+        }
+
     }
 
 </style>
+
+
+<script>
+
+    (() => {
+
+        const botaoGoogle =
+            document.getElementById("btnGoogle");
+
+        const carregamento =
+            document.getElementById("carregamentoGoogle");
+
+
+        if (!botaoGoogle || !carregamento) {
+            return;
+        }
+
+
+        function mostrarCarregamento() {
+
+            carregamento.classList.add("ativo");
+
+            carregamento.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            botaoGoogle.classList.add("carregando");
+
+            botaoGoogle.setAttribute(
+                "aria-disabled",
+                "true"
+            );
+
+        }
+
+
+        function esconderCarregamento() {
+
+            carregamento.classList.remove("ativo");
+
+            carregamento.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            botaoGoogle.classList.remove("carregando");
+
+            botaoGoogle.removeAttribute(
+                "aria-disabled"
+            );
+
+        }
+
+
+        botaoGoogle.addEventListener(
+            "click",
+            mostrarCarregamento
+        );
+
+
+        /*
+         * Se o usuário voltar pelo navegador,
+         * impede que a tela continue travada
+         * com o loading aberto.
+         */
+        window.addEventListener(
+            "pageshow",
+            esconderCarregamento
+        );
+
+    })();
+
+</script>

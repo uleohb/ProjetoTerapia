@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - AlinhaVIDA</title>
+    <title>
+    @(string.IsNullOrWhiteSpace(ViewData["Title"] as string)
+        ? "AlinhaVIDA"
+        : $"{ViewData["Title"]} - AlinhaVIDA")
+</title>
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -12,6 +16,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProjetoTerapia.styles.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="~/imagem/logo.png" asp-append-version="true" />
 </head>
 
 <body>

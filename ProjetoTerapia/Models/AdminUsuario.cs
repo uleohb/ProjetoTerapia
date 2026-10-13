@@ -17,5 +17,27 @@ namespace ProjetoTerapia.Models
         public bool Ativo { get; set; } = true;
 
         public DateTime DataCriacao { get; set; } = DateTime.Now;
+
+
+        // =====================================================
+        // SEGURANÇA DE LOGIN
+        // =====================================================
+
+        public int TentativasLoginFalhas { get; set; } = 0;
+
+        public DateTime? BloqueadoAte { get; set; }
+
+        public DateTime? UltimoLogin { get; set; }
+
+
+        // =====================================================
+        // AUTENTICAÇÃO EM DUAS ETAPAS
+        // =====================================================
+
+        public string? Codigo2FAHash { get; set; }
+
+        public DateTime? Codigo2FAExpiraEm { get; set; }
+
+        public DateTime? UltimoCodigo2FAEnviadoEm { get; set; }
     }
 }

@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ProjetoTerapia.Pages
 {
+
+    [EnableRateLimiting("admin-login")]
     public class LoginClinicaModel : PageModel
     {
         private readonly AppDbContext _context;
@@ -87,8 +91,25 @@ namespace ProjetoTerapia.Pages
         }
 
         // LOGIN GOOGLE
-        public IActionResult OnGetLoginGoogle()
+        public async Task<IActionResult> OnGetLoginGoogle()
         {
+            try
+            {
+                using var timeout = new CancellationTokenSource(
+                    TimeSpan.FromSeconds(5)
+                );
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "SELECT 1",
+                    timeout.Token
+                );
+            }
+            catch
+            {
+                // O aquecimento do banco é apenas uma otimização.
+                // Se falhar, o login com Google continua normalmente.
+            }
+
             var properties = new AuthenticationProperties
             {
                 RedirectUri = Url.Page(

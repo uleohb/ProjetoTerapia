@@ -151,9 +151,8 @@ namespace ProjetoTerapia.Pages
             };
 
             return PhysicalFile(
-                caminhoArquivo,
-                contentType,
-                enableRangeProcessing: true
+                   caminhoArquivo,
+                   contentType
             );
         }
 

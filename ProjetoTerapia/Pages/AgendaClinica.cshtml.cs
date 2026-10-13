@@ -1,17 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ProjetoTerapia.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ProjetoTerapia.Models;
 
 namespace ProjetoTerapia.Pages
 {
     public class AgendaClinicaModel : PageModel
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<AgendaClinicaModel> _logger;
 
-        public AgendaClinicaModel(AppDbContext context)
+        public AgendaClinicaModel(
+            AppDbContext context,
+            ILogger<AgendaClinicaModel> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public List<Consulta> Consultas { get; set; } = new();
@@ -31,138 +36,386 @@ namespace ProjetoTerapia.Pages
 
         public Clinica Clinica { get; set; } = new();
 
-        public IActionResult OnGet()
+        public string? ErroCarregamento { get; set; }
+
+
+        // =====================================================
+        // ABRIR AGENDA
+        // =====================================================
+
+        public async Task<IActionResult> OnGetAsync()
         {
             var clinicaId = ObterClinicaLogadaId();
 
-            if (clinicaId == null)
+            if (!clinicaId.HasValue)
             {
+                LimparSessaoClinica();
+
                 return RedirectToPage("/LoginClinica");
             }
 
-            CarregarAgenda(clinicaId.Value);
+            try
+            {
+                var clinica = await _context.Clinicas
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(
+                        c => c.Id == clinicaId.Value
+                    );
 
-            return Page();
+                if (clinica == null)
+                {
+                    LimparSessaoClinica();
+
+                    return RedirectToPage("/LoginClinica");
+                }
+
+                Clinica = clinica;
+
+                await CarregarAgendaAsync(
+                    clinicaId.Value
+                );
+
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Erro ao carregar agenda da clínica {ClinicaId}.",
+                    clinicaId.Value
+                );
+
+                ErroCarregamento =
+                    "Não foi possível carregar sua agenda agora. Tente novamente em alguns instantes.";
+
+                return Page();
+            }
         }
 
-        public IActionResult OnPostConfirmar(int id)
+
+        // =====================================================
+        // CONFIRMAR CONSULTA
+        // =====================================================
+
+        public async Task<IActionResult> OnPostConfirmarAsync(int id)
         {
             var clinicaId = ObterClinicaLogadaId();
 
-            if (clinicaId == null)
+            if (!clinicaId.HasValue)
             {
+                LimparSessaoClinica();
+
                 return RedirectToPage("/LoginClinica");
             }
 
-            var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
-
-            if (consulta != null)
+            try
             {
+                var consulta = await _context.Consultas
+                    .FirstOrDefaultAsync(
+                        x =>
+                            x.Id == id &&
+                            x.ClinicaId == clinicaId.Value
+                    );
+
+                if (consulta == null)
+                {
+                    return RedirectToPage("/AgendaClinica");
+                }
+
                 consulta.Status = "Confirmado";
-                _context.SaveChanges();
-            }
 
-            return RedirectToPage();
+                await _context.SaveChangesAsync();
+
+                return RedirectToPage("/AgendaClinica");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Erro ao confirmar consulta {ConsultaId}.",
+                    id
+                );
+
+                return RedirectToPage("/AgendaClinica");
+            }
         }
 
-        public IActionResult OnPostCancelar(int id)
+
+        // =====================================================
+        // CANCELAR CONSULTA
+        // =====================================================
+
+        public async Task<IActionResult> OnPostCancelarAsync(int id)
         {
             var clinicaId = ObterClinicaLogadaId();
 
-            if (clinicaId == null)
+            if (!clinicaId.HasValue)
             {
+                LimparSessaoClinica();
+
                 return RedirectToPage("/LoginClinica");
             }
 
-            var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
-
-            if (consulta != null)
+            try
             {
+                var consulta = await _context.Consultas
+                    .FirstOrDefaultAsync(
+                        x =>
+                            x.Id == id &&
+                            x.ClinicaId == clinicaId.Value
+                    );
+
+                if (consulta == null)
+                {
+                    return RedirectToPage("/AgendaClinica");
+                }
+
                 consulta.Status = "Cancelado";
-                _context.SaveChanges();
-            }
 
-            return RedirectToPage();
+                await _context.SaveChangesAsync();
+
+                return RedirectToPage("/AgendaClinica");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Erro ao cancelar consulta {ConsultaId}.",
+                    id
+                );
+
+                return RedirectToPage("/AgendaClinica");
+            }
         }
 
-        public IActionResult OnPostExcluir(int id)
+
+        // =====================================================
+        // EXCLUIR CONSULTA
+        // =====================================================
+
+        public async Task<IActionResult> OnPostExcluirAsync(int id)
         {
             var clinicaId = ObterClinicaLogadaId();
 
-            if (clinicaId == null)
+            if (!clinicaId.HasValue)
             {
+                LimparSessaoClinica();
+
                 return RedirectToPage("/LoginClinica");
             }
 
-            var consulta = _context.Consultas
-                .FirstOrDefault(x => x.Id == id && x.ClinicaId == clinicaId.Value);
-
-            if (consulta != null)
+            try
             {
-                _context.Consultas.Remove(consulta);
-                _context.SaveChanges();
-            }
+                var consulta = await _context.Consultas
+                    .FirstOrDefaultAsync(
+                        x =>
+                            x.Id == id &&
+                            x.ClinicaId == clinicaId.Value
+                    );
 
-            return RedirectToPage();
+                if (consulta == null)
+                {
+                    return RedirectToPage("/AgendaClinica");
+                }
+
+                _context.Consultas.Remove(consulta);
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToPage("/AgendaClinica");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Erro ao excluir consulta {ConsultaId}.",
+                    id
+                );
+
+                return RedirectToPage("/AgendaClinica");
+            }
         }
 
-        private void CarregarAgenda(int clinicaId)
-        {
-            Clinica = _context.Clinicas
-                .FirstOrDefault(c => c.Id == clinicaId) ?? new Clinica();
 
-            var query = _context.Consultas
-                .Include(x => x.Paciente)
-                .Include(x => x.ResultadoTestePaciente)
-                .Where(x => x.ClinicaId == clinicaId);
+        // =====================================================
+        // CARREGAR AGENDA
+        // =====================================================
+
+        private async Task CarregarAgendaAsync(int clinicaId)
+        {
+            /*
+             * Por enquanto carregamos apenas Consulta.
+             *
+             * Removi:
+             *
+             * Include(x => x.Paciente)
+             * Include(x => x.ResultadoTestePaciente)
+             *
+             * porque a versão atual da tela não precisa desses
+             * relacionamentos para abrir a agenda.
+             *
+             * Isso deixa a consulta mais simples e reduz a chance
+             * de um relacionamento antigo quebrar a página.
+             */
+
+            IQueryable<Consulta> query =
+                _context.Consultas
+                    .AsNoTracking()
+                    .Where(
+                        x => x.ClinicaId == clinicaId
+                    );
+
+
+            // =================================================
+            // BUSCA
+            // =================================================
 
             if (!string.IsNullOrWhiteSpace(Busca))
             {
-                query = query.Where(x =>
-                    x.NomePaciente.Contains(Busca) ||
-                    x.EmailPaciente.Contains(Busca));
+                var busca = Busca.Trim();
+
+                query = query.Where(
+                    x =>
+                        (
+                            x.NomePaciente != null &&
+                            EF.Functions.Like(
+                                x.NomePaciente,
+                                $"%{busca}%"
+                            )
+                        )
+                        ||
+                        (
+                            x.EmailPaciente != null &&
+                            EF.Functions.Like(
+                                x.EmailPaciente,
+                                $"%{busca}%"
+                            )
+                        )
+                );
             }
 
-            var todas = query.ToList();
+
+            var todas = await query
+                .OrderBy(x => x.DataConsulta)
+                .ToListAsync();
+
+
+            // =================================================
+            // PENDENTES
+            // =================================================
 
             SolicitacoesPendentes = todas
-                .Where(x => x.Status == "Pendente")
+                .Where(
+                    x => string.Equals(
+                        x.Status,
+                        "Pendente",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 .OrderBy(x => x.DataConsulta)
                 .ToList();
+
+
+            // =================================================
+            // CONFIRMADAS
+            // =================================================
 
             Consultas = todas
-                .Where(x => x.Status == "Confirmado")
+                .Where(
+                    x => string.Equals(
+                        x.Status,
+                        "Confirmado",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 .OrderBy(x => x.DataConsulta)
                 .ToList();
 
-            ConsultasHoje = Consultas.Count(x =>
-                x.DataConsulta.HasValue &&
-                x.DataConsulta.Value.Date == DateTime.Today);
 
-            Confirmadas = todas.Count(x => x.Status == "Confirmado");
+            // =================================================
+            // CONTADORES
+            // =================================================
 
-            Pendentes = todas.Count(x => x.Status == "Pendente");
+            var hoje = DateTime.Today;
 
-            Canceladas = todas.Count(x => x.Status == "Cancelado");
+
+            ConsultasHoje = Consultas.Count(
+                x =>
+                    x.DataConsulta.HasValue &&
+                    x.DataConsulta.Value.Date == hoje
+            );
+
+
+            Confirmadas = todas.Count(
+                x => string.Equals(
+                    x.Status,
+                    "Confirmado",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+
+            Pendentes = todas.Count(
+                x => string.Equals(
+                    x.Status,
+                    "Pendente",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+
+            Canceladas = todas.Count(
+                x => string.Equals(
+                    x.Status,
+                    "Cancelado",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
         }
+
+
+        // =====================================================
+        // OBTER CLÍNICA LOGADA
+        // =====================================================
 
         private int? ObterClinicaLogadaId()
         {
-            var clinicaIdString = HttpContext.Session.GetString("ClinicaLogada");
+            var clinicaIdString =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
 
-            if (string.IsNullOrEmpty(clinicaIdString))
+            if (string.IsNullOrWhiteSpace(
+                clinicaIdString))
             {
                 return null;
             }
 
-            if (!int.TryParse(clinicaIdString, out int clinicaId))
+            if (!int.TryParse(
+                clinicaIdString,
+                out var clinicaId))
+            {
+                return null;
+            }
+
+            if (clinicaId <= 0)
             {
                 return null;
             }
 
             return clinicaId;
+        }
+
+
+        // =====================================================
+        // LIMPAR SESSÃO
+        // =====================================================
+
+        private void LimparSessaoClinica()
+        {
+            HttpContext.Session.Remove(
+                "ClinicaLogada"
+            );
         }
     }
 }

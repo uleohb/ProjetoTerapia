@@ -1,66 +1,221 @@
-﻿@page
+﻿@page "/profissional/perfil"
 @model ProjetoTerapia.Pages.PerfilClinicaModel
+
+@using System
+@using System.Linq
+@using System.Globalization
+
+@{
+    var clinica = Model.Clinica
+        ?? throw new InvalidOperationException(
+            "O perfil profissional não foi carregado."
+        );
+
+    var nomeProfissional =
+        string.IsNullOrWhiteSpace(clinica.Nome)
+            ? "Profissional"
+            : clinica.Nome.Trim();
+
+    ViewData["Title"] = nomeProfissional;
+
+
+    // =====================================================
+    // WHATSAPP
+    // =====================================================
+
+    var telefoneOriginal =
+        clinica.Telefone ?? "";
+
+    var telefoneWhatsapp =
+        new string(
+            telefoneOriginal
+                .Where(char.IsDigit)
+                .ToArray()
+        );
+
+    telefoneWhatsapp =
+        telefoneWhatsapp.TrimStart('0');
+
+    if (!string.IsNullOrWhiteSpace(telefoneWhatsapp) &&
+        !telefoneWhatsapp.StartsWith("55"))
+    {
+        telefoneWhatsapp =
+            "55" + telefoneWhatsapp;
+    }
+
+    var whatsappDisponivel =
+        !string.IsNullOrWhiteSpace(telefoneWhatsapp) &&
+        telefoneWhatsapp.Length >= 12;
+
+
+    var mensagemWhatsapp =
+        Uri.EscapeDataString(
+            "Olá! Encontrei seu perfil no AlinhaVIDA e gostaria de saber mais sobre o atendimento."
+        );
+
+
+    var whatsappUrl =
+        whatsappDisponivel
+            ? $"https://wa.me/{telefoneWhatsapp}?text={mensagemWhatsapp}"
+            : "";
+
+
+    // =====================================================
+    // INSTAGRAM
+    // =====================================================
+
+    var instagramUrl =
+        clinica.Instagram?.Trim() ?? "";
+
+    if (!string.IsNullOrWhiteSpace(instagramUrl) &&
+        !instagramUrl.StartsWith(
+            "http",
+            StringComparison.OrdinalIgnoreCase))
+    {
+        instagramUrl =
+            "https://instagram.com/" +
+            instagramUrl.Replace("@", "");
+    }
+
+
+    // =====================================================
+    // SITE
+    // =====================================================
+
+    var siteUrl =
+        clinica.Site?.Trim() ?? "";
+
+    if (!string.IsNullOrWhiteSpace(siteUrl) &&
+        !siteUrl.StartsWith(
+            "http",
+            StringComparison.OrdinalIgnoreCase))
+    {
+        siteUrl =
+            "https://" + siteUrl;
+    }
+
+
+    // =====================================================
+    // AVATAR
+    // =====================================================
+
+    var inicial =
+        string.IsNullOrWhiteSpace(nomeProfissional)
+            ? "P"
+            : nomeProfissional
+                .Substring(0, 1)
+                .ToUpperInvariant();
+}
+
 
 <div class="perfil-page">
 
+    <!-- =====================================================
+         VOLTAR
+    ====================================================== -->
+
     <div class="voltar-container">
-        <a href="@(Model.EhDonoPerfil ? "/PainelClinica" : "/Clinicas")"
-           class="btn-voltar">
-            ← Voltar
-        </a>
+
+        @if (Model.EhDonoPerfil)
+        {
+            <a asp-page="/PainelClinica"
+               class="btn-voltar">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Voltar ao painel
+
+            </a>
+        }
+        else
+        {
+            <a asp-page="/Clinicas"
+               class="btn-voltar">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Voltar aos profissionais
+
+            </a>
+        }
+
     </div>
 
-    <!-- TOPO MODERNO -->
+
+    <!-- =====================================================
+         TOPO
+    ====================================================== -->
 
     <section class="perfil-topo-moderno">
 
         <div class="perfil-topo-card">
 
+
+            <!-- IDENTIDADE -->
+
             <div class="perfil-identidade">
 
                 <div class="avatar-perfil">
 
-                    @if (!string.IsNullOrEmpty(Model.Clinica.FotoPerfil))
+                    @if (!string.IsNullOrWhiteSpace(
+                        clinica.FotoPerfil))
                     {
-                        <img src="@Model.Clinica.FotoPerfil" alt="@Model.Clinica.Nome" />
+                        <img src="@clinica.FotoPerfil"
+                             alt="@nomeProfissional" />
                     }
                     else
                     {
-                        @(string.IsNullOrEmpty(Model.Clinica.Nome)
-                                            ? "C"
-                                            : Model.Clinica.Nome.Substring(0, 1).ToUpper())
-                                        }
+                        @inicial
+                    }
 
                 </div>
+
 
                 <div class="perfil-info-principal">
 
                     <span class="badge-top">
-                        Perfil Profissional
+                        Perfil profissional
                     </span>
 
+
                     <h1>
-                        @Model.Clinica.Nome
+                        @nomeProfissional
                     </h1>
+
 
                     <div class="linha-badges">
 
-                        @if (Model.Clinica.AtendimentoOnline)
+
+                        @if (clinica.AtendimentoOnline)
                         {
                             <span class="badge-info online">
+
+                                <i class="fa-solid fa-video"></i>
+
                                 Online
+
                             </span>
                         }
 
-                        @if (Model.Clinica.AtendimentoPresencial)
+
+                        @if (clinica.AtendimentoPresencial)
                         {
                             <span class="badge-info presencial">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
                                 Presencial
+
                             </span>
                         }
 
+
                         <span class="badge-info aprovado">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
                             Verificado
+
                         </span>
 
                     </div>
@@ -69,37 +224,75 @@
 
             </div>
 
+
+            <!-- =================================================
+                 AÇÕES PRINCIPAIS
+            ================================================== -->
+
             <div class="perfil-acoes-rapidas">
 
                 @if (!Model.EhDonoPerfil)
                 {
-                    <a href="/PerfilClinica?handler=Whatsapp&id=@Model.Clinica.Id"
-                       target="_blank"
-                       class="btn-topo whatsapp-topo">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        Chamar no WhatsApp
-                    </a>
 
-                    @if (Model.PacienteLogado)
+                    @if (whatsappDisponivel)
                     {
-                        <a href="/AgendarConsulta?id=@Model.Clinica.Id"
-                           class="btn-topo agendar-topo">
-                            Agendar consulta
+                        <a href="@whatsappUrl"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn-topo whatsapp-topo">
+
+                            <i class="fa-brands fa-whatsapp"></i>
+
+                            Chamar no WhatsApp
+
                         </a>
                     }
                     else
                     {
-                        <a href="/LoginPaciente"
+                        <span class="btn-topo whatsapp-topo indisponivel">
+
+                            <i class="fa-brands fa-whatsapp"></i>
+
+                            WhatsApp indisponível
+
+                        </span>
+                    }
+
+
+                    @if (Model.PacienteLogado)
+                    {
+                        <a asp-page="/AgendarConsulta"
+                           asp-route-id="@clinica.Id"
                            class="btn-topo agendar-topo">
-                            Entrar para agendar
+
+                            <i class="fa-regular fa-calendar-check"></i>
+
+                            Agendar consulta
+
                         </a>
                     }
+                    else
+                    {
+                        <a asp-page="/LoginPaciente"
+                           class="btn-topo agendar-topo">
+
+                            <i class="fa-regular fa-calendar-check"></i>
+
+                            Entrar para agendar
+
+                        </a>
+                    }
+
                 }
                 else
                 {
-                    <a href="/CadastroClinica"
+                    <a asp-page="/CadastroClinica"
                        class="btn-topo agendar-topo">
+
+                        <i class="fa-regular fa-pen-to-square"></i>
+
                         Editar perfil
+
                     </a>
                 }
 
@@ -109,197 +302,356 @@
 
     </section>
 
-    <!-- CONTEÚDO -->
+
+    <!-- =====================================================
+         CONTEÚDO
+    ====================================================== -->
 
     <div class="conteudo-perfil">
 
-        <!-- ESQUERDA -->
+
+        <!-- =================================================
+             COLUNA PRINCIPAL
+        ================================================== -->
 
         <div class="perfil-main">
 
+
             <!-- ESPECIALIDADES -->
 
-            <div class="card-perfil">
+            <section class="card-perfil">
 
-                <h3>Especialidades</h3>
+                <h3>
+                    Especialidades
+                </h3>
+
 
                 <div class="especialidades-lista">
 
-                    @foreach (var esp in Model.ListaEspecialidades)
+                    @if (Model.ListaEspecialidades != null &&
+                         Model.ListaEspecialidades.Any())
                     {
-                        <span class="tag-especialidade">
-                            @esp
-                        </span>
+                        @foreach (var especialidade
+                            in Model.ListaEspecialidades)
+                        {
+                            @if (!string.IsNullOrWhiteSpace(
+                                especialidade))
+                            {
+                                <span class="tag-especialidade">
+
+                                    @especialidade
+
+                                </span>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p class="info-texto">
+                            Especialidades não informadas.
+                        </p>
                     }
 
                 </div>
 
-            </div>
+            </section>
 
-            <!-- SOBRE -->
 
-            <div class="card-perfil">
+            <!-- =================================================
+                 SOBRE
+            ================================================== -->
 
-                <h3>Sobre o profissional</h3>
+            <section class="card-perfil">
+
+                <h3>
+                    Sobre o profissional
+                </h3>
+
 
                 <p class="texto-sobre">
-                    @Model.Clinica.Descricao
+
+                    @(string.IsNullOrWhiteSpace(
+                        clinica.Descricao)
+
+                        ? "Este profissional ainda não adicionou uma descrição."
+                        : clinica.Descricao)
+
                 </p>
 
-            </div>
+            </section>
 
-            <!-- LOCALIZAÇÃO -->
 
-            <div class="card-perfil">
+            <!-- =================================================
+                 LOCALIZAÇÃO
+            ================================================== -->
 
-                <h3>Localização</h3>
+            <section class="card-perfil">
+
+                <h3>
+                    Localização
+                </h3>
+
 
                 <p class="info-texto">
-                    @(string.IsNullOrWhiteSpace(Model.Clinica.Endereco) ? "Endereço não informado" : Model.Clinica.Endereco)
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <span>
+
+                        @(string.IsNullOrWhiteSpace(
+                            clinica.Endereco)
+
+                            ? "Endereço não informado"
+                            : clinica.Endereco)
+
+                    </span>
+
                 </p>
+
 
                 <p class="info-texto">
-                    Cidade: @(string.IsNullOrWhiteSpace(Model.Clinica.Cidade) ? "Não informada" : Model.Clinica.Cidade)
+
+                    <i class="fa-solid fa-city"></i>
+
+                    <span>
+
+                        @(string.IsNullOrWhiteSpace(
+                            clinica.Cidade)
+
+                            ? "Cidade não informada"
+                            : clinica.Cidade)
+
+                    </span>
+
                 </p>
 
-            </div>
+            </section>
 
         </div>
 
-        <!-- DIREITA -->
+
+        <!-- =================================================
+             COLUNA LATERAL
+        ================================================== -->
 
         <aside class="perfil-side">
 
-            <!-- VALOR -->
 
-            <div class="card-side destaque">
+            <!-- =================================================
+                 VALOR
+            ================================================== -->
 
-                <span>Consulta inicial</span>
+            <section class="card-side destaque">
+
+                <span>
+                    Consulta inicial
+                </span>
+
 
                 <h2>
-                    @Model.Clinica.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))
+
+                    @clinica.Valor.ToString(
+                        "C",
+                        new CultureInfo("pt-BR")
+                    )
+
                 </h2>
 
-            </div>
+            </section>
 
-            <!-- AGENDAMENTO -->
+
+            <!-- =================================================
+                 AGENDAMENTO
+            ================================================== -->
             @if (!Model.EhDonoPerfil)
             {
-                <div class="card-side agendamento-card">
+                <section class="card-side agendamento-card">
 
-                    <h3>Agendamento</h3>
+                    <h3>
+                        Agendamento
+                    </h3>
+
 
                     <p>
-                        Solicite uma consulta com este profissional.
+                        Solicite uma consulta diretamente
+                        com este profissional.
                     </p>
+
 
                     @if (Model.PacienteLogado)
                     {
-                        <a href="/AgendarConsulta?id=@Model.Clinica.Id"
+                        <a asp-page="/AgendarConsulta"
+                           asp-route-id="@clinica.Id"
                            class="btn-agendar-consulta">
+
+                            <i class="fa-regular fa-calendar-check"></i>
+
                             Agendar consulta
+
                         </a>
                     }
                     else
                     {
-                        <a href="/LoginPaciente"
+                        <a asp-page="/LoginPaciente"
                            class="btn-agendar-consulta">
+
+                            <i class="fa-regular fa-user"></i>
+
                             Entrar para agendar
+
                         </a>
                     }
 
-                </div>
+                </section>
             }
 
-            <!-- CONTATO -->
 
-            <div class="card-side">
+            <!-- =================================================
+                 CONTATO
+            ================================================== -->
 
-                <h3>Contato</h3>
+            <section class="card-side">
 
-                <p>
-                    @Model.Clinica.Telefone
+                <h3>
+                    Contato
+                </h3>
+
+
+                <p class="telefone-perfil">
+
+                    <i class="fa-solid fa-phone"></i>
+
+                    <span>
+
+                        @(string.IsNullOrWhiteSpace(
+                            clinica.Telefone)
+
+                            ? "Telefone não informado"
+                            : clinica.Telefone)
+
+                    </span>
+
                 </p>
 
-                <a href="/PerfilClinica?handler=Whatsapp&id=@Model.Clinica.Id"
-                   target="_blank"
-                   class="rede whatsapp">
 
-                    <i class="fa-brands fa-whatsapp"></i>
+                @if (whatsappDisponivel)
+                {
+                    <a href="@whatsappUrl"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="rede whatsapp"
+                       aria-label="Abrir conversa no WhatsApp"
+                       title="WhatsApp">
 
-                </a>
+                        <i class="fa-brands fa-whatsapp"></i>
 
-            </div>
+                    </a>
+                }
 
-            <!-- REDES -->
+            </section>
 
-            <div class="card-side">
 
-                <h3>Redes Sociais</h3>
+            <!-- =================================================
+                 REDES SOCIAIS
+            ================================================== -->
+            @if (!string.IsNullOrWhiteSpace(instagramUrl) ||
+                             !string.IsNullOrWhiteSpace(siteUrl))
+            {
+                <section class="card-side">
 
-                <div class="redes-grid">
+                    <h3>
+                        Redes sociais
+                    </h3>
 
-                    @if (!string.IsNullOrEmpty(Model.Clinica.Instagram))
-                    {
-                        <a href="@Model.Clinica.Instagram"
-                           target="_blank"
-                           class="rede insta">
 
-                            <i class="fa-brands fa-instagram"></i>
+                    <div class="redes-grid">
 
-                        </a>
-                    }
 
-                    @if (!string.IsNullOrEmpty(Model.Clinica.Site))
-                    {
-                        <a href="@Model.Clinica.Site"
-                           target="_blank"
-                           class="rede site">
+                        @if (!string.IsNullOrWhiteSpace(
+                            instagramUrl))
+                        {
+                            <a href="@instagramUrl"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="rede insta"
+                               aria-label="Instagram"
+                               title="Instagram">
 
-                            <i class="fa-solid fa-globe"></i>
+                                <i class="fa-brands fa-instagram"></i>
 
-                        </a>
-                    }
+                            </a>
+                        }
 
-                </div>
 
-            </div>
+                        @if (!string.IsNullOrWhiteSpace(
+                            siteUrl))
+                        {
+                            <a href="@siteUrl"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="rede site"
+                               aria-label="Site profissional"
+                               title="Site profissional">
 
-            <!-- STATS -->
+                                <i class="fa-solid fa-globe"></i>
+
+                            </a>
+                        }
+
+                    </div>
+
+                </section>
+            }
+
+
+            <!-- =================================================
+                 ESTATÍSTICAS
+            ================================================== -->
             @if (Model.EhDonoPerfil)
             {
-                <div class="card-side">
+                <section class="card-side">
 
-                    <h3>Estatísticas do perfil</h3>
+                    <h3>
+                        Estatísticas do perfil
+                    </h3>
+
 
                     <div class="stats-grid">
 
                         <div class="stat-box">
+
                             <strong>
-                                @Model.Clinica.Visualizacoes
+                                @clinica.Visualizacoes
                             </strong>
 
                             <span>
                                 Visualizações
                             </span>
+
                         </div>
 
+
                         <div class="stat-box">
+
                             <strong>
-                                @Model.Clinica.CliquesWhatsapp
+                                @clinica.CliquesWhatsapp
                             </strong>
 
                             <span>
                                 Cliques WhatsApp
                             </span>
+
                         </div>
 
                     </div>
 
-                </div>
+                </section>
 
-                <a href="/CadastroClinica"
+
+                <a asp-page="/CadastroClinica"
                    class="btn-editar">
+
+                    <i class="fa-regular fa-pen-to-square"></i>
 
                     Editar perfil
 
@@ -315,6 +667,10 @@
 
 <style>
 
+    /* =========================================================
+           BASE
+        ========================================================= */
+
     body {
         margin: 0;
         background: #ecfeff;
@@ -322,13 +678,44 @@
     }
 
 
-    /* TOPO MODERNO */
-
     .perfil-page {
         min-height: 100vh;
-        background: #ecfeff;
         padding-bottom: 50px;
+        background: radial-gradient( circle at top right, rgba(14,165,233,.08), transparent 28% ), radial-gradient( circle at bottom left, rgba(20,184,166,.08), transparent 32% ), #ecfeff;
     }
+
+
+    /* =========================================================
+           VOLTAR
+        ========================================================= */
+
+    .voltar-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 25px;
+    }
+
+
+    .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+
+        .btn-voltar:hover {
+            color: #0ea5e9;
+            transform: translateX(-3px);
+        }
+
+
+    /* =========================================================
+           TOPO
+        ========================================================= */
 
     .perfil-topo-moderno {
         max-width: 1200px;
@@ -336,48 +723,44 @@
         padding: 0 25px;
     }
 
+
     .perfil-topo-card {
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        padding: 34px 0 18px;
-        box-shadow: none;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         gap: 28px;
-        position: relative;
-        overflow: visible;
+        padding: 34px 0 18px;
     }
 
-        .perfil-topo-card::before {
-           display: none;
-        }
 
     .perfil-identidade {
         display: flex;
         align-items: center;
         gap: 26px;
-        position: relative;
-        z-index: 2;
     }
+
+
+    /* =========================================================
+           AVATAR
+        ========================================================= */
 
     .avatar-perfil {
         width: 118px;
         height: 118px;
-        border-radius: 30px;
-        background: white;
-        color: #0ea5e9;
-        font-size: 42px;
-        font-weight: 900;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
         overflow: hidden;
-        box-shadow: 0 18px 40px rgba(14,165,233,.16);
         border: 4px solid white;
+        border-radius: 30px;
+        background: linear-gradient( 135deg, #ffffff, #f0fdfa );
+        color: #0ea5e9;
+        font-size: 42px;
+        font-weight: 900;
+        box-shadow: 0 18px 40px rgba(14,165,233,.16);
     }
+
 
         .avatar-perfil img {
             width: 100%;
@@ -385,24 +768,32 @@
             object-fit: cover;
         }
 
+
+    /* =========================================================
+           INFORMAÇÕES PRINCIPAIS
+        ========================================================= */
+
     .perfil-info-principal h1 {
         margin: 12px 0 10px;
+        color: #0f172a;
         font-size: 38px;
         line-height: 1.1;
-        color: #0f172a;
         letter-spacing: -1px;
+        overflow-wrap: anywhere;
     }
+
 
     .badge-top {
         display: inline-flex;
-        background: #ecfeff;
-        color: #0369a1;
         padding: 8px 14px;
         border-radius: 999px;
+        background: #ecfeff;
+        color: #0369a1;
         font-size: 12px;
-        font-weight: 900;
+        font-weight: 800;
         text-transform: uppercase;
     }
+
 
     .linha-badges {
         display: flex;
@@ -411,89 +802,127 @@
         margin-top: 14px;
     }
 
+
     .badge-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         padding: 8px 13px;
         border-radius: 999px;
         font-size: 12px;
-        font-weight: 900;
+        font-weight: 800;
     }
+
 
     .online {
         background: #dcfce7;
         color: #166534;
     }
 
+
     .presencial {
         background: #dbeafe;
         color: #1d4ed8;
     }
+
 
     .aprovado {
         background: #fef3c7;
         color: #92400e;
     }
 
+
+    /* =========================================================
+           AÇÕES PRINCIPAIS
+        ========================================================= */
+
     .perfil-acoes-rapidas {
+        min-width: 230px;
         display: flex;
         flex-direction: column;
         gap: 12px;
-        min-width: 230px;
-        position: relative;
-        z-index: 2;
     }
 
+
     .btn-topo {
-        padding: 15px 18px;
-        border-radius: 17px;
-        text-decoration: none;
-        font-weight: 900;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        transition: .25s;
+        padding: 15px 18px;
+        border-radius: 17px;
+        color: white;
+        text-decoration: none;
         text-align: center;
+        font-weight: 800;
+        transition: .25s;
     }
 
+
         .btn-topo:hover {
+            color: white;
             transform: translateY(-3px);
             box-shadow: 0 18px 35px rgba(15,23,42,.12);
         }
 
+
     .whatsapp-topo {
-        background: linear-gradient(135deg,#22c55e,#16a34a);
-        color: white;
+        background: linear-gradient( 135deg, #22c55e, #16a34a );
     }
+
 
     .agendar-topo {
-        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-        color: white;
+        background: linear-gradient( 135deg, #14b8a6, #0ea5e9 );
     }
 
-    /* CONTEÚDO */
+
+    .btn-topo.indisponivel {
+        cursor: not-allowed;
+        opacity: .55;
+        box-shadow: none;
+        transform: none;
+    }
+
+
+    /* =========================================================
+           CONTEÚDO
+        ========================================================= */
 
     .conteudo-perfil {
-        max-width: 1200px;
-        margin: 28px auto 50px;
         position: relative;
         z-index: 10;
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 30px;
+        max-width: 1200px;
+        margin: 28px auto 50px;
         padding: 0 25px;
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+        gap: 30px;
     }
 
-    /* CARDS */
+
+    .perfil-main,
+    .perfil-side {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+
+    /* =========================================================
+           CARDS
+        ========================================================= */
 
     .card-perfil,
     .card-side {
-        background: #ffffff;
-        border-radius: 26px;
         padding: 26px;
-        box-shadow: 0 10px 24px rgba(15,23,42,.05);
         border: 1px solid #ddeceb;
+        border-radius: 26px;
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(15,23,42,.05);
         transition: .25s;
     }
+
 
         .card-perfil:hover,
         .card-side:hover {
@@ -501,16 +930,19 @@
             box-shadow: 0 26px 60px rgba(15,23,42,.10);
         }
 
+
         .card-perfil h3,
         .card-side h3 {
-            margin-top: 0;
-            margin-bottom: 18px;
+            margin: 0 0 18px;
             color: #0f172a;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-    /* TAGS */
+
+    /* =========================================================
+           ESPECIALIDADES
+        ========================================================= */
 
     .especialidades-lista {
         display: flex;
@@ -518,95 +950,110 @@
         gap: 12px;
     }
 
+
     .tag-especialidade {
-        background: #dbeafe;
-        color: #2563eb;
         padding: 10px 14px;
         border-radius: 999px;
+        background: #dbeafe;
+        color: #2563eb;
         font-size: 13px;
         font-weight: 700;
     }
 
-    /* TEXTO */
+
+    /* =========================================================
+           TEXTOS
+        ========================================================= */
 
     .texto-sobre,
-    .info-texto {
+    .info-texto,
+    .telefone-perfil {
         color: #475569;
         line-height: 1.7;
-        max-width: 620px;
         font-size: 14px;
-        font-weight: 400;
         overflow-wrap: break-word;
         word-break: break-word;
     }
 
-    /* SIDE */
+
+    .texto-sobre {
+        margin: 0;
+    }
+
+
+    .info-texto,
+    .telefone-perfil {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+
+        .info-texto i,
+        .telefone-perfil i {
+            margin-top: 5px;
+            flex-shrink: 0;
+            color: #0ea5e9;
+        }
+
+
+    /* =========================================================
+           VALOR
+        ========================================================= */
 
     .destaque {
-        background: linear-gradient(135deg,#2563eb,#0ea5e9);
+        background: linear-gradient( 135deg, #2563eb, #0ea5e9 );
         color: white;
     }
+
 
         .destaque span {
             opacity: .85;
         }
 
+
         .destaque h2 {
+            margin: 8px 0 0;
             font-size: 32px;
             font-weight: 700;
         }
 
-    /* BOTÕES */
 
-    .btn-whatsapp,
-    .btn-editar {
+    /* =========================================================
+           AGENDAMENTO
+        ========================================================= */
+
+    .agendamento-card p {
+        margin-bottom: 18px;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+
+    .btn-agendar-consulta {
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        gap: 9px;
         padding: 16px;
         border-radius: 16px;
+        background: linear-gradient( 135deg, #14b8a6, #0ea5e9 );
+        color: white;
         text-decoration: none;
         font-weight: 700;
         transition: .25s;
     }
 
-    .btn-whatsapp {
-        background: #25D366;
-        color: white;
-        margin-top: 18px;
-    }
 
-    .btn-editar {
-        background: linear-gradient(135deg,#2563eb,#0ea5e9);
-        color: white;
-    }
-
-        .btn-whatsapp:hover,
-        .btn-editar:hover {
+        .btn-agendar-consulta:hover {
+            color: white;
             transform: translateY(-3px);
         }
 
-    .whatsapp {
-        background: #ecfdf5;
-        color: #16a34a;
-    }
 
-    .rede {
-        width: 60px;
-        height: 60px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        transition: .25s;
-    }
-
-        .rede:hover {
-            transform: translateY(-3px);
-        }
-
-    /* REDES */
+    /* =========================================================
+           REDES
+        ========================================================= */
 
     .redes-grid {
         display: flex;
@@ -614,26 +1061,46 @@
         flex-wrap: wrap;
     }
 
+
     .rede {
-        flex: 1;
-        text-align: center;
-        padding: 14px;
+        width: 58px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 14px;
+        font-size: 25px;
         text-decoration: none;
-        font-weight: 700;
+        transition: .25s;
     }
+
+
+        .rede:hover {
+            transform: translateY(-3px);
+        }
+
+
+    .whatsapp {
+        background: #ecfdf5;
+        color: #16a34a;
+    }
+
 
     .insta {
         background: #fdf2f8;
         color: #be185d;
     }
 
+
     .site {
         background: #eff6ff;
         color: #2563eb;
     }
 
-    /* STATS */
+
+    /* =========================================================
+           ESTATÍSTICAS
+        ========================================================= */
 
     .stats-grid {
         display: grid;
@@ -641,27 +1108,58 @@
         gap: 15px;
     }
 
+
     .stat-box {
-        background: #f8fafc;
-        border-radius: 18px;
         padding: 20px;
+        border-radius: 18px;
+        background: #f8fafc;
         text-align: center;
     }
 
+
         .stat-box strong {
             display: block;
-            font-size: 24px;
             color: #0f172a;
+            font-size: 24px;
         }
+
 
         .stat-box span {
             color: #64748b;
             font-size: 13px;
         }
 
-    /* RESPONSIVO */
 
-    @@media(max-width:900px) {
+    /* =========================================================
+           EDITAR
+        ========================================================= */
+
+    .btn-editar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px;
+        border-radius: 16px;
+        background: linear-gradient( 135deg, #2563eb, #0ea5e9 );
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        transition: .25s;
+    }
+
+
+        .btn-editar:hover {
+            color: white;
+            transform: translateY(-3px);
+        }
+
+
+    /* =========================================================
+           TABLET
+        ========================================================= */
+
+    @@media (max-width: 900px) {
 
         .perfil-topo-card {
             flex-direction: column;
@@ -669,65 +1167,89 @@
             text-align: center;
         }
 
+
         .perfil-identidade {
             flex-direction: column;
             text-align: center;
         }
 
+
         .linha-badges {
             justify-content: center;
         }
+
 
         .perfil-acoes-rapidas {
             width: 100%;
             min-width: 0;
         }
 
+
         .conteudo-perfil {
             grid-template-columns: 1fr;
         }
+
 
         .perfil-info-principal h1 {
             font-size: 32px;
         }
     }
 
-    .voltar-container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 0 25px;
-    }
 
-    .btn-voltar {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        color: #2563eb;
-        font-weight: 600;
-    }
+    /* =========================================================
+           MOBILE
+        ========================================================= */
 
-    .agendamento-card p {
-        color: #64748b;
-        line-height: 1.6;
-        margin-bottom: 18px;
-    }
+    @@media (max-width: 520px) {
 
-    .btn-agendar-consulta {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 16px;
-        border-radius: 16px;
-        text-decoration: none;
-        font-weight: 700;
-        transition: .25s;
-        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-        color: white;
-    }
-
-        .btn-agendar-consulta:hover {
-            transform: translateY(-3px);
+        .perfil-topo-moderno,
+        .conteudo-perfil,
+        .voltar-container {
+            padding-left: 16px;
+            padding-right: 16px;
         }
+
+
+        .voltar-container {
+            margin: 16px auto;
+        }
+
+
+        .perfil-topo-card {
+            padding-top: 18px;
+        }
+
+
+        .avatar-perfil {
+            width: 100px;
+            height: 100px;
+            border-radius: 25px;
+            font-size: 36px;
+        }
+
+
+        .perfil-info-principal h1 {
+            font-size: 28px;
+        }
+
+
+        .card-perfil,
+        .card-side {
+            padding: 21px;
+            border-radius: 22px;
+        }
+
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .btn-topo,
+        .btn-agendar-consulta,
+        .btn-editar {
+            min-height: 52px;
+        }
+    }
 
 </style>

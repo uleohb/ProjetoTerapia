@@ -70,6 +70,15 @@ namespace ProjetoTerapia.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("BloqueadoAte")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Codigo2FAExpiraEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Codigo2FAHash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
@@ -88,6 +97,15 @@ namespace ProjetoTerapia.Migrations
                     b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TentativasLoginFalhas")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UltimoCodigo2FAEnviadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UltimoLogin")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
