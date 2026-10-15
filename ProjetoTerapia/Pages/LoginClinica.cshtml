@@ -2,84 +2,147 @@
 @model ProjetoTerapia.Pages.LoginClinicaModel
 
 @{
-    ViewData["Title"] = "Entrar";
+    ViewData["Title"] = "Login profissional";
 }
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
 
 <div class="container-auth">
 
     <div class="auth-wrapper">
 
-        <!-- =====================================================
+
+        <!-- =================================================
              LADO ESQUERDO
-        ====================================================== -->
-        <section class="side-login">
+        ================================================== -->
+
+        <div class="side-login">
 
             <div class="gradient-circle circle-1"></div>
             <div class="gradient-circle circle-2"></div>
 
+
             <div class="content-side">
 
                 <span class="badge-side">
-                    ✨ Plataforma moderna para saúde emocional
+
+                    <i class="fa-solid fa-heart-pulse"></i>
+
+                    Plataforma para saúde emocional
+
                 </span>
+
 
                 <h1>
                     Bem-vindo de volta ao AlinhaVIDA.
                 </h1>
 
+
                 <p>
                     Acesse sua plataforma e continue conectando
-                    pessoas, transformando vidas e organizando
-                    seus atendimentos com praticidade.
+                    pessoas, organizando seus atendimentos
+                    e gerenciando sua presença profissional.
                 </p>
+
 
                 <div class="mini-cards">
 
-                    <div class="mini-card">
-                        <span class="mini-icon">🔒</span>
-
-                        <div>
-                            <strong>Ambiente Seguro</strong>
-                            <small>Proteção e privacidade</small>
-                        </div>
-                    </div>
 
                     <div class="mini-card">
-                        <span class="mini-icon">📅</span>
+
+                        <div class="mini-icon">
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                        </div>
 
                         <div>
-                            <strong>Gestão Inteligente</strong>
-                            <small>Organize consultas e atendimentos</small>
+
+                            <strong>
+                                Ambiente seguro
+                            </strong>
+
+                            <small>
+                                Proteção e privacidade
+                            </small>
+
                         </div>
+
                     </div>
+
 
                     <div class="mini-card">
-                        <span class="mini-icon">💙</span>
+
+                        <div class="mini-icon">
+
+                            <i class="fa-regular fa-calendar-check"></i>
+
+                        </div>
 
                         <div>
-                            <strong>Conexões Humanas</strong>
-                            <small>Mais acolhimento e proximidade</small>
+
+                            <strong>
+                                Gestão inteligente
+                            </strong>
+
+                            <small>
+                                Organize seus atendimentos
+                            </small>
+
                         </div>
+
                     </div>
+
+
+                    <div class="mini-card">
+
+                        <div class="mini-icon">
+
+                            <i class="fa-solid fa-users"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Conexões humanas
+                            </strong>
+
+                            <small>
+                                Aproximando pacientes e profissionais
+                            </small>
+
+                        </div>
+
+                    </div>
+
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
 
-        <!-- =====================================================
+        <!-- =================================================
              LADO DIREITO
-        ====================================================== -->
-        <section class="card-auth">
+        ================================================== -->
+
+        <div class="card-auth">
+
 
             <img src="~/imagem/AlinhaVIDA.png"
                  asp-append-version="true"
                  class="logo-auth"
                  alt="AlinhaVIDA" />
 
-            <h2>Entrar na plataforma</h2>
+
+            <h2>
+                Entrar na plataforma
+            </h2>
+
 
             <p class="sub">
                 Entre com sua conta profissional para acessar
@@ -90,125 +153,135 @@
             <!-- =================================================
                  GOOGLE
             ================================================== -->
+
             <a asp-page="/LoginClinica"
                asp-page-handler="LoginGoogle"
                class="btn-google"
                id="btnGoogle">
 
-                <svg class="google-icon"
-                     xmlns="http://www.w3.org/2000/svg"
-                     viewBox="0 0 48 48"
-                     aria-hidden="true">
+                <span class="google-icon-area">
 
-                    <path fill="#FFC107"
-                          d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.195 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.84 1.154 7.955 3.045l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                    <i class="fa-brands fa-google"></i>
 
-                    <path fill="#FF3D00"
-                          d="M6.306 14.691l6.571 4.819C14.655 16.108 19.001 12 24 12c3.059 0 5.84 1.154 7.955 3.045l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                </span>
 
-                    <path fill="#4CAF50"
-                          d="M24 44c5.104 0 9.784-1.947 13.331-5.118l-6.146-5.199C29.135 35.091 26.715 36 24 36c-5.176 0-9.623-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
-
-                    <path fill="#1976D2"
-                          d="M43.611 20.083H42V20H24v8h11.303c-.793 2.237-2.231 4.166-4.118 5.683l.003-.002 6.146 5.199C36.897 39.245 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
-
-                </svg>
-
-                <span>Continuar com Google</span>
+                <span>
+                    Continuar com Google
+                </span>
 
             </a>
 
 
-            <!-- =================================================
-                 LOADING GOOGLE / BANCO AZURE
-            ================================================== -->
-            <div id="carregamentoGoogle"
-                 class="carregamento-google"
-                 aria-hidden="true">
+            <!--
+                IMPORTANTE:
 
-                <div class="carregamento-card"
-                     role="status"
-                     aria-live="polite">
+                NÃO existe onclick no botão Google.
 
-                    <div class="spinner-google"></div>
+                Portanto o carregamento NÃO aparece antes
+                da pessoa escolher uma conta.
 
-                    <h3>Entrando na sua conta...</h3>
-
-                    <p>
-                        Estamos preparando seu acesso com segurança.
-                    </p>
-
-                    <span class="loading-info">
-                        Na primeira entrada, isso pode levar alguns segundos.
-                    </span>
-
-                </div>
-
-            </div>
+                Ele só aparecerá quando o Google retornar
+                para o AlinhaVIDA.
+            -->
 
 
-            <!-- =================================================
-                 DIVISOR
-            ================================================== -->
             <div class="divider">
-                <span>ou</span>
+
+                <span>
+                    ou
+                </span>
+
             </div>
 
 
             <!-- =================================================
                  ERRO
             ================================================== -->
+
             @if (!string.IsNullOrWhiteSpace(Model.Erro))
             {
-                <div class="validation-box"
-                     role="alert">
+                <div class="validation-box">
 
                     <i class="fa-solid fa-circle-exclamation"></i>
 
-                    <p>@Model.Erro</p>
+                    <p>
+                        @Model.Erro
+                    </p>
 
                 </div>
             }
 
 
             <!-- =================================================
-                 LOGIN EMAIL / SENHA
+                 LOGIN NORMAL
             ================================================== -->
+
             <form method="post"
-                  class="form-login">
+                  id="formLoginNormal"
+                  onsubmit="mostrarCarregamentoLoginNormal()">
+
 
                 <div class="campo-login">
 
-                    <label for="Email">
+                    <label asp-for="Email">
                         Email
                     </label>
 
-                    <input type="email"
-                           asp-for="Email"
-                           id="Email"
-                           placeholder="seuemail@exemplo.com"
-                           autocomplete="email"
-                           required />
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-regular fa-envelope"></i>
+
+
+                        <input type="email"
+                               asp-for="Email"
+                               placeholder="seuemail@exemplo.com"
+                               autocomplete="email"
+                               required />
+
+                    </div>
 
                 </div>
+
 
                 <div class="campo-login">
 
-                    <label for="Senha">
+                    <label asp-for="Senha">
                         Senha
                     </label>
 
-                    <input type="password"
-                           asp-for="Senha"
-                           id="Senha"
-                           placeholder="Digite sua senha"
-                           autocomplete="current-password"
-                           required />
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-lock"></i>
+
+
+                        <input type="password"
+                               asp-for="Senha"
+                               id="campoSenha"
+                               placeholder="Digite sua senha"
+                               autocomplete="current-password"
+                               required />
+
+
+                        <button type="button"
+                                class="btn-ver-senha"
+                                onclick="alternarSenha()"
+                                aria-label="Mostrar ou ocultar senha">
+
+                            <i class="fa-regular fa-eye"
+                               id="iconeSenha"></i>
+
+                        </button>
+
+                    </div>
 
                 </div>
 
+
                 <button type="submit"
-                        class="btn-primary">
+                        class="btn-primary"
+                        id="btnLoginNormal">
 
                     Entrar
 
@@ -225,20 +298,89 @@
             </form>
 
 
-            <!-- =================================================
-                 CADASTRO
-            ================================================== -->
             <p class="link-login">
 
                 Ainda não possui conta?
 
-                <a href="/CadastroConta">
+                <a asp-page="/CadastroConta">
                     Criar conta
                 </a>
 
             </p>
 
-        </section>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FORMULÁRIO INTERNO DO GOOGLE
+========================================================= -->
+
+@if (Model.ProcessandoGoogle)
+{
+    /*
+     * Esta página só chega aqui DEPOIS que a pessoa
+     * selecionou sua conta no Google.
+     *
+     * O navegador primeiro renderiza a tela de carregamento.
+     * Logo depois este formulário é enviado automaticamente
+     * para finalizar a consulta ao banco.
+     */
+
+    <form method="post"
+          asp-page-handler="FinalizarGoogle"
+          id="formFinalizarGoogle"
+          class="form-processamento-google">
+
+    </form>
+}
+
+
+<!-- =========================================================
+     CARREGAMENTO
+========================================================= -->
+
+<div id="carregamentoLogin"
+     class="carregamento-login @(Model.ProcessandoGoogle ? "ativo" : "")"
+     role="status"
+     aria-live="polite">
+
+
+    <div class="loading-card">
+
+
+        <div class="spinner-login"></div>
+
+
+        @if (Model.ProcessandoGoogle)
+        {
+            <h3>
+                Entrando na sua conta...
+            </h3>
+
+            <p>
+                Sua conta Google foi confirmada.
+                Estamos preparando seu painel profissional.
+            </p>
+        }
+        else
+        {
+            <h3>
+                Entrando na sua conta...
+            </h3>
+
+            <p>
+                Estamos validando seus dados com segurança.
+            </p>
+        }
+
+
+        <small>
+            Isso pode levar alguns segundos.
+        </small>
 
     </div>
 
@@ -247,27 +389,40 @@
 
 <style>
 
-    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-
     /* =========================================================
-       BASE
+       RESET
     ========================================================= */
 
+    @@import url(
+        'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+    );
+
+
     * {
+        margin: 0;
+
+        padding: 0;
+
         box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
+
+        font-family:
+            'Poppins',
+            sans-serif;
     }
 
+
+    html,
     body {
+        min-height: 100%;
+
         margin: 0;
+    }
+
+
+    body {
         overflow-x: hidden;
+
         background:
-            radial-gradient(
-                circle at top left,
-                rgba(37, 99, 235, .12),
-                transparent 30%
-            ),
             linear-gradient(
                 135deg,
                 #06121f,
@@ -277,38 +432,58 @@
     }
 
 
+    .container,
+    .container-fluid,
+    main.pb-3 {
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+    }
+
+
     /* =========================================================
-       CONTAINER
+       LAYOUT
     ========================================================= */
 
     .container-auth {
         min-height: 100vh;
 
         display: flex;
-        align-items: center;
+
         justify-content: center;
 
-        padding: 40px 24px;
+        align-items: center;
+
+        padding: 40px;
     }
+
 
     .auth-wrapper {
         width: 100%;
+
         max-width: 1400px;
 
-        min-height: 780px;
+        min-height: 820px;
 
         display: flex;
 
         overflow: hidden;
 
-        border-radius: 32px;
+        border-radius: 35px;
 
-        background: rgba(255,255,255,.04);
+        background:
+            rgba(255,255,255,.04);
 
-        border: 1px solid rgba(255,255,255,.06);
+        backdrop-filter:
+            blur(10px);
 
         box-shadow:
-            0 30px 80px rgba(0,0,0,.35);
+            0 30px 80px
+            rgba(0,0,0,.35);
     }
 
 
@@ -317,13 +492,16 @@
     ========================================================= */
 
     .side-login {
+        position: relative;
+
         width: 55%;
 
-        position: relative;
         overflow: hidden;
 
         display: flex;
+
         align-items: center;
+
         justify-content: center;
 
         padding: 70px;
@@ -337,51 +515,62 @@
             );
     }
 
+
     .content-side {
         position: relative;
+
         z-index: 2;
 
-        width: 100%;
         max-width: 540px;
     }
+
 
     .badge-side {
         display: inline-flex;
 
-        padding: 10px 18px;
+        align-items: center;
+
+        gap: 8px;
 
         margin-bottom: 28px;
 
+        padding: 10px 18px;
+
+        border:
+            1px solid
+            rgba(255,255,255,.08);
+
         border-radius: 999px;
 
-        background: rgba(255,255,255,.08);
-
-        border: 1px solid rgba(255,255,255,.08);
+        background:
+            rgba(255,255,255,.08);
 
         color: #cbd5e1;
 
         font-size: 13px;
-        font-weight: 500;
 
-        backdrop-filter: blur(12px);
+        backdrop-filter:
+            blur(12px);
     }
 
+
     .content-side h1 {
-        margin: 0 0 24px;
+        margin-bottom: 24px;
 
         color: white;
 
-        font-size: clamp(42px, 4vw, 58px);
+        font-size: 56px;
 
-        line-height: 1.08;
+        line-height: 1.06;
 
         font-weight: 700;
 
         letter-spacing: -2px;
     }
 
+
     .content-side > p {
-        margin: 0 0 40px;
+        margin-bottom: 40px;
 
         color: #cbd5e1;
 
@@ -391,58 +580,60 @@
     }
 
 
-    /* =========================================================
-       MINI CARDS
-    ========================================================= */
-
     .mini-cards {
         display: flex;
+
         flex-direction: column;
 
-        gap: 14px;
+        gap: 16px;
     }
+
 
     .mini-card {
         display: flex;
+
         align-items: center;
 
         gap: 16px;
 
-        padding: 17px 18px;
+        padding: 18px;
+
+        border:
+            1px solid
+            rgba(255,255,255,.08);
 
         border-radius: 20px;
 
-        background: rgba(255,255,255,.06);
+        background:
+            rgba(255,255,255,.06);
 
-        border: 1px solid rgba(255,255,255,.08);
-
-        backdrop-filter: blur(12px);
-
-        transition: .25s ease;
+        backdrop-filter:
+            blur(12px);
     }
 
-    .mini-card:hover {
-        transform: translateX(4px);
-
-        background: rgba(255,255,255,.08);
-    }
 
     .mini-icon {
-        width: 42px;
-        height: 42px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 46px;
+        height: 46px;
 
         flex-shrink: 0;
 
-        border-radius: 13px;
+        display: flex;
 
-        background: rgba(255,255,255,.07);
+        align-items: center;
 
-        font-size: 22px;
+        justify-content: center;
+
+        border-radius: 14px;
+
+        background:
+            rgba(14,165,233,.15);
+
+        color: #7dd3fc;
+
+        font-size: 19px;
     }
+
 
     .mini-card strong {
         display: block;
@@ -450,20 +641,13 @@
         margin-bottom: 3px;
 
         color: white;
-
-        font-size: 15px;
     }
+
 
     .mini-card small {
         color: #94a3b8;
-
-        font-size: 13px;
     }
 
-
-    /* =========================================================
-       CÍRCULOS DECORATIVOS
-    ========================================================= */
 
     .gradient-circle {
         position: absolute;
@@ -471,84 +655,87 @@
         border-radius: 50%;
 
         filter: blur(90px);
-
-        pointer-events: none;
     }
+
 
     .circle-1 {
-        width: 360px;
-        height: 360px;
+        width: 350px;
+        height: 350px;
 
-        top: -140px;
-        left: -140px;
+        top: -120px;
+        left: -120px;
 
-        background: rgba(37,99,235,.28);
+        background:
+            rgba(37,99,235,.25);
     }
 
+
     .circle-2 {
-        width: 320px;
-        height: 320px;
+        width: 300px;
+        height: 300px;
 
-        right: -120px;
-        bottom: -120px;
+        right: -100px;
+        bottom: -100px;
 
-        background: rgba(14,165,233,.22);
+        background:
+            rgba(14,165,233,.20);
     }
 
 
     /* =========================================================
-       CARD DE LOGIN
+       LOGIN
     ========================================================= */
 
     .card-auth {
         width: 45%;
 
-        max-width: 540px;
+        max-width: 520px;
 
         margin: auto;
 
-        padding: 45px;
-
-        background: rgba(255,255,255,.98);
+        padding: 40px;
 
         border-radius: 30px;
+
+        background:
+            rgba(255,255,255,.98);
 
         text-align: center;
 
         box-shadow:
-            0 25px 60px rgba(0,0,0,.22);
+            0 25px 60px
+            rgba(0,0,0,.25);
     }
 
-    .logo-auth {
-        width: 270px;
 
-        max-width: 90%;
+    .logo-auth {
+        width: 260px;
+
+        max-width: 100%;
 
         height: auto;
 
         margin-bottom: 12px;
     }
 
+
     .card-auth h2 {
-        margin: 0 0 10px;
+        margin-bottom: 10px;
 
         color: #0f172a;
 
         font-size: 28px;
-
-        font-weight: 700;
-
-        letter-spacing: -.5px;
     }
 
+
     .sub {
-        margin: 0 0 28px;
+        margin-bottom: 28px;
 
         color: #64748b;
 
-        line-height: 1.7;
-
         font-size: 14px;
+
+        line-height: 1.7;
     }
 
 
@@ -558,81 +745,52 @@
 
     .btn-google {
         width: 100%;
-        min-height: 58px;
+
+        min-height: 54px;
 
         display: flex;
+
         align-items: center;
+
         justify-content: center;
 
         gap: 12px;
 
-        padding: 0 20px;
+        padding: 14px 18px;
 
-        margin-bottom: 22px;
+        border:
+            1px solid #e2e8f0;
+
+        border-radius: 14px;
 
         background: white;
-
-        border: 1px solid #dbe2ea;
-
-        border-radius: 15px;
 
         color: #334155;
 
         text-decoration: none;
 
-        font-size: 15px;
         font-weight: 600;
 
-        cursor: pointer;
-
-        transition:
-            transform .2s ease,
-            border-color .2s ease,
-            box-shadow .2s ease,
-            background .2s ease;
+        transition: .25s;
     }
+
 
     .btn-google:hover {
-        color: #1e293b;
+        color: #0f172a;
 
-        background: #f8fafc;
-
-        border-color: #cbd5e1;
-
-        text-decoration: none;
-
-        transform: translateY(-2px);
+        transform:
+            translateY(-2px);
 
         box-shadow:
-            0 10px 24px rgba(15,23,42,.07);
+            0 10px 22px
+            rgba(0,0,0,.06);
     }
 
-    .btn-google:focus-visible {
-        outline: none;
 
-        box-shadow:
-            0 0 0 4px rgba(37,99,235,.13);
-    }
+    .google-icon-area {
+        color: #4285f4;
 
-    .btn-google.carregando {
-        pointer-events: none;
-
-        opacity: .7;
-    }
-
-    .google-icon {
-        width: 23px;
-        height: 23px;
-
-        display: block;
-
-        flex-shrink: 0;
-    }
-
-    .btn-google span {
-        display: inline-block;
-
-        line-height: 1;
+        font-size: 20px;
     }
 
 
@@ -643,29 +801,29 @@
     .divider {
         position: relative;
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        margin: 25px 0;
 
-        margin: 24px 0;
+        text-align: center;
     }
+
 
     .divider::before {
         content: "";
 
         position: absolute;
 
-        left: 0;
-
         width: 100%;
         height: 1px;
+
+        top: 50%;
+        left: 0;
 
         background: #e2e8f0;
     }
 
+
     .divider span {
         position: relative;
-        z-index: 1;
 
         padding: 0 14px;
 
@@ -678,12 +836,8 @@
 
 
     /* =========================================================
-       FORM
+       CAMPOS
     ========================================================= */
-
-    .form-login {
-        width: 100%;
-    }
 
     .campo-login {
         margin-bottom: 15px;
@@ -691,26 +845,52 @@
         text-align: left;
     }
 
+
     .campo-login label {
         display: block;
 
-        margin: 0 0 7px 2px;
+        margin-bottom: 7px;
 
-        color: #475569;
+        color: #334155;
 
         font-size: 13px;
 
         font-weight: 600;
     }
 
-    .campo-login input {
+
+    .input-wrapper {
+        position: relative;
+
+        display: flex;
+
+        align-items: center;
+    }
+
+
+    .input-wrapper > i {
+        position: absolute;
+
+        left: 16px;
+
+        z-index: 2;
+
+        color: #94a3b8;
+    }
+
+
+    .input-wrapper input {
         width: 100%;
 
         height: 54px;
 
-        padding: 0 16px;
+        margin: 0;
 
-        border: 1px solid #dbe2ea;
+        padding:
+            0 48px 0 45px;
+
+        border:
+            1px solid #dbeafe;
 
         border-radius: 14px;
 
@@ -722,35 +902,57 @@
 
         outline: none;
 
-        transition:
-            border-color .2s ease,
-            background .2s ease,
-            box-shadow .2s ease;
+        transition: .2s;
     }
 
-    .campo-login input::placeholder {
-        color: #94a3b8;
-    }
 
-    .campo-login input:focus {
-        background: white;
-
+    .input-wrapper input:focus {
         border-color: #2563eb;
 
+        background: white;
+
         box-shadow:
-            0 0 0 4px rgba(37,99,235,.09);
+            0 0 0 4px
+            rgba(37,99,235,.09);
+    }
+
+
+    .btn-ver-senha {
+        position: absolute;
+
+        right: 8px;
+
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border: none;
+
+        background: transparent;
+
+        color: #64748b;
+
+        cursor: pointer;
     }
 
 
     /* =========================================================
-       BOTÃO ENTRAR
+       BOTÃO NORMAL
     ========================================================= */
 
     .btn-primary {
         width: 100%;
+
         min-height: 54px;
 
-        margin-top: 4px;
+        margin-top: 5px;
+
+        padding: 15px;
 
         border: none;
 
@@ -767,23 +969,30 @@
 
         font-size: 15px;
 
-        font-weight: 600;
+        font-weight: 700;
 
         cursor: pointer;
 
-        box-shadow:
-            0 10px 24px rgba(37,99,235,.18);
-
-        transition:
-            transform .2s ease,
-            box-shadow .2s ease;
+        transition: .25s;
     }
 
+
     .btn-primary:hover {
-        transform: translateY(-2px);
+        transform:
+            translateY(-2px);
 
         box-shadow:
-            0 15px 30px rgba(37,99,235,.27);
+            0 15px 30px
+            rgba(37,99,235,.25);
+    }
+
+
+    .btn-primary:disabled {
+        cursor: wait;
+
+        opacity: .75;
+
+        transform: none;
     }
 
 
@@ -792,183 +1001,171 @@
     ========================================================= */
 
     .link-recuperar {
-        display: inline-block;
+        display: block;
 
-        margin-top: 16px;
+        margin-top: 15px;
 
         color: #2563eb;
 
         text-decoration: none;
 
-        font-size: 13px;
+        font-size: 14px;
 
         font-weight: 600;
     }
 
-    .link-recuperar:hover {
-        text-decoration: underline;
-    }
 
     .link-login {
-        margin: 23px 0 0;
+        margin-top: 22px;
 
         color: #64748b;
 
-        font-size: 13px;
+        font-size: 14px;
     }
 
-    .link-login a {
-        margin-left: 3px;
 
+    .link-login a {
         color: #2563eb;
 
         text-decoration: none;
 
-        font-weight: 600;
-    }
-
-    .link-login a:hover {
-        text-decoration: underline;
+        font-weight: 700;
     }
 
 
     /* =========================================================
-       ERROS
+       ERRO
     ========================================================= */
 
     .validation-box {
         display: flex;
-        align-items: center;
 
-        gap: 10px;
+        align-items: flex-start;
+
+        gap: 9px;
 
         margin-bottom: 18px;
 
-        padding: 13px 15px;
+        padding: 13px 14px;
 
-        border: 1px solid rgba(239,68,68,.18);
+        border:
+            1px solid
+            rgba(239,68,68,.20);
 
-        border-radius: 13px;
+        border-radius: 14px;
 
-        background: rgba(239,68,68,.07);
+        background:
+            rgba(239,68,68,.08);
 
         text-align: left;
     }
 
-    .validation-box i {
-        color: #dc2626;
 
-        flex-shrink: 0;
+    .validation-box i {
+        margin-top: 2px;
+
+        color: #dc2626;
     }
+
 
     .validation-box p {
         margin: 0;
 
-        color: #b91c1c;
+        color: #dc2626;
 
         font-size: 13px;
+
+        line-height: 1.5;
 
         font-weight: 500;
     }
 
 
     /* =========================================================
-       LOADING GOOGLE / AZURE
+       CARREGAMENTO
     ========================================================= */
 
-    .carregamento-google {
+    .carregamento-login {
         position: fixed;
 
         inset: 0;
 
         z-index: 99999;
 
-        display: flex;
+        display: none;
+
         align-items: center;
+
         justify-content: center;
 
-        padding: 25px;
+        padding: 24px;
 
-        background: rgba(15,23,42,.45);
+        background:
+            rgba(15,23,42,.72);
 
-        backdrop-filter: blur(7px);
-        -webkit-backdrop-filter: blur(7px);
-
-        opacity: 0;
-
-        visibility: hidden;
-
-        pointer-events: none;
-
-        transition:
-            opacity .22s ease,
-            visibility .22s ease;
+        backdrop-filter:
+            blur(8px);
     }
 
-    .carregamento-google.ativo {
-        opacity: 1;
 
-        visibility: visible;
-
-        pointer-events: auto;
+    .carregamento-login.ativo {
+        display: flex;
     }
 
-    .carregamento-card {
+
+    .loading-card {
         width: 100%;
+
         max-width: 430px;
 
-        padding: 38px 34px;
+        padding: 38px 30px;
 
-        background: rgba(255,255,255,.98);
+        border:
+            1px solid
+            rgba(255,255,255,.7);
 
-        border: 1px solid rgba(255,255,255,.7);
+        border-radius: 26px;
 
-        border-radius: 25px;
+        background: white;
 
         text-align: center;
 
         box-shadow:
-            0 30px 80px rgba(15,23,42,.25);
-
-        transform: translateY(8px) scale(.98);
-
-        transition: transform .22s ease;
+            0 30px 80px
+            rgba(0,0,0,.28);
     }
 
-    .carregamento-google.ativo .carregamento-card {
-        transform: translateY(0) scale(1);
-    }
 
-    .spinner-google {
-        width: 54px;
-        height: 54px;
+    .spinner-login {
+        width: 58px;
+        height: 58px;
 
-        margin: 0 auto 22px;
+        margin:
+            0 auto 22px;
 
-        border: 5px solid #e2e8f0;
+        border:
+            5px solid #e2e8f0;
 
         border-top-color: #2563eb;
-
-        border-right-color: #0ea5e9;
 
         border-radius: 50%;
 
         animation:
-            girar .75s linear infinite;
+            girar .8s linear infinite;
     }
 
-    .carregamento-card h3 {
-        margin: 0 0 9px;
+
+    .loading-card h3 {
+        margin-bottom: 8px;
 
         color: #0f172a;
 
         font-size: 21px;
-
-        font-weight: 700;
     }
 
-    .carregamento-card p {
-        margin: 0;
+
+    .loading-card p {
+        margin-bottom: 12px;
 
         color: #64748b;
 
@@ -977,107 +1174,93 @@
         line-height: 1.6;
     }
 
-    .loading-info {
-        display: block;
 
-        margin-top: 8px;
-
+    .loading-card small {
         color: #94a3b8;
 
         font-size: 12px;
     }
 
 
-    /* =========================================================
-       ANIMAÇÃO
-    ========================================================= */
+    .form-processamento-google {
+        display: none;
+    }
+
 
     @@keyframes girar {
 
         to {
-            transform: rotate(360deg);
+            transform:
+                rotate(360deg);
         }
 
     }
 
 
     /* =========================================================
-       RESPONSIVIDADE
+       RESPONSIVO
     ========================================================= */
 
-    @@media (max-width: 1050px) {
-
-        .side-login {
-            width: 50%;
-
-            padding: 45px;
-        }
-
-        .card-auth {
-            width: 50%;
-
-            margin: 25px;
-
-            padding: 35px;
-        }
-
-        .content-side h1 {
-            font-size: 42px;
-        }
-
-    }
-
-
-    @@media (max-width: 850px) {
-
-        .container-auth {
-            padding: 20px;
-        }
-
-        .auth-wrapper {
-            min-height: auto;
-
-            border-radius: 25px;
-        }
+    @@media (max-width: 900px) {
 
         .side-login {
             display: none;
         }
 
+
+        .auth-wrapper {
+            min-height: auto;
+
+            background: transparent;
+
+            box-shadow: none;
+        }
+
+
         .card-auth {
             width: 100%;
-            max-width: 540px;
 
-            margin: auto;
+            max-width: 520px;
+        }
 
-            padding: 35px 28px;
 
-            border-radius: 25px;
+        .container-auth {
+            padding: 20px;
         }
 
     }
 
 
-    @@media (max-width: 480px) {
+    @@media (max-width: 520px) {
 
         .container-auth {
-            padding: 12px;
+            padding: 14px;
         }
+
 
         .card-auth {
-            padding: 30px 20px;
+            padding:
+                30px 20px;
+
+            border-radius: 24px;
         }
 
+
         .logo-auth {
-            width: 230px;
+            width: 215px;
         }
+
 
         .card-auth h2 {
             font-size: 24px;
         }
 
-        .carregamento-card {
-            padding: 32px 24px;
+
+        .loading-card {
+            padding:
+                32px 22px;
+
+            border-radius: 22px;
         }
 
     }
@@ -1087,73 +1270,198 @@
 
 <script>
 
-    (() => {
+    // =========================================================
+    // LOGIN NORMAL
+    // =========================================================
 
-        const botaoGoogle =
-            document.getElementById("btnGoogle");
+    function mostrarCarregamentoLoginNormal() {
 
         const carregamento =
-            document.getElementById("carregamentoGoogle");
+            document.getElementById(
+                "carregamentoLogin"
+            );
+
+        const botao =
+            document.getElementById(
+                "btnLoginNormal"
+            );
 
 
-        if (!botaoGoogle || !carregamento) {
+        if (carregamento) {
+
+            carregamento.classList.add(
+                "ativo"
+            );
+
+        }
+
+
+        if (botao) {
+
+            botao.disabled = true;
+
+            botao.textContent =
+                "Entrando...";
+
+        }
+
+    }
+
+
+    // =========================================================
+    // MOSTRAR / OCULTAR SENHA
+    // =========================================================
+
+    function alternarSenha() {
+
+        const campo =
+            document.getElementById(
+                "campoSenha"
+            );
+
+        const icone =
+            document.getElementById(
+                "iconeSenha"
+            );
+
+
+        if (!campo || !icone) {
             return;
         }
 
 
-        function mostrarCarregamento() {
+        if (campo.type === "password") {
 
-            carregamento.classList.add("ativo");
+            campo.type = "text";
 
-            carregamento.setAttribute(
-                "aria-hidden",
-                "false"
+            icone.classList.remove(
+                "fa-eye"
             );
 
-            botaoGoogle.classList.add("carregando");
+            icone.classList.add(
+                "fa-eye-slash"
+            );
 
-            botaoGoogle.setAttribute(
-                "aria-disabled",
-                "true"
+        }
+        else {
+
+            campo.type = "password";
+
+            icone.classList.remove(
+                "fa-eye-slash"
+            );
+
+            icone.classList.add(
+                "fa-eye"
             );
 
         }
 
+    }
 
-        function esconderCarregamento() {
 
-            carregamento.classList.remove("ativo");
+    // =========================================================
+    // GOOGLE
+    // =========================================================
 
-            carregamento.setAttribute(
-                "aria-hidden",
-                "true"
-            );
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
-            botaoGoogle.classList.remove("carregando");
+            const formularioGoogle =
+                document.getElementById(
+                    "formFinalizarGoogle"
+                );
 
-            botaoGoogle.removeAttribute(
-                "aria-disabled"
-            );
+
+            /*
+             * Se este formulário existe, significa que:
+             *
+             * 1. Google já autenticou;
+             * 2. usuário já escolheu a conta;
+             * 3. tela de carregamento já está visível.
+             *
+             * Agora começamos o trabalho no banco.
+             */
+
+            if (formularioGoogle) {
+
+                requestAnimationFrame(
+                    function () {
+
+                        setTimeout(
+                            function () {
+
+                                formularioGoogle.submit();
+
+                            },
+                            150
+                        );
+
+                    }
+                );
+
+            }
 
         }
+    );
 
 
-        botaoGoogle.addEventListener(
-            "click",
-            mostrarCarregamento
-        );
+    // =========================================================
+    // VOLTAR DO CACHE DO NAVEGADOR
+    // =========================================================
+
+    window.addEventListener(
+        "pageshow",
+        function () {
+
+            const formularioGoogle =
+                document.getElementById(
+                    "formFinalizarGoogle"
+                );
 
 
-        /*
-         * Se o usuário voltar pelo navegador,
-         * impede que a tela continue travada
-         * com o loading aberto.
-         */
-        window.addEventListener(
-            "pageshow",
-            esconderCarregamento
-        );
+            /*
+             * Se NÃO estamos processando Google,
+             * removemos qualquer overlay antigo que
+             * possa ter sido restaurado pelo navegador.
+             */
 
-    })();
+            if (!formularioGoogle) {
+
+                const carregamento =
+                    document.getElementById(
+                        "carregamentoLogin"
+                    );
+
+
+                const botao =
+                    document.getElementById(
+                        "btnLoginNormal"
+                    );
+
+
+                if (carregamento) {
+
+                    carregamento.classList.remove(
+                        "ativo"
+                    );
+
+                }
+
+
+                if (botao) {
+
+                    botao.disabled = false;
+
+                    botao.textContent =
+                        "Entrar";
+
+                }
+
+            }
+
+        }
+    );
 
 </script>

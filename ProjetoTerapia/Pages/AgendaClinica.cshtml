@@ -40,20 +40,16 @@
             </a>
 
 
-            <!--
-                Ainda não existe uma página separada de pacientes.
-
-                Não usamos href="#" porque isso adicionava "#" à URL.
-            -->
-
-            <div class="menu-item menu-item-desabilitado"
-                 title="Área de pacientes em desenvolvimento">
+            <a asp-page="/PacientesClinica"
+               class="menu-item">
 
                 <i class="fa-solid fa-user-group"></i>
 
-                <span>Pacientes</span>
+                <span>
+                    Pacientes
+                </span>
 
-            </div>
+            </a>
 
 
             <a asp-page="/PerfilClinica"
@@ -658,7 +654,7 @@
 
             </section>
 
-        }
+       
 
     </main>
 

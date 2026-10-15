@@ -1,0 +1,2220 @@
+﻿@page "/profissional/pacientes"
+@model ProjetoTerapia.Pages.PacientesClinicaModel
+
+@{
+    ViewData["Title"] = "Pacientes";
+}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+<div class="pacientes-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <a asp-page="/PainelClinica"
+           class="logo-link"
+           aria-label="Painel profissional">
+
+            <img src="~/imagem/AlinhaVIDA.png"
+                 asp-append-version="true"
+                 class="logo-sidebar"
+                 alt="AlinhaVIDA" />
+
+        </a>
+
+
+        <nav class="menu-sidebar">
+
+
+            <a asp-page="/PainelClinica"
+               class="menu-item">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a asp-page="/AgendaClinica"
+               class="menu-item">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <span>
+                    Agenda
+                </span>
+
+            </a>
+
+
+            <a asp-page="/PacientesClinica"
+               class="menu-item ativo">
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <span>
+                    Pacientes
+                </span>
+
+            </a>
+
+
+            <a asp-page="/PerfilClinica"
+               class="menu-item">
+
+                <i class="fa-regular fa-id-card"></i>
+
+                <span>
+                    Perfil
+                </span>
+
+            </a>
+
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTEÚDO
+    ====================================================== -->
+
+    <main class="pacientes-content">
+
+
+        <!-- =================================================
+             CABEÇALHO
+        ================================================== -->
+
+        <header class="topo-pacientes">
+
+
+            <div class="titulo-pacientes">
+
+
+                <span class="badge-pagina">
+
+                    <i class="fa-solid fa-user-group"></i>
+
+                    Gestão de pacientes
+
+                </span>
+
+
+                <h1>
+                    Pacientes
+                </h1>
+
+
+                <p>
+                    Visualize pacientes com atendimentos confirmados,
+                    acompanhe consultas e encontre rapidamente
+                    quem já passou pela sua clínica.
+                </p>
+
+
+            </div>
+
+
+            <a asp-page="/AgendaClinica"
+               class="btn-agenda">
+
+                <i class="fa-regular fa-calendar-check"></i>
+
+                Abrir agenda
+
+            </a>
+
+
+        </header>
+
+
+        <!-- =================================================
+             ERRO
+        ================================================== -->
+
+        @if (!string.IsNullOrWhiteSpace(
+            Model.ErroCarregamento))
+        {
+            <div class="alerta-erro">
+
+                <div class="alerta-erro-icone">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Não foi possível carregar os pacientes
+                    </strong>
+
+                    <p>
+                        @Model.ErroCarregamento
+                    </p>
+
+                </div>
+
+
+                <a asp-page="/PacientesClinica">
+                    Tentar novamente
+                </a>
+
+            </div>
+        }
+
+
+        <!-- =================================================
+             RESUMO
+        ================================================== -->
+
+        <section class="resumo-grid">
+
+
+            <article class="resumo-card">
+
+                <div class="resumo-icone pacientes">
+
+                    <i class="fa-solid fa-user-group"></i>
+
+                </div>
+
+
+                <span>
+                    Pacientes
+                </span>
+
+
+                <strong>
+                    @Model.TotalPacientes
+                </strong>
+
+
+                <small>
+                    Com consulta confirmada
+                </small>
+
+            </article>
+
+
+            <article class="resumo-card">
+
+                <div class="resumo-icone consultas">
+
+                    <i class="fa-regular fa-calendar-check"></i>
+
+                </div>
+
+
+                <span>
+                    Consultas
+                </span>
+
+
+                <strong>
+                    @Model.TotalConsultasConfirmadas
+                </strong>
+
+
+                <small>
+                    Atendimentos confirmados
+                </small>
+
+            </article>
+
+
+            <article class="resumo-card">
+
+                <div class="resumo-icone proximas">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+
+                <span>
+                    Com próxima consulta
+                </span>
+
+
+                <strong>
+                    @Model.PacientesComProximaConsulta
+                </strong>
+
+
+                <small>
+                    Pacientes com retorno marcado
+                </small>
+
+            </article>
+
+
+            <article class="resumo-card">
+
+                <div class="resumo-icone hoje">
+
+                    <i class="fa-regular fa-clock"></i>
+
+                </div>
+
+
+                <span>
+                    Hoje
+                </span>
+
+
+                <strong>
+                    @Model.ConsultasHoje
+                </strong>
+
+
+                <small>
+                    Consultas neste dia
+                </small>
+
+            </article>
+
+
+        </section>
+
+
+        <!-- =================================================
+             PAINEL PRINCIPAL
+        ================================================== -->
+
+        <section class="pacientes-box">
+
+
+            <!-- BUSCA -->
+
+            <div class="pacientes-box-topo">
+
+
+                <div>
+
+                    <span class="subtitulo">
+                        Seus pacientes
+                    </span>
+
+
+                    <h2>
+                        Lista de pacientes
+                    </h2>
+
+
+                    <p>
+                        Pessoas que possuem atendimento confirmado
+                        com sua clínica.
+                    </p>
+
+                </div>
+
+
+                <form method="get"
+                      class="busca-pacientes">
+
+
+                    <div class="campo-busca-wrapper">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+
+                        <input type="text"
+                               name="Busca"
+                               value="@Model.Busca"
+                               placeholder="Buscar por nome ou email..."
+                               autocomplete="off" />
+
+                    </div>
+
+
+                    <button type="submit">
+
+                        <span>
+                            Buscar
+                        </span>
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model.Busca))
+                    {
+                        <a asp-page="/PacientesClinica"
+                           class="btn-limpar">
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                            Limpar
+
+                        </a>
+                    }
+
+
+                </form>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 LISTA
+            ================================================== -->
+
+            @if (Model.Pacientes.Any())
+            {
+                <div class="lista-pacientes">
+
+
+                    @foreach (var paciente in Model.Pacientes)
+                    {
+                        var inicial =
+                            string.IsNullOrWhiteSpace(
+                                paciente.Nome)
+                                ? "P"
+                                : paciente.Nome
+                                    .Substring(0, 1)
+                                    .ToUpperInvariant();
+
+
+                        var buscaAgenda =
+                            !string.IsNullOrWhiteSpace(
+                                paciente.Email)
+                                ? paciente.Email
+                                : paciente.Nome;
+
+
+                        <article class="paciente-card">
+
+
+                            <!-- PERFIL -->
+
+                            <div class="paciente-identidade">
+
+
+                                <div class="avatar-paciente">
+
+                                    @inicial
+
+                                </div>
+
+
+                                <div class="paciente-dados">
+
+
+                                    <div class="nome-linha">
+
+                                        <h3>
+                                            @paciente.Nome
+                                        </h3>
+
+
+                                        @if (paciente.ProximaConsulta.HasValue)
+                                        {
+                                            <span class="status-paciente ativo">
+
+                                                <i class="fa-solid fa-circle"></i>
+
+                                                Em acompanhamento
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-paciente historico">
+
+                                                <i class="fa-solid fa-check"></i>
+
+                                                Histórico
+
+                                            </span>
+                                        }
+
+                                    </div>
+
+
+                                    <div class="contato-paciente">
+
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            paciente.Email))
+                                        {
+                                            <span>
+
+                                                <i class="fa-regular fa-envelope"></i>
+
+                                                @paciente.Email
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>
+
+                                                <i class="fa-regular fa-envelope"></i>
+
+                                                Email não informado
+
+                                            </span>
+                                        }
+
+
+                                        <span>
+
+                                            <i class="fa-solid fa-stethoscope"></i>
+
+                                            @paciente.TipoAtendimento
+
+                                        </span>
+
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 INFORMAÇÕES
+                            ================================================== -->
+
+                            <div class="paciente-metricas">
+
+
+                                <div class="metrica">
+
+                                    <span>
+                                        Consultas
+                                    </span>
+
+                                    <strong>
+                                        @paciente.TotalConsultas
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="metrica">
+
+                                    <span>
+                                        Última consulta
+                                    </span>
+
+                                    <strong>
+
+                                        @(paciente.UltimaConsulta.HasValue
+                                            ? paciente.UltimaConsulta.Value
+                                                .ToString("dd/MM/yyyy")
+                                            : "—")
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="metrica destaque">
+
+                                    <span>
+                                        Próxima consulta
+                                    </span>
+
+                                    <strong>
+
+                                        @(paciente.ProximaConsulta.HasValue
+                                            ? paciente.ProximaConsulta.Value
+                                                .ToString("dd/MM/yyyy HH:mm")
+                                            : "Sem retorno marcado")
+
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 AÇÃO
+                            ================================================== -->
+
+                            <div class="paciente-acoes">
+
+
+                                <a asp-page="/AgendaClinica"
+                                   asp-route-Busca="@buscaAgenda"
+                                   class="btn-historico">
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <span>
+                                        Ver na agenda
+                                    </span>
+
+                                </a>
+
+
+                            </div>
+
+
+                        </article>
+                    }
+
+
+                </div>
+            }
+            else
+            {
+                <div class="estado-vazio">
+
+
+                    <div class="vazio-ilustracao">
+
+                        <div class="vazio-circulo circulo-1"></div>
+                        <div class="vazio-circulo circulo-2"></div>
+
+                        <i class="fa-solid fa-user-group"></i>
+
+                    </div>
+
+
+                    @if (!string.IsNullOrWhiteSpace(
+                        Model.Busca))
+                    {
+                        <h3>
+                            Nenhum paciente encontrado
+                        </h3>
+
+
+                        <p>
+                            Não encontramos pacientes com o nome
+                            ou email informado.
+                        </p>
+
+
+                        <a asp-page="/PacientesClinica"
+                           class="btn-vazio">
+
+                            Limpar busca
+
+                        </a>
+                    }
+                    else
+                    {
+                        <h3>
+                            Seus pacientes aparecerão aqui
+                        </h3>
+
+
+                        <p>
+                            Quando você confirmar uma solicitação
+                            de consulta, o paciente será adicionado
+                            automaticamente a esta área.
+                        </p>
+
+
+                        <a asp-page="/AgendaClinica"
+                           class="btn-vazio">
+
+                            Ir para a agenda
+
+                        </a>
+                    }
+
+
+                </div>
+            }
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+       BASE
+    ========================================================= */
+
+    @@import url(
+        'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap'
+    );
+
+
+    * {
+        box-sizing: border-box;
+    }
+
+
+    html,
+    body {
+        margin: 0;
+
+        padding: 0;
+
+        min-height: 100%;
+
+        background: #f8fafc;
+
+        color: #0f172a;
+
+        font-family:
+            'Poppins',
+            sans-serif;
+    }
+
+
+    .container,
+    .container-fluid,
+    main.pb-3 {
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+    }
+
+
+    /* =========================================================
+       LAYOUT
+    ========================================================= */
+
+    .pacientes-layout {
+        min-height: 100vh;
+
+        display: flex;
+
+        background:
+            radial-gradient(
+                circle at top right,
+                rgba(37,99,235,.06),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at bottom left,
+                rgba(14,165,233,.05),
+                transparent 32%
+            ),
+            #f8fafc;
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+
+    .sidebar {
+        position: relative;
+
+        width: 300px;
+
+        min-height: 100vh;
+
+        flex-shrink: 0;
+
+        padding:
+            30px 24px;
+
+        border-right:
+            1px solid #e2e8f0;
+
+        background:
+            linear-gradient(
+                180deg,
+                #ffffff 0%,
+                #f8fbff 100%
+            );
+
+        box-shadow:
+            8px 0 35px
+            rgba(15,23,42,.035);
+    }
+
+
+    .logo-link {
+        display: block;
+
+        position: relative;
+
+        z-index: 2;
+    }
+
+
+    .logo-sidebar {
+        width: 220px;
+
+        max-width: 100%;
+
+        height: auto;
+
+        display: block;
+
+        margin:
+            0 auto 55px;
+    }
+
+
+    .menu-sidebar {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+
+    .menu-item {
+        min-height: 58px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+        padding:
+            15px 20px;
+
+        border-radius: 18px;
+
+        color: #475569;
+
+        text-decoration: none;
+
+        font-size: 15px;
+
+        font-weight: 600;
+
+        transition: .25s;
+    }
+
+
+    .menu-item i {
+        width: 24px;
+
+        text-align: center;
+
+        font-size: 19px;
+    }
+
+
+    .menu-item:hover {
+        color: #2563eb;
+
+        background:
+            rgba(37,99,235,.05);
+
+        transform:
+            translateX(4px);
+    }
+
+
+    .menu-item.ativo {
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #06b6d4
+            );
+
+        box-shadow:
+            0 13px 30px
+            rgba(37,99,235,.20);
+    }
+
+
+    /* =========================================================
+       CONTEÚDO
+    ========================================================= */
+
+    .pacientes-content {
+        width: 100%;
+
+        min-width: 0;
+
+        padding:
+            46px 50px 70px;
+    }
+
+
+    /* =========================================================
+       TOPO
+    ========================================================= */
+
+    .topo-pacientes {
+        display: flex;
+
+        align-items: flex-end;
+
+        justify-content: space-between;
+
+        gap: 30px;
+
+        max-width: 1500px;
+
+        margin:
+            0 auto 34px;
+    }
+
+
+    .titulo-pacientes {
+        max-width: 760px;
+    }
+
+
+    .badge-pagina {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        margin-bottom: 13px;
+
+        padding:
+            8px 14px;
+
+        border:
+            1px solid
+            rgba(37,99,235,.10);
+
+        border-radius: 999px;
+
+        background:
+            rgba(37,99,235,.06);
+
+        color: #2563eb;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        letter-spacing: .4px;
+
+        text-transform: uppercase;
+    }
+
+
+    .titulo-pacientes h1 {
+        margin:
+            0 0 10px;
+
+        color: #0f172a;
+
+        font-size: 40px;
+
+        line-height: 1.12;
+
+        letter-spacing: -1.3px;
+    }
+
+
+    .titulo-pacientes p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 15px;
+
+        line-height: 1.7;
+    }
+
+
+    .btn-agenda {
+        min-height: 52px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 9px;
+
+        padding:
+            14px 22px;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #0ea5e9
+            );
+
+        color: white;
+
+        text-decoration: none;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+
+        box-shadow:
+            0 13px 28px
+            rgba(37,99,235,.18);
+
+        transition: .25s;
+    }
+
+
+    .btn-agenda:hover {
+        color: white;
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 18px 38px
+            rgba(37,99,235,.24);
+    }
+
+
+    /* =========================================================
+       RESUMO
+    ========================================================= */
+
+    .resumo-grid {
+        max-width: 1500px;
+
+        margin:
+            0 auto 28px;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(4,minmax(0,1fr));
+
+        gap: 18px;
+    }
+
+
+    .resumo-card {
+        min-width: 0;
+
+        padding: 23px;
+
+        border:
+            1px solid #e7edf4;
+
+        border-radius: 24px;
+
+        background:
+            rgba(255,255,255,.95);
+
+        box-shadow:
+            0 12px 35px
+            rgba(15,23,42,.045);
+    }
+
+
+    .resumo-icone {
+        width: 47px;
+        height: 47px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        margin-bottom: 16px;
+
+        border-radius: 14px;
+
+        font-size: 18px;
+    }
+
+
+    .resumo-icone.pacientes {
+        background: #dbeafe;
+
+        color: #2563eb;
+    }
+
+
+    .resumo-icone.consultas {
+        background: #dcfce7;
+
+        color: #16a34a;
+    }
+
+
+    .resumo-icone.proximas {
+        background: #ede9fe;
+
+        color: #7c3aed;
+    }
+
+
+    .resumo-icone.hoje {
+        background: #fef3c7;
+
+        color: #d97706;
+    }
+
+
+    .resumo-card > span {
+        display: block;
+
+        margin-bottom: 4px;
+
+        color: #64748b;
+
+        font-size: 13px;
+
+        font-weight: 600;
+    }
+
+
+    .resumo-card > strong {
+        display: block;
+
+        margin-bottom: 4px;
+
+        color: #0f172a;
+
+        font-size: 32px;
+
+        line-height: 1.2;
+    }
+
+
+    .resumo-card > small {
+        color: #94a3b8;
+
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+       CONTAINER DE PACIENTES
+    ========================================================= */
+
+    .pacientes-box {
+        max-width: 1500px;
+
+        margin: auto;
+
+        padding: 30px;
+
+        border:
+            1px solid #e2e8f0;
+
+        border-radius: 30px;
+
+        background:
+            rgba(255,255,255,.96);
+
+        box-shadow:
+            0 16px 50px
+            rgba(15,23,42,.055);
+    }
+
+
+    .pacientes-box-topo {
+        display: flex;
+
+        align-items: flex-end;
+
+        justify-content: space-between;
+
+        gap: 28px;
+
+        margin-bottom: 27px;
+    }
+
+
+    .subtitulo {
+        display: block;
+
+        margin-bottom: 6px;
+
+        color: #2563eb;
+
+        font-size: 11px;
+
+        font-weight: 800;
+
+        letter-spacing: .7px;
+
+        text-transform: uppercase;
+    }
+
+
+    .pacientes-box-topo h2 {
+        margin:
+            0 0 5px;
+
+        color: #0f172a;
+
+        font-size: 24px;
+    }
+
+
+    .pacientes-box-topo p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       BUSCA
+    ========================================================= */
+
+    .busca-pacientes {
+        width: 100%;
+
+        max-width: 650px;
+
+        display: flex;
+
+        gap: 10px;
+    }
+
+
+    .campo-busca-wrapper {
+        position: relative;
+
+        flex: 1;
+
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+    }
+
+
+    .campo-busca-wrapper i {
+        position: absolute;
+
+        left: 17px;
+
+        color: #94a3b8;
+
+        pointer-events: none;
+    }
+
+
+    .campo-busca-wrapper input {
+        width: 100%;
+
+        height: 52px;
+
+        padding:
+            0 18px 0 46px;
+
+        border:
+            1px solid #dbe2ea;
+
+        border-radius: 16px;
+
+        background: #f8fafc;
+
+        color: #0f172a;
+
+        outline: none;
+
+        font-size: 13px;
+
+        transition: .2s;
+    }
+
+
+    .campo-busca-wrapper input:focus {
+        border-color: #2563eb;
+
+        background: white;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(37,99,235,.08);
+    }
+
+
+    .busca-pacientes button,
+    .btn-limpar {
+        height: 52px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 8px;
+
+        padding:
+            0 20px;
+
+        border-radius: 15px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+
+    .busca-pacientes button {
+        border: none;
+
+        background: #2563eb;
+
+        color: white;
+
+        cursor: pointer;
+    }
+
+
+    .btn-limpar {
+        border:
+            1px solid #e2e8f0;
+
+        background: white;
+
+        color: #64748b;
+
+        text-decoration: none;
+    }
+
+
+    /* =========================================================
+       PACIENTE
+    ========================================================= */
+
+    .lista-pacientes {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 14px;
+    }
+
+
+    .paciente-card {
+        display: grid;
+
+        grid-template-columns:
+            minmax(280px,1.3fr)
+            minmax(420px,1fr)
+            auto;
+
+        align-items: center;
+
+        gap: 24px;
+
+        padding: 22px;
+
+        border:
+            1px solid #e8edf3;
+
+        border-radius: 24px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #fbfdff
+            );
+
+        transition: .25s;
+    }
+
+
+    .paciente-card:hover {
+        border-color: #dbeafe;
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            0 16px 38px
+            rgba(15,23,42,.065);
+    }
+
+
+    .paciente-identidade {
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+    }
+
+
+    .avatar-paciente {
+        width: 58px;
+        height: 58px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 18px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #06b6d4
+            );
+
+        color: white;
+
+        font-size: 21px;
+
+        font-weight: 800;
+
+        box-shadow:
+            0 10px 24px
+            rgba(37,99,235,.18);
+    }
+
+
+    .paciente-dados {
+        min-width: 0;
+    }
+
+
+    .nome-linha {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 9px;
+
+        margin-bottom: 7px;
+    }
+
+
+    .nome-linha h3 {
+        margin: 0;
+
+        overflow-wrap: anywhere;
+
+        color: #0f172a;
+
+        font-size: 17px;
+    }
+
+
+    .status-paciente {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding:
+            5px 9px;
+
+        border-radius: 999px;
+
+        font-size: 10px;
+
+        font-weight: 800;
+    }
+
+
+    .status-paciente i {
+        font-size: 6px;
+    }
+
+
+    .status-paciente.ativo {
+        background: #dcfce7;
+
+        color: #166534;
+    }
+
+
+    .status-paciente.historico {
+        background: #f1f5f9;
+
+        color: #64748b;
+    }
+
+
+    .contato-paciente {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap:
+            7px 15px;
+    }
+
+
+    .contato-paciente span {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        min-width: 0;
+
+        color: #64748b;
+
+        font-size: 12px;
+    }
+
+
+    .contato-paciente i {
+        color: #2563eb;
+    }
+
+
+    /* =========================================================
+       MÉTRICAS
+    ========================================================= */
+
+    .paciente-metricas {
+        min-width: 0;
+
+        display: grid;
+
+        grid-template-columns:
+            .7fr 1fr 1.35fr;
+
+        gap: 8px;
+    }
+
+
+    .metrica {
+        min-width: 0;
+
+        padding:
+            11px 13px;
+
+        border:
+            1px solid #edf2f7;
+
+        border-radius: 14px;
+
+        background: #f8fafc;
+    }
+
+
+    .metrica span {
+        display: block;
+
+        margin-bottom: 4px;
+
+        color: #94a3b8;
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+    }
+
+
+    .metrica strong {
+        display: block;
+
+        overflow-wrap: anywhere;
+
+        color: #334155;
+
+        font-size: 12px;
+
+        line-height: 1.4;
+    }
+
+
+    .metrica.destaque {
+        background: #eff6ff;
+
+        border-color: #dbeafe;
+    }
+
+
+    .metrica.destaque strong {
+        color: #1d4ed8;
+    }
+
+
+    /* =========================================================
+       AÇÕES
+    ========================================================= */
+
+    .paciente-acoes {
+        display: flex;
+
+        justify-content: flex-end;
+    }
+
+
+    .btn-historico {
+        min-height: 45px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 8px;
+
+        padding:
+            11px 16px;
+
+        border:
+            1px solid #dbeafe;
+
+        border-radius: 14px;
+
+        background: #eff6ff;
+
+        color: #2563eb;
+
+        text-decoration: none;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        white-space: nowrap;
+
+        transition: .25s;
+    }
+
+
+    .btn-historico:hover {
+        color: #1d4ed8;
+
+        background: white;
+
+        transform:
+            translateY(-2px);
+    }
+
+
+    /* =========================================================
+       VAZIO
+    ========================================================= */
+
+    .estado-vazio {
+        padding:
+            70px 25px;
+
+        text-align: center;
+    }
+
+
+    .vazio-ilustracao {
+        position: relative;
+
+        width: 86px;
+        height: 86px;
+
+        margin:
+            0 auto 22px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 27px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #eff6ff,
+                #ecfeff
+            );
+
+        color: #2563eb;
+
+        font-size: 31px;
+
+        overflow: hidden;
+    }
+
+
+    .vazio-ilustracao > i {
+        position: relative;
+
+        z-index: 2;
+    }
+
+
+    .vazio-circulo {
+        position: absolute;
+
+        border-radius: 50%;
+    }
+
+
+    .circulo-1 {
+        width: 45px;
+        height: 45px;
+
+        top: -15px;
+        right: -10px;
+
+        background:
+            rgba(37,99,235,.16);
+    }
+
+
+    .circulo-2 {
+        width: 40px;
+        height: 40px;
+
+        bottom: -12px;
+        left: -10px;
+
+        background:
+            rgba(6,182,212,.18);
+    }
+
+
+    .estado-vazio h3 {
+        margin:
+            0 0 8px;
+
+        color: #0f172a;
+
+        font-size: 20px;
+    }
+
+
+    .estado-vazio p {
+        max-width: 540px;
+
+        margin:
+            0 auto 22px;
+
+        color: #64748b;
+
+        font-size: 13px;
+
+        line-height: 1.65;
+    }
+
+
+    .btn-vazio {
+        display: inline-flex;
+
+        padding:
+            12px 18px;
+
+        border-radius: 14px;
+
+        background: #2563eb;
+
+        color: white;
+
+        text-decoration: none;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       ERRO
+    ========================================================= */
+
+    .alerta-erro {
+        max-width: 1500px;
+
+        margin:
+            0 auto 25px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+        padding: 18px;
+
+        border:
+            1px solid #fecaca;
+
+        border-radius: 18px;
+
+        background: white;
+    }
+
+
+    .alerta-erro-icone {
+        width: 45px;
+        height: 45px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background: #fee2e2;
+
+        color: #dc2626;
+    }
+
+
+    .alerta-erro strong {
+        display: block;
+
+        margin-bottom: 3px;
+
+        font-size: 13px;
+    }
+
+
+    .alerta-erro p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 12px;
+    }
+
+
+    .alerta-erro > a {
+        margin-left: auto;
+
+        padding:
+            10px 14px;
+
+        border-radius: 12px;
+
+        background: #2563eb;
+
+        color: white;
+
+        text-decoration: none;
+
+        font-size: 12px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================= */
+
+    @@media (max-width: 1200px) {
+
+        .paciente-card {
+            grid-template-columns:
+                1fr;
+        }
+
+
+        .paciente-acoes {
+            justify-content: flex-start;
+        }
+
+
+        .btn-historico {
+            width: 100%;
+        }
+
+
+        .pacientes-box-topo {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+
+        .busca-pacientes {
+            max-width: none;
+        }
+
+    }
+
+
+    @@media (max-width: 1050px) {
+
+        .resumo-grid {
+            grid-template-columns:
+                repeat(2,minmax(0,1fr));
+        }
+
+
+        .pacientes-content {
+            padding:
+                35px 28px 60px;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @@media (max-width: 900px) {
+
+        .pacientes-layout {
+            flex-direction: column;
+        }
+
+
+        .sidebar {
+            width: 100%;
+
+            min-height: auto;
+
+            padding:
+                18px 16px;
+
+            border-right: none;
+
+            border-bottom:
+                1px solid #e2e8f0;
+        }
+
+
+        .logo-sidebar {
+            width: 175px;
+
+            margin:
+                0 auto 20px;
+        }
+
+
+        .menu-sidebar {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4,minmax(0,1fr));
+
+            gap: 8px;
+        }
+
+
+        .menu-item {
+            min-height: 65px;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            gap: 5px;
+
+            padding:
+                9px 5px;
+
+            border-radius: 14px;
+
+            font-size: 10px;
+
+            text-align: center;
+        }
+
+
+        .menu-item i {
+            width: auto;
+
+            font-size: 17px;
+        }
+
+
+        .menu-item:hover {
+            transform: none;
+        }
+
+
+        .pacientes-content {
+            padding:
+                26px 16px 50px;
+        }
+
+
+        .topo-pacientes {
+            align-items: stretch;
+
+            flex-direction: column;
+
+            gap: 18px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .titulo-pacientes h1 {
+            font-size: 31px;
+        }
+
+
+        .titulo-pacientes p {
+            font-size: 13px;
+        }
+
+
+        .btn-agenda {
+            width: 100%;
+        }
+
+
+        .pacientes-box {
+            padding: 18px;
+
+            border-radius: 23px;
+        }
+
+
+        .paciente-metricas {
+            grid-template-columns:
+                1fr 1fr;
+        }
+
+
+        .metrica.destaque {
+            grid-column:
+                1 / -1;
+        }
+
+    }
+
+
+    /* =========================================================
+       CELULAR
+    ========================================================= */
+
+    @@media (max-width: 600px) {
+
+        .pacientes-content {
+            padding:
+                22px 12px 45px;
+        }
+
+
+        .resumo-grid {
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+        }
+
+
+        .resumo-card {
+            padding: 17px;
+
+            border-radius: 19px;
+        }
+
+
+        .resumo-icone {
+            width: 40px;
+            height: 40px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .resumo-card > strong {
+            font-size: 27px;
+        }
+
+
+        .resumo-card > span {
+            min-height: 36px;
+
+            font-size: 11px;
+        }
+
+
+        .resumo-card > small {
+            display: none;
+        }
+
+
+        .pacientes-box-topo h2 {
+            font-size: 21px;
+        }
+
+
+        .busca-pacientes {
+            display: grid;
+
+            grid-template-columns:
+                1fr;
+        }
+
+
+        .busca-pacientes button,
+        .btn-limpar {
+            width: 100%;
+        }
+
+
+        .paciente-card {
+            gap: 18px;
+
+            padding: 17px;
+
+            border-radius: 21px;
+        }
+
+
+        .paciente-identidade {
+            align-items: flex-start;
+        }
+
+
+        .avatar-paciente {
+            width: 50px;
+            height: 50px;
+
+            border-radius: 15px;
+        }
+
+
+        .nome-linha {
+            align-items: flex-start;
+
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+
+        .nome-linha h3 {
+            font-size: 16px;
+        }
+
+
+        .contato-paciente {
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+
+        .contato-paciente span {
+            max-width: 100%;
+
+            overflow-wrap: anywhere;
+
+            font-size: 11px;
+        }
+
+
+        .paciente-metricas {
+            grid-template-columns:
+                1fr;
+        }
+
+
+        .metrica.destaque {
+            grid-column: auto;
+        }
+
+
+        .metrica {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+        }
+
+
+        .metrica span {
+            margin: 0;
+        }
+
+
+        .metrica strong {
+            text-align: right;
+        }
+
+
+        .btn-historico {
+            min-height: 50px;
+
+            font-size: 13px;
+        }
+
+
+        .alerta-erro {
+            align-items: stretch;
+
+            flex-direction: column;
+        }
+
+
+        .alerta-erro > a {
+            width: 100%;
+
+            margin-left: 0;
+
+            text-align: center;
+        }
+
+    }
+
+
+    @@media (max-width: 390px) {
+
+        .menu-sidebar {
+            grid-template-columns:
+                repeat(2,1fr);
+        }
+
+
+        .resumo-grid {
+            grid-template-columns:
+                1fr;
+        }
+
+    }
+
+</style>

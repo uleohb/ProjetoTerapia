@@ -1,6 +1,25 @@
+# Visual Studio
 .vs/
+*.user
+*.suo
+
+# Build
 bin/
 obj/
+**/bin/
+**/obj/
+
+# Configurações locais
 appsettings.Development.json
-ProjetoTerapia/bin/
-ProjetoTerapia/obj/
+
+# Publicação / credenciais locais
+*.pubxml.user
+*.publishsettings
+
+# Temporários
+*.tmp
+*.log
+
+# Perfis locais de publicação do Visual Studio
+**/Properties/PublishProfiles/*.pubxml
+**/Properties/PublishProfiles/*.pubxml.user
