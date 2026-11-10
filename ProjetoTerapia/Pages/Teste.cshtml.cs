@@ -1,253 +1,841 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using ProjetoTerapia.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 
 namespace ProjetoTerapia.Pages
 {
     public class TesteModel : PageModel
     {
         private readonly AppDbContext _context;
-        public bool PacienteLogado { get; set; }
-        public string NomePaciente { get; set; } = "";
-        public TesteModel(AppDbContext context)
+
+
+        // =====================================================
+        // CHAVES DO RESULTADO TEMPORÁRIO
+        // =====================================================
+
+        private const string SessionNivel =
+            "TesteResultadoNivel";
+
+        private const string SessionScoreFinal =
+            "TesteResultadoScoreFinal";
+
+        private const string SessionAnsiedade =
+            "TesteResultadoAnsiedade";
+
+        private const string SessionDepressao =
+            "TesteResultadoDepressao";
+
+        private const string SessionMensagem =
+            "TesteResultadoMensagem";
+
+        private const string SessionRecomendacao =
+            "TesteResultadoRecomendacao";
+
+        private const string SessionResultadoSalvo =
+            "TesteResultadoSalvo";
+
+
+        // =====================================================
+        // CONSTRUTOR
+        // =====================================================
+
+        public TesteModel(
+            AppDbContext context)
         {
             _context = context;
         }
 
-        public List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
+
+        // =====================================================
+        // DADOS DA PÁGINA
+        // =====================================================
+
+        public bool PacienteLogado { get; set; }
+
+
+        public string NomePaciente { get; set; } = "";
+
+
+        public List<Pergunta> Perguntas { get; set; }
+            = new();
+
 
         [BindProperty]
-        public List<bool> Respostas { get; set; } = new List<bool>();
+        public List<bool> Respostas { get; set; }
+            = new();
+
 
         public bool MostrarResultado { get; set; }
 
+
         public string Nivel { get; set; } = "";
+
 
         public double ScoreFinal { get; set; }
 
+
         public double PorcentagemAnsiedade { get; set; }
+
 
         public double PorcentagemDepressao { get; set; }
 
+
         public string Mensagem { get; set; } = "";
+
 
         public string Recomendacao { get; set; } = "";
 
+
         public bool ResultadoSalvo { get; set; }
 
-        public void OnGet()
+
+        // =====================================================
+        // GET
+        // =====================================================
+
+        public async Task<IActionResult> OnGetAsync(
+            bool resultado = false)
         {
-            CarregarPacienteLogado();
+            await CarregarPacienteLogadoAsync();
 
-            Teste teste = new Teste();
-            Perguntas = teste.Perguntas;
 
-            MostrarResultado = false;
-            ResultadoSalvo = false;
-        }
+            var teste =
+                new Teste();
 
-        public IActionResult OnPost()
-        {
-            CarregarPacienteLogado();
 
-            Teste teste = new Teste();
-            Perguntas = teste.Perguntas;
+            Perguntas =
+                teste.Perguntas;
 
-            int ansiedade = 0;
-            int depressao = 0;
 
-            int maxAnsiedade = 0;
-            int maxDepressao = 0;
-
-            if (Respostas == null || Respostas.Count != Perguntas.Count)
+            /*
+             * Se estamos entrando normalmente em /Teste,
+             * significa que o usuário quer iniciar/refazer
+             * o teste.
+             */
+            if (!resultado)
             {
                 MostrarResultado = false;
+
+                ResultadoSalvo = false;
+
+                LimparResultadoDaSessao();
+
                 return Page();
             }
 
-            for (int i = 0; i < Perguntas.Count; i++)
+
+            /*
+             * Se chegamos em:
+             *
+             * /Teste?resultado=true
+             *
+             * carregamos o resultado calculado no POST.
+             */
+            var resultadoEncontrado =
+                CarregarResultadoDaSessao();
+
+
+            if (!resultadoEncontrado)
             {
-                int pontos = Respostas[i] ? 10 : 0;
+                /*
+                 * Caso alguém tente acessar diretamente
+                 * ?resultado=true sem ter realizado o teste.
+                 */
+
+                return RedirectToPage(
+                    "/Teste"
+                );
+            }
+
+
+            MostrarResultado = true;
+
+
+            return Page();
+        }
+
+
+        // =====================================================
+        // POST
+        // =====================================================
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var teste =
+                new Teste();
+
+
+            Perguntas =
+                teste.Perguntas;
+
+
+            // =================================================
+            // VALIDAR RESPOSTAS
+            // =================================================
+
+            if (Respostas == null ||
+                Respostas.Count != Perguntas.Count)
+            {
+                await CarregarPacienteLogadoAsync();
+
+
+                MostrarResultado = false;
+
+
+                ModelState.AddModelError(
+                    "",
+                    "Responda todas as perguntas antes de finalizar o teste."
+                );
+
+
+                return Page();
+            }
+
+
+            // =================================================
+            // CALCULAR PONTUAÇÕES
+            // =================================================
+
+            int ansiedade = 0;
+
+            int depressao = 0;
+
+            int maxAnsiedade = 0;
+
+            int maxDepressao = 0;
+
+
+            for (int i = 0;
+                 i < Perguntas.Count;
+                 i++)
+            {
+                int pontos =
+                    Respostas[i]
+                        ? 10
+                        : 0;
+
 
                 if (Perguntas[i].Tipo == "A")
                 {
                     ansiedade += pontos;
+
                     maxAnsiedade += 10;
                 }
                 else
                 {
                     depressao += pontos;
+
                     maxDepressao += 10;
                 }
             }
 
+
+            // =================================================
+            // PORCENTAGENS
+            // =================================================
+
             PorcentagemAnsiedade =
-                Math.Round((ansiedade * 100.0) / maxAnsiedade, 1);
+                maxAnsiedade > 0
+                    ? Math.Round(
+                        ansiedade * 100.0
+                        / maxAnsiedade,
+                        1
+                    )
+                    : 0;
+
 
             PorcentagemDepressao =
-                Math.Round((depressao * 100.0) / maxDepressao, 1);
+                maxDepressao > 0
+                    ? Math.Round(
+                        depressao * 100.0
+                        / maxDepressao,
+                        1
+                    )
+                    : 0;
 
-            ScoreFinal = Math.Round((PorcentagemAnsiedade + PorcentagemDepressao) / 2.0, 1);
 
-            if (ScoreFinal >= 80)
-            {
-                Nivel = "Muito Alto";
+            ScoreFinal =
+                Math.Round(
+                    (
+                        PorcentagemAnsiedade
+                        +
+                        PorcentagemDepressao
+                    )
+                    / 2.0,
+                    1
+                );
 
-                Mensagem = "Seu resultado indica sinais emocionais intensos que merecem atenção prioritária.";
 
-                Recomendacao = "Recomendamos buscar apoio profissional o quanto antes para avaliar sua situação e iniciar um acompanhamento adequado.";
-            }
-            else if (ScoreFinal >= 60)
-            {
-                Nivel = "Alto";
+            // =================================================
+            // CLASSIFICAÇÃO
+            // =================================================
 
-                Mensagem = "Seu resultado sugere sinais importantes de sofrimento emocional.";
+            DefinirClassificacao();
 
-                Recomendacao = "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
-            }
-            else if (ScoreFinal >= 40)
-            {
-                Nivel = "Moderado";
 
-                Mensagem = "Alguns sinais emocionais merecem atenção.";
+            // =================================================
+            // SALVAR NO HISTÓRICO DO PACIENTE
+            // =================================================
 
-                Recomendacao = "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
-            }
-            else if (ScoreFinal >= 25)
-            {
-                Nivel = "Levemente Moderado";
+            ResultadoSalvo =
+                await SalvarResultadoSePacienteLogadoAsync(
+                    ansiedade,
+                    depressao
+                );
 
-                Mensagem = "Seu resultado demonstra sinais leves de atenção emocional.";
 
-                Recomendacao = "Pequenas mudanças na rotina e o suporte adequado podem ajudar a preservar seu equilíbrio emocional.";
-            }
-            else
-            {
-                Nivel = "Leve";
+            // =================================================
+            // GUARDAR RESULTADO TEMPORARIAMENTE
+            // =================================================
 
-                Mensagem = "Seu resultado indica poucos sinais de sofrimento emocional no momento.";
+            SalvarResultadoNaSessao();
 
-                Recomendacao = "Continue mantendo hábitos saudáveis, autocuidado e acompanhamento preventivo para preservar seu bem-estar.";
-            }
 
-            MostrarResultado = true;
+            /*
+             * =================================================
+             * POST → REDIRECT → GET
+             * =================================================
+             *
+             * ESSA É A PARTE QUE CORRIGE O ERR_CACHE_MISS.
+             *
+             * O navegador não fica mais parado em uma resposta
+             * de POST.
+             */
 
-            SalvarResultadoSePacienteLogado(ansiedade, depressao);
-
-            return Page();
+            return RedirectToPage(
+                "/Teste",
+                new
+                {
+                    resultado = true
+                }
+            );
         }
 
-        private void SalvarResultadoSePacienteLogado(int ansiedade, int depressao)
+
+        // =====================================================
+        // CLASSIFICAÇÃO
+        // =====================================================
+
+        private void DefinirClassificacao()
         {
-            var pacienteIdSessao = HttpContext.Session.GetString("PacienteLogado");
-
-            if (string.IsNullOrEmpty(pacienteIdSessao))
+            if (ScoreFinal >= 80)
             {
-                ResultadoSalvo = false;
+                Nivel =
+                    "Muito Alto";
+
+
+                Mensagem =
+                    "Seu resultado indica sinais emocionais intensos que merecem atenção prioritária.";
+
+
+                Recomendacao =
+                    "Recomendamos buscar apoio profissional o quanto antes para avaliar sua situação e iniciar um acompanhamento adequado.";
+
+
                 return;
             }
 
-            if (!int.TryParse(pacienteIdSessao, out int pacienteId))
+
+            if (ScoreFinal >= 60)
             {
-                ResultadoSalvo = false;
+                Nivel =
+                    "Alto";
+
+
+                Mensagem =
+                    "Seu resultado sugere sinais importantes de sofrimento emocional.";
+
+
+                Recomendacao =
+                    "Recomendamos iniciar um acompanhamento profissional o quanto antes para melhorar seu bem-estar emocional e evitar que os sintomas se intensifiquem.";
+
+
                 return;
             }
 
-            var pacienteExiste = _context.Pacientes
-                .Any(p => p.Id == pacienteId);
+
+            if (ScoreFinal >= 40)
+            {
+                Nivel =
+                    "Moderado";
+
+
+                Mensagem =
+                    "Alguns sinais emocionais merecem atenção.";
+
+
+                Recomendacao =
+                    "Buscar orientação especializada agora pode ajudar a evitar que esses sinais evoluam e melhorar sua qualidade de vida.";
+
+
+                return;
+            }
+
+
+            if (ScoreFinal >= 25)
+            {
+                Nivel =
+                    "Levemente Moderado";
+
+
+                Mensagem =
+                    "Seu resultado demonstra sinais leves de atenção emocional.";
+
+
+                Recomendacao =
+                    "Pequenas mudanças na rotina e o suporte adequado podem ajudar a preservar seu equilíbrio emocional.";
+
+
+                return;
+            }
+
+
+            Nivel =
+                "Leve";
+
+
+            Mensagem =
+                "Seu resultado indica poucos sinais de sofrimento emocional no momento.";
+
+
+            Recomendacao =
+                "Continue mantendo hábitos saudáveis, autocuidado e acompanhamento preventivo para preservar seu bem-estar.";
+        }
+
+
+        // =====================================================
+        // SALVAR RESULTADO NO BANCO
+        // =====================================================
+
+        private async Task<bool>
+            SalvarResultadoSePacienteLogadoAsync(
+                int ansiedade,
+                int depressao)
+        {
+            var pacienteIdSessao =
+                HttpContext.Session.GetString(
+                    "PacienteLogado"
+                );
+
+
+            if (string.IsNullOrWhiteSpace(
+                pacienteIdSessao))
+            {
+                return false;
+            }
+
+
+            if (!int.TryParse(
+                pacienteIdSessao,
+                out int pacienteId))
+            {
+                return false;
+            }
+
+
+            var pacienteExiste =
+                await _context.Pacientes
+                    .AsNoTracking()
+                    .AnyAsync(
+                        p =>
+                            p.Id == pacienteId
+                    );
+
 
             if (!pacienteExiste)
             {
-                ResultadoSalvo = false;
-                return;
+                return false;
             }
 
-            var resultadoFinal = DefinirResultadoFinal();
 
-            var resultado = new ResultadoTestePaciente
-            {
-                PacienteId = pacienteId,
+            var resultadoFinal =
+                DefinirResultadoFinal();
 
-                PontuacaoAnsiedade = ansiedade,
-                PontuacaoDepressao = depressao,
 
-                PercentualAnsiedade = Convert.ToDecimal(PorcentagemAnsiedade),
-                PercentualDepressao = Convert.ToDecimal(PorcentagemDepressao),
+            var resultado =
+                new ResultadoTestePaciente
+                {
+                    PacienteId =
+                        pacienteId,
 
-                ResultadoFinal = resultadoFinal,
-                Nivel = Nivel,
-                Mensagem = Mensagem,
+                    PontuacaoAnsiedade =
+                        ansiedade,
 
-                DataResultado = DateTime.Now
-            };
+                    PontuacaoDepressao =
+                        depressao,
 
-            _context.ResultadosTestePacientes.Add(resultado);
-            _context.SaveChanges();
+                    PercentualAnsiedade =
+                        Convert.ToDecimal(
+                            PorcentagemAnsiedade
+                        ),
 
-            ResultadoSalvo = true;
+                    PercentualDepressao =
+                        Convert.ToDecimal(
+                            PorcentagemDepressao
+                        ),
+
+                    ResultadoFinal =
+                        resultadoFinal,
+
+                    Nivel =
+                        Nivel,
+
+                    Mensagem =
+                        Mensagem,
+
+                    DataResultado =
+                        DateTime.Now
+                };
+
+
+            _context
+                .ResultadosTestePacientes
+                .Add(
+                    resultado
+                );
+
+
+            await _context.SaveChangesAsync();
+
+
+            return true;
         }
+
+
+        // =====================================================
+        // DEFINIR RESULTADO FINAL
+        // =====================================================
 
         private string DefinirResultadoFinal()
         {
             if (ScoreFinal < 25)
             {
-                return "Bem-estar preservado";
+                return
+                    "Bem-estar preservado";
             }
 
-            var diferenca = Math.Abs(PorcentagemAnsiedade - PorcentagemDepressao);
 
-            if (PorcentagemAnsiedade >= 40 && PorcentagemDepressao >= 40 && diferenca <= 20)
+            var diferenca =
+                Math.Abs(
+                    PorcentagemAnsiedade
+                    -
+                    PorcentagemDepressao
+                );
+
+
+            if (PorcentagemAnsiedade >= 40 &&
+                PorcentagemDepressao >= 40 &&
+                diferenca <= 20)
             {
-                return "Sinais mistos";
+                return
+                    "Sinais mistos";
             }
 
-            if (PorcentagemAnsiedade > PorcentagemDepressao)
+
+            if (PorcentagemAnsiedade >
+                PorcentagemDepressao)
             {
-                return "Sinais predominantes de ansiedade";
+                return
+                    "Sinais predominantes de ansiedade";
             }
 
-            if (PorcentagemDepressao > PorcentagemAnsiedade)
+
+            if (PorcentagemDepressao >
+                PorcentagemAnsiedade)
             {
-                return "Sinais predominantes de depressão";
+                return
+                    "Sinais predominantes de depressão";
             }
 
-            return "Atenção emocional";
+
+            return
+                "Atenção emocional";
         }
 
-        private void CarregarPacienteLogado()
+
+        // =====================================================
+        // SALVAR RESULTADO NA SESSÃO
+        // =====================================================
+
+        private void SalvarResultadoNaSessao()
         {
-            var pacienteIdSessao = HttpContext.Session.GetString("PacienteLogado");
+            HttpContext.Session.SetString(
+                SessionNivel,
+                Nivel
+            );
 
-            if (string.IsNullOrEmpty(pacienteIdSessao))
+
+            HttpContext.Session.SetString(
+                SessionScoreFinal,
+                ScoreFinal.ToString(
+                    CultureInfo.InvariantCulture
+                )
+            );
+
+
+            HttpContext.Session.SetString(
+                SessionAnsiedade,
+                PorcentagemAnsiedade.ToString(
+                    CultureInfo.InvariantCulture
+                )
+            );
+
+
+            HttpContext.Session.SetString(
+                SessionDepressao,
+                PorcentagemDepressao.ToString(
+                    CultureInfo.InvariantCulture
+                )
+            );
+
+
+            HttpContext.Session.SetString(
+                SessionMensagem,
+                Mensagem
+            );
+
+
+            HttpContext.Session.SetString(
+                SessionRecomendacao,
+                Recomendacao
+            );
+
+
+            HttpContext.Session.SetString(
+                SessionResultadoSalvo,
+                ResultadoSalvo
+                    ? "true"
+                    : "false"
+            );
+        }
+
+
+        // =====================================================
+        // CARREGAR RESULTADO DA SESSÃO
+        // =====================================================
+
+        private bool CarregarResultadoDaSessao()
+        {
+            var nivel =
+                HttpContext.Session.GetString(
+                    SessionNivel
+                );
+
+
+            var score =
+                HttpContext.Session.GetString(
+                    SessionScoreFinal
+                );
+
+
+            var ansiedade =
+                HttpContext.Session.GetString(
+                    SessionAnsiedade
+                );
+
+
+            var depressao =
+                HttpContext.Session.GetString(
+                    SessionDepressao
+                );
+
+
+            var mensagem =
+                HttpContext.Session.GetString(
+                    SessionMensagem
+                );
+
+
+            var recomendacao =
+                HttpContext.Session.GetString(
+                    SessionRecomendacao
+                );
+
+
+            if (string.IsNullOrWhiteSpace(nivel) ||
+                string.IsNullOrWhiteSpace(score) ||
+                string.IsNullOrWhiteSpace(ansiedade) ||
+                string.IsNullOrWhiteSpace(depressao))
+            {
+                return false;
+            }
+
+
+            if (!double.TryParse(
+                score,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var scoreFinal))
+            {
+                return false;
+            }
+
+
+            if (!double.TryParse(
+                ansiedade,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var percentualAnsiedade))
+            {
+                return false;
+            }
+
+
+            if (!double.TryParse(
+                depressao,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var percentualDepressao))
+            {
+                return false;
+            }
+
+
+            Nivel =
+                nivel;
+
+
+            ScoreFinal =
+                scoreFinal;
+
+
+            PorcentagemAnsiedade =
+                percentualAnsiedade;
+
+
+            PorcentagemDepressao =
+                percentualDepressao;
+
+
+            Mensagem =
+                mensagem ?? "";
+
+
+            Recomendacao =
+                recomendacao ?? "";
+
+
+            ResultadoSalvo =
+                string.Equals(
+                    HttpContext.Session.GetString(
+                        SessionResultadoSalvo
+                    ),
+                    "true",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+
+            return true;
+        }
+
+
+        // =====================================================
+        // LIMPAR RESULTADO DA SESSÃO
+        // =====================================================
+
+        private void LimparResultadoDaSessao()
+        {
+            HttpContext.Session.Remove(
+                SessionNivel
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionScoreFinal
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionAnsiedade
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionDepressao
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionMensagem
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionRecomendacao
+            );
+
+
+            HttpContext.Session.Remove(
+                SessionResultadoSalvo
+            );
+        }
+
+
+        // =====================================================
+        // PACIENTE LOGADO
+        // =====================================================
+
+        private async Task CarregarPacienteLogadoAsync()
+        {
+            var pacienteIdSessao =
+                HttpContext.Session.GetString(
+                    "PacienteLogado"
+                );
+
+
+            if (string.IsNullOrWhiteSpace(
+                pacienteIdSessao))
             {
                 PacienteLogado = false;
+
                 NomePaciente = "";
+
                 return;
             }
 
-            if (!int.TryParse(pacienteIdSessao, out int pacienteId))
+
+            if (!int.TryParse(
+                pacienteIdSessao,
+                out int pacienteId))
             {
                 PacienteLogado = false;
+
                 NomePaciente = "";
+
                 return;
             }
 
-            var paciente = _context.Pacientes
-                .FirstOrDefault(x => x.Id == pacienteId);
+
+            var paciente =
+                await _context.Pacientes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(
+                        x =>
+                            x.Id == pacienteId
+                    );
+
 
             if (paciente == null)
             {
                 PacienteLogado = false;
+
                 NomePaciente = "";
+
+                HttpContext.Session.Remove(
+                    "PacienteLogado"
+                );
+
                 return;
             }
 
-            PacienteLogado = true;
-            NomePaciente = paciente.Nome;
-        }
 
+            PacienteLogado = true;
+
+
+            NomePaciente =
+                paciente.Nome ?? "";
+        }
     }
 }

@@ -315,6 +315,9 @@ namespace ProjetoTerapia.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ExibirPublicamente")
+                        .HasColumnType("bit");
+
                     b.Property<string>("FotoPerfil")
                         .HasColumnType("nvarchar(max)");
 

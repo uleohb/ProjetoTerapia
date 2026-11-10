@@ -81,6 +81,12 @@ namespace ProjetoTerapia.Pages
              * alterações nessas clínicas.
              *
              * Isso reduz memória e processamento.
+             *
+             * ExibirPublicamente:
+             *
+             * Permite manter contas de teste funcionando
+             * normalmente no sistema, mas escondidas da
+             * vitrine pública.
              */
 
             IQueryable<Clinica> query =
@@ -89,7 +95,8 @@ namespace ProjetoTerapia.Pages
                     .Where(
                         c =>
                             c.Aprovado &&
-                            c.Pago
+                            c.Pago &&
+                            c.ExibirPublicamente
                     );
 
 

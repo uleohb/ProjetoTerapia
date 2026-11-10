@@ -1,7 +1,7 @@
-﻿@page
-@model ProjetoTerapia.Pages.AdminLHModel
+﻿    @page
+    @model ProjetoTerapia.Pages.AdminLHModel
 
-@functions {
+    @functions {
     string TraduzirStatusMercadoPago(string? status)
     {
         if (string.IsNullOrWhiteSpace(status))
@@ -21,9 +21,9 @@
             _ => status
         };
     }
-}
+    }
 
-<div class="admin-page">
+    <div class="admin-page">
 
     <aside class="sidebar-admin">
 
@@ -199,16 +199,18 @@
                 <input type="hidden" name="aba" value="clinicas" />
 
                 <input type="text"
-                       name="Busca"
-                       value="@Model.Busca"
-                       placeholder="Buscar por nome, email ou cidade..." />
+                        name="Busca"
+                        value="@Model.Busca"
+                        placeholder="Buscar por nome, email ou cidade..." />
 
                 <select name="FiltroStatus">
-                    <option value="">Todos os status</option>
-                    <option value="pendente">Pendentes</option>
-                    <option value="aprovado">Aprovadas sem pagamento</option>
-                    <option value="ativo">Ativas</option>
-                    <option value="alteracao">Alterações pendentes</option>
+                        <option value="">Todos os status</option>
+                        <option value="pendente">Pendentes</option>
+                        <option value="aprovado">Aprovadas sem pagamento</option>
+                        <option value="ativo">Ativas</option>
+                        <option value="alteracao">Alterações pendentes</option>
+                        <option value="visivel">Visíveis na vitrine</option>
+                        <option value="oculto">Ocultos da vitrine</option>
                 </select>
 
                 <button type="submit" class="btn-filtrar">
@@ -237,40 +239,53 @@
 
                             <div class="status-tags">
 
-                                @if (!clinica.Aprovado)
-                                {
-                                    <span class="tag pendente">
-                                        Pendente
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="tag aprovado">
-                                        Aprovado
-                                    </span>
-                                }
+    @if (!clinica.Aprovado)
+    {
+        <span class="tag pendente">
+            Pendente
+        </span>
+    }
+    else
+    {
+        <span class="tag aprovado">
+            Aprovado
+        </span>
+    }
 
-                                @if (clinica.Pago)
-                                {
-                                    <span class="tag pago">
-                                        Pago
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="tag nao-pago">
-                                        Não pago
-                                    </span>
-                                }
+    @if (clinica.Pago)
+    {
+        <span class="tag pago">
+            Pago
+        </span>
+    }
+    else
+    {
+        <span class="tag nao-pago">
+            Não pago
+        </span>
+    }
 
-                                @if (clinica.ClinicaAlteracaoPendente)
-                                {
-                                    <span class="tag alteracao">
-                                        Alteração pendente
-                                    </span>
-                                }
+    @if (clinica.ClinicaAlteracaoPendente)
+    {
+        <span class="tag alteracao">
+            Alteração pendente
+        </span>
+    }
 
-                        </div>
+    @if (clinica.ExibirPublicamente)
+    {
+        <span class="tag visivel">
+            Visível na vitrine
+        </span>
+    }
+    else
+    {
+        <span class="tag oculto">
+            Oculto da vitrine
+        </span>
+    }
+
+    </div>
 
                     </div>
 
@@ -307,8 +322,8 @@
                                 @(clinica.DataVencimento.HasValue
                                                                 ? clinica.DataVencimento.Value.ToString("dd/MM/yyyy")
                                                                 : "Sem vencimento")
-                                                                               </strong>
-                                                                           </div>
+                                                                                </strong>
+                                                                            </div>
 
                     </div>
 
@@ -364,6 +379,30 @@
                                     </button>
                                 }
 
+                                @if (clinica.Aprovado && clinica.Pago)
+    {
+    if (clinica.ExibirPublicamente)
+    {
+        <button type="submit"
+                name="acao"
+                value="ocultarVitrine"
+                class="btn-acao ocultar-vitrine"
+                onclick='return confirmarAcao(this, "ocultar este profissional da vitrine pública? A conta continuará funcionando normalmente.")'>
+            Ocultar da vitrine
+        </button>
+    }
+    else
+    {
+        <button type="submit"
+                name="acao"
+                value="mostrarVitrine"
+                class="btn-acao mostrar-vitrine"
+                onclick='return confirmarAcao(this, "mostrar este profissional novamente na vitrine pública?")'>
+            Mostrar na vitrine
+        </button>
+    }
+    }
+
                                 <button type="submit"
                                         name="acao"
                                         value="excluir"
@@ -374,9 +413,10 @@
 
                             </form>
 
-                            <a href="/PerfilClinica?id=@clinica.Id"
-                               target="_blank"
-                               class="btn-ver-perfil">
+                            <a asp-page="/PerfilClinica"
+                                asp-route-id="@clinica.Id"
+                                target="_blank"
+                                class="btn-ver-perfil">
                                 Ver perfil público
                             </a>
 
@@ -555,9 +595,9 @@
                                 <input type="hidden" name="id" value="@alteracao.Id" />
 
                                 <input type="text"
-                                       name="MotivoRecusa"
-                                       class="input-recusa"
-                                       placeholder="Motivo da recusa..." />
+                                        name="MotivoRecusa"
+                                        class="input-recusa"
+                                        placeholder="Motivo da recusa..." />
 
                                 <button type="submit"
                                         name="acao"
@@ -571,7 +611,8 @@
 
                         @if (alteracao.Clinica != null)
                             {
-                                <a href="/PerfilClinica?id=@alteracao.Clinica.Id"
+                                <a asp-page="/PerfilClinica"
+                                   asp-route-id="@alteracao.Clinica.Id"
                                    target="_blank"
                                    class="btn-ver-perfil">
                                     Ver perfil atual
@@ -650,10 +691,10 @@
 
                         <div class="acoes-card-admin">
 
-                            <a href="https://mpago.la/33FgjZL"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="btn-ver-perfil">
+                            <a href="https://mpago.li/1xuTRg5"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn-ver-perfil">
                                 Abrir link de pagamento
                             </a>
 
@@ -864,8 +905,8 @@
                                 @(item.DataPagamento.HasValue
                                                                 ? item.DataPagamento.Value.ToString("dd/MM/yyyy HH:mm")
                                                                 : "Não confirmado")
-                                                                               </strong>
-                                                                           </div>
+                                                                                </strong>
+                                                                            </div>
 
                         <div>
                             <span>Início</span>
@@ -873,8 +914,8 @@
                                 @(item.DataInicio.HasValue
                                                                 ? item.DataInicio.Value.ToString("dd/MM/yyyy")
                                                                 : "Não iniciado")
-                                                                             </strong>
-                                                                         </div>
+                                                                                </strong>
+                                                                            </div>
 
                         <div>
                             <span>Fim</span>
@@ -882,8 +923,8 @@
                                 @(item.DataFim.HasValue
                                                                 ? item.DataFim.Value.ToString("dd/MM/yyyy")
                                                                 : "Não iniciado")
-                                                                             </strong>
-                                                                         </div>
+                                                                                </strong>
+                                                                            </div>
 
                         <div>
                             <span>Mercado Pago</span>
@@ -942,15 +983,17 @@
                             @if (!string.IsNullOrWhiteSpace(item.LinkPagamento) && !item.Pago)
                             {
                                 <a href="@item.LinkPagamento"
-                                   target="_blank"
-                                   class="btn-ver-perfil">
+                                    target="_blank"
+                                    class="btn-ver-perfil">
                                     Abrir pagamento
                                 </a>
                             }
 
                             @if (item.Clinica != null)
                             {
-                                <a href="/PerfilClinica?id=@item.Clinica.Id"
+                                <!-- Divulgação -->
+                                <a asp-page="/PerfilClinica"
+                                   asp-route-id="@item.Clinica.Id"
                                    target="_blank"
                                    class="btn-ver-perfil">
                                     Ver perfil
@@ -1008,34 +1051,34 @@
                 <form method="post" class="form-vendedor-admin">
 
                     <input type="text"
-                           asp-for="NovoVendedorNome"
-                           placeholder="Nome do vendedor" />
+                            asp-for="NovoVendedorNome"
+                            placeholder="Nome do vendedor" />
 
                     <input type="email"
-                           asp-for="NovoVendedorEmail"
-                           placeholder="Email do vendedor" />
+                            asp-for="NovoVendedorEmail"
+                            placeholder="Email do vendedor" />
 
                     <input type="text"
-                           asp-for="NovoVendedorTelefone"
-                           placeholder="Telefone / WhatsApp" />
+                            asp-for="NovoVendedorTelefone"
+                            placeholder="Telefone / WhatsApp" />
 
                     <input type="password"
-                           asp-for="NovoVendedorSenha"
-                           placeholder="Senha inicial" />
+                            asp-for="NovoVendedorSenha"
+                            placeholder="Senha inicial" />
 
                     <div class="campo-vendedor">
                         <label>Comissão (%)</label>
 
                         <input type="number"
-                               asp-for="NovoVendedorComissao"
-                               min="1"
-                               max="100"
-                               step="1" />
+                                asp-for="NovoVendedorComissao"
+                                min="1"
+                                max="100"
+                                step="1" />
                     </div>
 
                     <input type="text"
-                           asp-for="NovoVendedorPix"
-                           placeholder="Chave Pix" />
+                            asp-for="NovoVendedorPix"
+                            placeholder="Chave Pix" />
 
                     <button type="submit"
                             name="acao"
@@ -1257,8 +1300,8 @@
                                 @(venda.DataConfirmacaoVenda.HasValue
                                                                 ? venda.DataConfirmacaoVenda.Value.ToString("dd/MM/yyyy HH:mm")
                                                                 : venda.DataCadastro.ToString("dd/MM/yyyy HH:mm"))
-                                                                                                              </strong>
-                                                                                                          </div>
+                                                                                                                </strong>
+                                                                                                            </div>
 
                         <div>
                             <span>Comissão paga em</span>
@@ -1266,8 +1309,8 @@
                                 @(venda.DataPagamentoComissao.HasValue
                                                                 ? venda.DataPagamentoComissao.Value.ToString("dd/MM/yyyy HH:mm")
                                                                 : "Pendente")
-                                                                         </strong>
-                                                                     </div>
+                                                                            </strong>
+                                                                        </div>
 
                         <div>
                             <span>Documento</span>
@@ -1282,25 +1325,27 @@
 
                         <div class="acoes-card-admin">
 
-                       @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
-                       {
+                        @if (!string.IsNullOrWhiteSpace(venda.ComprovanteNotaFiscal))
+                        {
                                 <a asp-page="/AdminLH"
-                                   asp-page-handler="ComprovanteVendedor"
-                                   asp-route-vendaId="@venda.Id"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="btn-ver-perfil">
+                                    asp-page-handler="ComprovanteVendedor"
+                                    asp-route-vendaId="@venda.Id"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn-ver-perfil">
                                     Ver documento
                                 </a>
-                       }
+                        }
 
                             @if (venda.ClinicaId.HasValue)
                             {
-                                <a href="/PerfilClinica?id=@venda.ClinicaId"
-                                   target="_blank"
-                                   class="btn-ver-perfil">
-                                    Ver clínica
-                                </a>
+                              <!-- Venda -->
+<a asp-page="/PerfilClinica"
+   asp-route-id="@venda.ClinicaId"
+   target="_blank"
+   class="btn-ver-perfil">
+    Ver clínica
+</a>
                             }
 
                             <form method="post">
@@ -1414,9 +1459,9 @@
 
     </main>
 
-</div>
+    </div>
 
-<div id="modalConfirmacao" class="modal-confirmacao">
+    <div id="modalConfirmacao" class="modal-confirmacao">
 
     <div class="modal-box">
 
@@ -1446,9 +1491,9 @@
 
     </div>
 
-</div>
+    </div>
 
-<style>
+    <style>
 
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
@@ -1814,14 +1859,25 @@
             color: #1d4ed8;
         }
 
-    .info-grid,
-    .pagamento-box {
-        display: grid;
-        grid-template-columns: repeat(3,1fr);
-        gap: 12px;
-        margin-bottom: 18px;
-    }
+        .tag.visivel {
+            background: #dcfce7;
+            color: #166534;
+        }
 
+        .tag.oculto {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .info-grid,
+        .pagamento-box {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        } 
+  
         .info-grid div,
         .pagamento-box div {
             padding: 14px;
@@ -1894,9 +1950,19 @@
         }
 
         .btn-acao.suspender {
-            color: #92400e;
-            background: #fef3c7;
-        }
+    color: #92400e;
+    background: #fef3c7;
+    }
+
+    .btn-acao.ocultar-vitrine {
+    color: #475569;
+    background: #e2e8f0;
+    }
+
+    .btn-acao.mostrar-vitrine {
+    color: white;
+    background: #5425A3;
+    }
 
         .btn-acao.excluir {
             color: white;
@@ -2335,9 +2401,9 @@
         width: 100%;
     }
 
-</style>
+    </style>
 
-<script>
+    <script>
     var formParaEnviar = null;
     var acaoSelecionada = null;
 
@@ -2443,4 +2509,4 @@
             });
         }
     });
-</script>
+    </script>

@@ -8,9 +8,12 @@
 
     <div class="pagamento-card">
 
-        <img src="/imagem/AlinhaVIDA.png"
-             class="logo-pagamento"
-             alt="Logo" />
+        <!-- LOGO -->
+        <div class="logo-area-pagamento">
+            <img src="/imagem/AlinhaVIDA.png"
+                 class="logo-pagamento"
+                 alt="AlinhaVIDA" />
+        </div>
 
         @if (Model.Clinica != null)
         {
@@ -24,15 +27,19 @@
                     Seu cadastro ainda está em análise
                 </h1>
 
-                <p>
-                    Após a aprovação da administração, você poderá ativar seu plano profissional.
+                <p class="descricao-principal">
+                    Após a aprovação da administração,
+                    você poderá ativar seu plano profissional.
                 </p>
 
-                <a href="/PainelClinica" class="btn-secundario">
+                <a asp-page="/PainelClinica"
+                   class="btn-secundario">
                     Voltar ao painel
                 </a>
             }
-            else if (Model.Clinica.Pago && !Model.PlanoVencido && !Model.PlanoPertoDeVencer)
+            else if (Model.Clinica.Pago &&
+                     !Model.PlanoVencido &&
+                     !Model.PlanoPertoDeVencer)
             {
                 <span class="badge-pagamento ativo">
                     Plano ativo
@@ -42,7 +49,7 @@
                     Sua assinatura está ativa
                 </h1>
 
-                <p>
+                <p class="descricao-principal">
                     Seu perfil profissional já está liberado na plataforma.
                     O pagamento só será necessário novamente próximo ao vencimento.
                 </p>
@@ -51,78 +58,134 @@
 
                     <div>
                         <span>Plano</span>
-                        <strong>@(Model.Clinica.NomePlano ?? "Plano Profissional Anual")</strong>
+
+                        <strong>
+                            @(Model.Clinica.NomePlano ?? "Plano Profissional Anual")
+                        </strong>
                     </div>
 
                     <div>
                         <span>Valor</span>
-                        <strong>@Model.ValorPlanoFormatado</strong>
+
+                        <strong>
+                            @Model.ValorPlanoFormatado
+                        </strong>
                     </div>
 
                     <div>
                         <span>Vencimento</span>
-                        <strong>@Model.Clinica.DataVencimento?.ToString("dd/MM/yyyy")</strong>
+
+                        <strong>
+                            @(Model.Clinica.DataVencimento.HasValue
+                                ? Model.Clinica.DataVencimento.Value.ToString("dd/MM/yyyy")
+                                : "Não informado")
+                        </strong>
                     </div>
 
                 </div>
 
-                <a href="/PainelClinica" class="btn-principal">
+                <a asp-page="/PainelClinica"
+                   class="btn-principal">
                     Voltar ao painel
                 </a>
             }
             else
             {
-                <span class="badge-pagamento">
-                    Ativação profissional
-                </span>
+                <!-- SEM BADGE "ATIVAÇÃO PROFISSIONAL" -->
 
-                <h1>
-                    Ative seu plano profissional
+                <h1 class="titulo-ativacao">
+                    @if (Model.PlanoVencido)
+                    {
+                        <text>Renove seu plano profissional</text>
+                    }
+                    else if (Model.PlanoPertoDeVencer)
+                    {
+                        <text>Renove sua assinatura</text>
+                    }
+                    else
+                    {
+                        <text>Ative seu plano profissional</text>
+                    }
                 </h1>
 
-                <p>
-                    Após a confirmação do pagamento, seu perfil fica disponível para pacientes
+                <p class="descricao-principal">
+                    Após a confirmação do pagamento,
+                    seu perfil fica disponível para pacientes
                     encontrarem você na plataforma.
                 </p>
 
                 @if (Model.PlanoPertoDeVencer)
                 {
                     <div class="alerta-renovacao">
-                        Seu plano vence em @Model.DiasRestantes dia(s). Você já pode solicitar a renovação.
+                        Seu plano vence em
+                        <strong>@Model.DiasRestantes dia(s)</strong>.
+                        Você já pode realizar a renovação.
                     </div>
                 }
 
                 @if (Model.PlanoVencido)
                 {
                     <div class="alerta-vencido">
-                        Seu plano está vencido. Renove para manter seu perfil ativo.
+                        Seu plano está vencido.
+                        Renove para manter seu perfil ativo na plataforma.
                     </div>
                 }
 
                 <div class="plano-box">
 
-                    <span>Plano Profissional Anual</span>
+                    <span class="plano-nome">
+                        Plano Profissional Anual
+                    </span>
 
-                    <strong>R$ 450,00 / ano</strong>
-                    <p>
+                    <strong class="plano-valor">
+                        R$ 450,00
+                    </strong>
+
+                    <div class="plano-periodo">
+                        por ano
+                    </div>
+
+                    <p class="parcelamento">
                         Equivalente a 12x de R$ 37,50.
                     </p>
 
-                    <p>
-                        Pagamento via Mercado Pago. Após pagar, aguarde a confirmação da administração.
-                    </p>
+                    <div class="separador-plano"></div>
+
+                    <div class="mercado-pago-info">
+
+                        <div class="icone-seguranca">
+                            ✓
+                        </div>
+
+                        <div>
+                            <strong>
+                                Pagamento seguro via Mercado Pago
+                            </strong>
+
+                            <p>
+                                Após a confirmação do pagamento,
+                                seu plano será ativado automaticamente.
+                            </p>
+                        </div>
+
+                    </div>
 
                 </div>
 
                 <div class="acoes-pagamento">
 
-                    <form method="post" asp-page-handler="Pagar">
-                        <button type="submit" class="btn-principal">
+                    <form method="post"
+                          asp-page-handler="Pagar">
+
+                        <button type="submit"
+                                class="btn-principal btn-pagar">
                             Pagar com Mercado Pago
                         </button>
+
                     </form>
 
-                    <a href="/PainelClinica" class="btn-secundario">
+                    <a asp-page="/PainelClinica"
+                       class="btn-secundario">
                         Voltar ao painel
                     </a>
 
@@ -134,9 +197,15 @@
 
 </div>
 
+
 <style>
 
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+    /* =====================================================
+           GERAL
+        ===================================================== */
 
     * {
         box-sizing: border-box;
@@ -159,6 +228,11 @@
         background: transparent !important;
     }
 
+
+    /* =====================================================
+           PÁGINA
+        ===================================================== */
+
     .pagamento-page {
         min-height: 100vh;
         display: flex;
@@ -167,8 +241,13 @@
         padding: 40px 20px;
         position: relative;
         overflow: hidden;
-        background: radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%), radial-gradient(circle at bottom right, rgba(124,58,237,.16), transparent 35%), linear-gradient(135deg,#e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
+        background: radial-gradient( circle at top left, rgba(14,165,233,.20), transparent 34% ), radial-gradient( circle at bottom right, rgba(124,58,237,.16), transparent 35% ), linear-gradient( 135deg, #e0f7ff 0%, #f8fcff 48%, #edf3ff 100% );
     }
+
+
+    /* =====================================================
+           EFEITOS DE FUNDO
+        ===================================================== */
 
     .rgb {
         position: absolute;
@@ -193,25 +272,51 @@
         right: -100px;
     }
 
+
+    /* =====================================================
+           CARD
+        ===================================================== */
+
     .pagamento-card {
         width: 100%;
         max-width: 620px;
         position: relative;
         z-index: 2;
-        background: rgba(255,255,255,.92);
-        border: 1px solid rgba(226,232,240,.9);
+        background: rgba(255,255,255,.94);
+        border: 1px solid rgba(226,232,240,.95);
         backdrop-filter: blur(18px);
         border-radius: 34px;
-        padding: 40px;
+        padding: 38px 40px 40px;
         box-shadow: 0 25px 70px rgba(15,23,42,.10);
         text-align: center;
     }
 
-    .logo-pagamento {
-        width: 250px;
-        max-width: 100%;
-        margin-bottom: 10px;
+
+    /* =====================================================
+           LOGO
+        ===================================================== */
+
+    .logo-area-pagamento {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 18px;
     }
+
+    .logo-pagamento {
+        display: block;
+        width: 280px;
+        max-width: 82%;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+
+    /* =====================================================
+           BADGES
+        ===================================================== */
 
     .badge-pagamento {
         display: inline-block;
@@ -234,46 +339,135 @@
             color: #92400e;
         }
 
+
+    /* =====================================================
+           TEXTO
+        ===================================================== */
+
     h1 {
         margin: 0 0 14px;
         font-size: 36px;
-        line-height: 1.1;
+        line-height: 1.15;
         color: #0f172a;
-        letter-spacing: -1px;
+        letter-spacing: -1.2px;
+        font-weight: 800;
     }
 
-    p {
+    .titulo-ativacao {
+        margin-top: 4px;
+    }
+
+    .descricao-principal {
+        max-width: 500px;
+        margin: 0 auto 26px;
         color: #64748b;
         line-height: 1.7;
-        margin-bottom: 24px;
+        font-size: 16px;
     }
 
-    .plano-box,
+
+    /* =====================================================
+           PLANO
+        ===================================================== */
+
+    .plano-box {
+        background: linear-gradient( 145deg, #f8fafc, #f5f9ff );
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        padding: 28px;
+        margin: 24px 0 28px;
+    }
+
+    .plano-nome {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .plano-valor {
+        display: block;
+        font-size: 38px;
+        line-height: 1.1;
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .plano-periodo {
+        color: #64748b;
+        font-size: 15px;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    .parcelamento {
+        color: #64748b;
+        margin: 14px 0 20px;
+        font-size: 15px;
+    }
+
+    .separador-plano {
+        width: 100%;
+        height: 1px;
+        background: #e2e8f0;
+        margin: 22px 0;
+    }
+
+
+    /* =====================================================
+           MERCADO PAGO
+        ===================================================== */
+
+    .mercado-pago-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        text-align: left;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 16px 18px;
+    }
+
+    .icone-seguranca {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: #15803d;
+        font-weight: 900;
+    }
+
+    .mercado-pago-info strong {
+        display: block;
+        color: #0f172a;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .mercado-pago-info p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+
+    /* =====================================================
+           PLANO ATIVO
+        ===================================================== */
+
     .info-plano {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 24px;
         padding: 24px;
         margin: 24px 0;
-    }
-
-        .plano-box span,
-        .info-plano span {
-            display: block;
-            color: #94a3b8;
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .plano-box strong {
-            display: block;
-            font-size: 34px;
-            color: #0f172a;
-            margin-bottom: 10px;
-        }
-
-    .info-plano {
         display: grid;
         grid-template-columns: 1fr;
         gap: 14px;
@@ -287,54 +481,34 @@
             padding: 16px;
         }
 
+        .info-plano span {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
         .info-plano strong {
             color: #0f172a;
+            font-size: 15px;
         }
 
-    .acoes-pagamento {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
 
-    .btn-principal,
-    .btn-secundario {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 15px 22px;
-        border-radius: 16px;
-        text-decoration: none;
-        font-weight: 800;
-        transition: .25s;
-    }
-
-    .btn-principal {
-        color: white;
-        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-        box-shadow: 0 14px 28px rgba(14,165,233,.18);
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-secundario {
-        color: #0ea5e9;
-        background: white;
-        border: 1px solid #dbeafe;
-    }
-
-        .btn-principal:hover,
-        .btn-secundario:hover {
-            transform: translateY(-2px);
-        }
+    /* =====================================================
+           AVISOS
+        ===================================================== */
 
     .alerta-renovacao,
     .alerta-vencido {
-        padding: 16px;
+        padding: 16px 18px;
         border-radius: 16px;
         margin: 20px 0;
-        font-weight: 700;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.55;
     }
 
     .alerta-renovacao {
@@ -349,19 +523,131 @@
         border: 1px solid #fecaca;
     }
 
-    @@media(max-width: 600px) {
+
+    /* =====================================================
+           BOTÕES
+        ===================================================== */
+
+    .acoes-pagamento {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+        .acoes-pagamento form {
+            margin: 0;
+            display: flex;
+        }
+
+    .btn-principal,
+    .btn-secundario {
+        min-height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 24px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 800;
+        transition: transform .25s, box-shadow .25s, background .25s;
+    }
+
+    .btn-principal {
+        color: white;
+        background: linear-gradient( 135deg, #14b8a6, #0ea5e9 );
+        box-shadow: 0 14px 28px rgba(14,165,233,.18);
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-pagar {
+        min-width: 230px;
+    }
+
+    .btn-secundario {
+        color: #0284c7;
+        background: white;
+        border: 1px solid #dbeafe;
+    }
+
+        .btn-principal:hover,
+        .btn-secundario:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-principal:hover {
+        box-shadow: 0 18px 34px rgba(14,165,233,.25);
+    }
+
+    .btn-secundario:hover {
+        background: #f8fbff;
+    }
+
+
+    /* =====================================================
+           MOBILE
+        ===================================================== */
+
+    @@media (max-width: 600px) {
+
+        .pagamento-page {
+            padding: 22px 14px;
+        }
+
         .pagamento-card {
-            padding: 28px 22px;
+            padding: 28px 20px 30px;
+            border-radius: 26px;
+        }
+
+        .logo-area-pagamento {
+            margin-bottom: 16px;
+        }
+
+        .logo-pagamento {
+            width: 235px;
+            max-width: 85%;
         }
 
         h1 {
-            font-size: 30px;
+            font-size: 29px;
+            letter-spacing: -.8px;
         }
 
-        .acoes-pagamento,
-        .btn-principal,
-        .btn-secundario {
+        .descricao-principal {
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .plano-box {
+            padding: 22px 18px;
+            border-radius: 20px;
+        }
+
+        .plano-valor {
+            font-size: 34px;
+        }
+
+        .mercado-pago-info {
+            padding: 15px;
+        }
+
+        .acoes-pagamento {
             width: 100%;
+            flex-direction: column;
+        }
+
+            .acoes-pagamento form {
+                width: 100%;
+            }
+
+        .btn-principal,
+        .btn-secundario,
+        .btn-pagar {
+            width: 100%;
+            min-width: 0;
         }
     }
 
