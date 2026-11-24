@@ -10,7 +10,7 @@ namespace ProjetoTerapia
         {
             //ANSIEDADE 
             new Pergunta { Texto = "Seu emocional está sobrecarregado?", Tipo = "A", SimSaudavel = false },
-            new Pergunta { Texto = "Sua mente nunca desliga?", Tipo = "A", SimSaudavel = false },
+            new Pergunta { Texto = "Você tem dificuldade para desacelerar os pensamentos?", Tipo = "A", SimSaudavel = false },
             new Pergunta { Texto = "Você sente que perdeu o controle dos seus pensamentos?", Tipo = "A", SimSaudavel = false },
             new Pergunta { Texto = "Seu humor oscila ao longo do dia?", Tipo = "A", SimSaudavel = false },
             new Pergunta { Texto = "Você sente ansiedade sem motivo aparente?", Tipo = "A", SimSaudavel = false },

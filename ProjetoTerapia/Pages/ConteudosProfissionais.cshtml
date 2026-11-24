@@ -1,0 +1,1267 @@
+﻿@page "/profissional/conteudos"
+@model ProjetoTerapia.Pages.ConteudosProfissionaisModel
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+
+<div class="conteudos-page">
+
+    <div class="conteudos-container">
+
+
+        <!-- =====================================================
+             VOLTAR
+        ====================================================== -->
+
+        <a href="/profissional/painel"
+           class="voltar-painel">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Voltar ao painel
+
+        </a>
+
+
+        <!-- =====================================================
+             CABEÇALHO
+        ====================================================== -->
+
+        <header class="conteudos-header">
+
+            <div>
+
+                <span>
+                    Perfil profissional
+                </span>
+
+                <h1>
+                    Conteúdos do seu perfil
+                </h1>
+
+                <p>
+                    Publique conteúdos para apresentar seu trabalho
+                    aos pacientes que acessarem seu perfil.
+                </p>
+
+            </div>
+
+
+            <div class="contador-conteudos">
+
+                <strong>
+                    @Model.Conteudos.Count
+                </strong>
+
+                <span>
+                    /
+                    @ProjetoTerapia.Pages.ConteudosProfissionaisModel.LimiteConteudos
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             MENSAGENS
+        ====================================================== -->
+        @if (TempData["SucessoConteudo"] != null)
+        {
+            <div class="mensagem sucesso">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                @TempData["SucessoConteudo"]
+
+            </div>
+        }
+
+
+        @if (TempData["ErroConteudo"] != null)
+        {
+            <div class="mensagem erro">
+
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                @TempData["ErroConteudo"]
+
+            </div>
+        }
+
+
+        <!-- =====================================================
+             ADICIONAR
+        ====================================================== -->
+
+        <section class="adicionar-grid">
+
+
+            <!-- POST -->
+
+            <a href="/profissional/conteudos?novo=Imagem"
+               class="adicionar-card">
+
+                <div class="mais">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                </div>
+
+
+                <i class="fa-regular fa-image icone"></i>
+
+
+                <strong>
+                    Adicionar post
+                </strong>
+
+
+                <p>
+                    Imagem, título e legenda.
+                </p>
+
+            </a>
+
+
+            <!-- VÍDEO -->
+
+            <a href="/profissional/conteudos?novo=Video"
+               class="adicionar-card">
+
+                <div class="mais">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                </div>
+
+
+                <i class="fa-solid fa-video icone"></i>
+
+
+                <strong>
+                    Adicionar vídeo
+                </strong>
+
+
+                <p>
+                    Publique um vídeo sobre seu trabalho.
+                </p>
+
+            </a>
+
+
+        </section>
+
+
+        <!-- =====================================================
+             FORMULÁRIO NOVO CONTEÚDO
+        ====================================================== -->
+        @if (Model.Novo == "Imagem" ||
+                     Model.Novo == "Video")
+        {
+            var ehImagem =
+                Model.Novo == "Imagem";
+
+
+            <section class="novo-conteudo-box">
+
+
+                <div class="novo-conteudo-topo">
+
+
+                    <div>
+
+                        <span>
+                            Nova publicação
+                        </span>
+
+
+                        <h2>
+
+                            @(ehImagem
+                                ? "Adicionar post"
+                                : "Adicionar vídeo")
+
+                        </h2>
+
+
+                        <p>
+
+                            @(ehImagem
+                                ? "Escolha uma imagem e adicione título e legenda."
+                                : "Escolha um vídeo e conte um pouco sobre o conteúdo.")
+
+                        </p>
+
+                    </div>
+
+
+                    <a href="/profissional/conteudos"
+                       class="fechar-formulario"
+                       title="Fechar">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                    </a>
+
+
+                </div>
+
+
+                <form method="post"
+                      asp-page-handler="Criar"
+                      enctype="multipart/form-data"
+                      class="form-conteudo">
+
+
+                    <input type="hidden"
+                           asp-for="TipoNovo"
+                           value="@Model.Novo" />
+
+
+                    <!-- TÍTULO -->
+
+                    <div class="campo-conteudo">
+
+                        <label asp-for="Titulo">
+
+                            Título
+
+                        </label>
+
+
+                        <input asp-for="Titulo"
+                               maxlength="120"
+                               placeholder="Ex.: Como funciona a primeira consulta" />
+
+                    </div>
+
+
+                    <!-- LEGENDA -->
+
+                    <div class="campo-conteudo">
+
+                        <label asp-for="Legenda">
+
+                            Legenda
+
+                        </label>
+
+
+                        <textarea asp-for="Legenda"
+                                  maxlength="1000"
+                                  rows="4"
+                                  placeholder="Escreva uma breve descrição..."></textarea>
+
+                    </div>
+
+
+                    <!-- ARQUIVO -->
+
+                    <div class="campo-conteudo">
+
+                        <label asp-for="Arquivo">
+
+                            @(ehImagem
+                                ? "Imagem"
+                                : "Vídeo")
+
+                        </label>
+
+
+                        <div class="arquivo-box">
+
+                            <i class="@(ehImagem
+                                                               ? "fa-regular fa-image"
+                                                               : "fa-solid fa-video")">
+                            </i>
+
+
+                            <input asp-for="Arquivo"
+                                   type="file"
+                                   accept="@(ehImagem
+                                                                   ? ".jpg,.jpeg,.png,.webp"
+                                                                   : ".mp4,.webm")"
+                                   required />
+
+                        </div>
+
+
+                        <small>
+
+                            @(ehImagem
+                                ? "JPG, JPEG, PNG ou WEBP. Máximo de 10 MB."
+                                : "MP4 ou WEBM. Máximo de 100 MB.")
+
+                        </small>
+
+                    </div>
+
+
+                    <!-- PUBLICAR -->
+
+                    <button type="submit"
+                            class="btn-publicar-conteudo">
+
+                        <i class="fa-solid fa-paper-plane"></i>
+
+                        Publicar
+
+                    </button>
+
+
+                </form>
+
+
+            </section>
+        }
+
+
+        <!-- =====================================================
+             MEUS CONTEÚDOS
+        ====================================================== -->
+
+        <section class="meus-conteudos">
+
+
+            <div class="titulo-lista">
+
+                <div>
+
+                    <span>
+                        Publicações
+                    </span>
+
+
+                    <h2>
+                        Meus conteúdos
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SEM CONTEÚDO
+            ================================================== -->
+            @if (!Model.Conteudos.Any())
+            {
+                <div class="nenhum-conteudo">
+
+                    <i class="fa-regular fa-images"></i>
+
+
+                    <h3>
+                        Nenhum conteúdo publicado
+                    </h3>
+
+
+                    <p>
+                        Seus posts e vídeos aparecerão aqui.
+                    </p>
+
+                </div>
+            }
+
+            // =================================================
+            // COM CONTEÚDOS
+            // =================================================
+
+            else
+            {
+                <div class="lista-conteudos">
+
+
+                    @foreach (var conteudo in Model.Conteudos)
+                    {
+                        <article class="conteudo-item">
+
+
+                            <!-- =============================
+                                 PRÉVIA
+                            ============================== -->
+
+                            <div class="preview-conteudo">
+
+
+                                @if (conteudo.Tipo == "Imagem")
+                                {
+                                    <img src="@conteudo.UrlArquivo"
+                                         alt="@conteudo.Titulo" />
+                                }
+
+
+                                else if (conteudo.Tipo == "Video")
+                                {
+                                    <video controls
+                                           preload="metadata">
+
+                                        <source src="@conteudo.UrlArquivo" />
+
+                                        Seu navegador não suporta vídeos.
+
+                                    </video>
+                                }
+
+
+                            </div>
+
+
+                            <!-- =============================
+                                 INFORMAÇÕES
+                            ============================== -->
+
+                            <div class="conteudo-info">
+
+
+                                <div class="conteudo-tags">
+
+
+                                    <span class="tipo">
+
+                                        @(conteudo.Tipo == "Video"
+                                            ? "Vídeo"
+                                            : "Post")
+
+                                    </span>
+
+
+                                    <span class="status-publicacao @(conteudo.Ativo ? "ativo" : "oculto")">
+
+                                        @(conteudo.Ativo
+                                            ? "Publicado"
+                                            : "Oculto")
+
+                                    </span>
+
+
+                                </div>
+
+
+                                <h3>
+
+                                    @(string.IsNullOrWhiteSpace(
+                                            conteudo.Titulo)
+                                        ? "Sem título"
+                                        : conteudo.Titulo)
+
+                                </h3>
+
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                        conteudo.Legenda))
+                                {
+                                    <p>
+                                        @conteudo.Legenda
+                                    </p>
+                                }
+
+
+                                <small class="data-conteudo">
+
+                                    Publicado em
+                                    @conteudo.DataCadastro.ToString("dd/MM/yyyy")
+
+                                </small>
+
+
+                            </div>
+
+
+                            <!-- =============================
+                                 AÇÕES
+                            ============================== -->
+
+                            <div class="acoes-conteudo">
+
+
+                                <!-- PUBLICAR / OCULTAR -->
+
+                                <form method="post"
+                                      asp-page-handler="AlternarStatus">
+
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@conteudo.Id" />
+
+
+                                    <button type="submit">
+
+
+                                        @if (conteudo.Ativo)
+                                        {
+                                            <i class="fa-regular fa-eye-slash"></i>
+
+                                            <span>
+                                                Ocultar
+                                            </span>
+                                        }
+
+                                        else
+                                        {
+                                            <i class="fa-regular fa-eye"></i>
+
+                                            <span>
+                                                Publicar
+                                            </span>
+                                        }
+
+
+                                    </button>
+
+
+                                </form>
+
+
+                                <!-- EXCLUIR -->
+
+                                <form method="post"
+                                      asp-page-handler="Excluir"
+                                      onsubmit="return confirm('Deseja excluir este conteúdo permanentemente?');">
+
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@conteudo.Id" />
+
+
+                                    <button type="submit"
+                                            class="excluir">
+
+                                        <i class="fa-regular fa-trash-can"></i>
+
+                                        Excluir
+
+                                    </button>
+
+
+                                </form>
+
+
+                            </div>
+
+
+                        </article>
+                    }
+
+
+                </div>
+            }
+
+
+        </section>
+
+
+    </div>
+
+</div>
+
+
+<style>
+
+
+    /* =====================================================
+           PÁGINA
+        ====================================================== */
+
+    .conteudos-page {
+        min-height: 100vh;
+        padding: 40px 20px 70px;
+        background: linear-gradient( 145deg, #f8f7ff, #ffffff );
+    }
+
+
+    .conteudos-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: auto;
+    }
+
+
+    /* =====================================================
+           VOLTAR
+        ====================================================== */
+
+    .voltar-painel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        color: #6650bd;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+
+        .voltar-painel:hover {
+            color: #4e37a7;
+        }
+
+
+    /* =====================================================
+           HEADER
+        ====================================================== */
+
+    .conteudos-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+        padding: 30px;
+        border-radius: 22px;
+        background: white;
+        box-shadow: 0 12px 40px rgba(74, 56, 130, .08);
+        margin-bottom: 25px;
+    }
+
+
+        .conteudos-header > div > span {
+            color: #7557d7;
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .8px;
+        }
+
+
+        .conteudos-header h1 {
+            margin: 8px 0;
+            font-size: 30px;
+            color: #29263d;
+        }
+
+
+        .conteudos-header p {
+            margin: 0;
+            color: #716e7e;
+        }
+
+
+    /* =====================================================
+           CONTADOR
+        ====================================================== */
+
+    .contador-conteudos {
+        min-width: 105px;
+        padding: 16px;
+        border-radius: 16px;
+        background: #f3efff;
+        text-align: center;
+    }
+
+
+        .contador-conteudos strong {
+            font-size: 28px;
+            color: #6548c5;
+        }
+
+
+        .contador-conteudos span {
+            color: #8a839e;
+            font-weight: 700;
+        }
+
+
+    /* =====================================================
+           ADICIONAR
+        ====================================================== */
+
+    .adicionar-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+
+    .adicionar-card {
+        position: relative;
+        min-height: 190px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 2px dashed #d7ccf6;
+        border-radius: 20px;
+        text-align: center;
+        transition: transform .2s, border-color .2s, box-shadow .2s;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+
+
+        .adicionar-card:hover {
+            transform: translateY(-3px);
+            border-color: #8267d9;
+            box-shadow: 0 12px 30px rgba(83, 62, 150, .08);
+        }
+
+
+        .adicionar-card .mais {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            background: linear-gradient( 135deg, #6b4fd3, #9175e7 );
+        }
+
+
+        .adicionar-card .icone {
+            font-size: 31px;
+            color: #7054d0;
+            margin-bottom: 14px;
+        }
+
+
+        .adicionar-card strong {
+            color: #302c45;
+            font-size: 17px;
+        }
+
+
+        .adicionar-card p {
+            color: #817c90;
+            margin-bottom: 0;
+        }
+
+
+    /* =====================================================
+           FORMULÁRIO
+        ====================================================== */
+
+    .novo-conteudo-box {
+        background: white;
+        padding: 30px;
+        border-radius: 22px;
+        margin-bottom: 30px;
+        box-shadow: 0 12px 40px rgba(74, 56, 130, .07);
+    }
+
+
+    .novo-conteudo-topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+
+        .novo-conteudo-topo span {
+            color: #7255ce;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+
+        .novo-conteudo-topo h2 {
+            margin: 5px 0 8px;
+            color: #302d43;
+        }
+
+
+        .novo-conteudo-topo p {
+            margin: 0;
+            color: #777383;
+        }
+
+
+    .fechar-formulario {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background: #f3efff;
+        color: #684bc8;
+        transition: .2s;
+    }
+
+
+        .fechar-formulario:hover {
+            background: #e8e0ff;
+        }
+
+
+    .form-conteudo {
+        display: grid;
+        gap: 18px;
+    }
+
+
+    .campo-conteudo {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+
+        .campo-conteudo label {
+            font-weight: 700;
+            color: #403b55;
+        }
+
+
+        .campo-conteudo input,
+        .campo-conteudo textarea {
+            width: 100%;
+            border: 1px solid #ded8ef;
+            border-radius: 12px;
+            padding: 13px 14px;
+            outline: none;
+            font: inherit;
+            color: #302d43;
+            background: #ffffff;
+        }
+
+
+        .campo-conteudo textarea {
+            resize: vertical;
+            min-height: 115px;
+        }
+
+
+            .campo-conteudo input:focus,
+            .campo-conteudo textarea:focus {
+                border-color: #8267d9;
+                box-shadow: 0 0 0 3px rgba(130, 103, 217, .10);
+            }
+
+
+        .campo-conteudo small {
+            color: #888196;
+        }
+
+
+    .arquivo-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border: 1px dashed #d7ccf6;
+        border-radius: 14px;
+        background: #fbfaff;
+    }
+
+
+        .arquivo-box > i {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            color: #7054d0;
+            background: #f0ebff;
+        }
+
+
+        .arquivo-box input {
+            border: 0;
+            box-shadow: none;
+            background: transparent;
+            padding: 6px;
+        }
+
+
+    .btn-publicar-conteudo {
+        width: fit-content;
+        border: 0;
+        border-radius: 12px;
+        padding: 13px 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient( 135deg, #6b4fd3, #9175e7 );
+        transition: .2s;
+    }
+
+
+        .btn-publicar-conteudo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107, 79, 211, .25);
+        }
+
+
+    /* =====================================================
+           MEUS CONTEÚDOS
+        ====================================================== */
+
+    .meus-conteudos {
+        padding: 30px;
+        background: white;
+        border-radius: 22px;
+        box-shadow: 0 12px 40px rgba(74, 56, 130, .07);
+    }
+
+
+    .titulo-lista span {
+        color: #7255ce;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+
+    .titulo-lista h2 {
+        margin: 6px 0 22px;
+        color: #2e2a42;
+    }
+
+
+    /* =====================================================
+           VAZIO
+        ====================================================== */
+
+    .nenhum-conteudo {
+        padding: 55px 20px;
+        text-align: center;
+        border-radius: 18px;
+        background: #faf9ff;
+    }
+
+
+        .nenhum-conteudo > i {
+            font-size: 38px;
+            color: #9b88da;
+            margin-bottom: 12px;
+        }
+
+
+        .nenhum-conteudo h3 {
+            margin-bottom: 7px;
+            color: #343047;
+        }
+
+
+        .nenhum-conteudo p {
+            color: #837e91;
+        }
+
+
+    /* =====================================================
+           LISTA
+        ====================================================== */
+
+    .lista-conteudos {
+        display: grid;
+        gap: 15px;
+    }
+
+
+    .conteudo-item {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 20px;
+        padding: 18px;
+        border: 1px solid #eeeaf8;
+        border-radius: 18px;
+        background: #ffffff;
+    }
+
+
+    /* =====================================================
+           PREVIEW
+        ====================================================== */
+
+    .preview-conteudo {
+        width: 150px;
+        height: 110px;
+        overflow: hidden;
+        border-radius: 13px;
+        background: #f3f0fa;
+    }
+
+
+        .preview-conteudo img,
+        .preview-conteudo video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+
+    /* =====================================================
+           INFORMAÇÕES
+        ====================================================== */
+
+    .conteudo-info {
+        min-width: 0;
+    }
+
+
+    .conteudo-tags {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+
+    .conteudo-item .tipo {
+        color: #7155cc;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+
+    .status-publicacao {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+
+        .status-publicacao.ativo {
+            background: #e9fff1;
+            color: #25854c;
+        }
+
+
+        .status-publicacao.oculto {
+            background: #f2f0f5;
+            color: #77717f;
+        }
+
+
+    .conteudo-item h3 {
+        margin: 7px 0;
+        color: #302d43;
+    }
+
+
+    .conteudo-item p {
+        margin: 0 0 8px;
+        color: #777383;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+
+    .data-conteudo {
+        color: #aaa5b4;
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+           AÇÕES
+        ====================================================== */
+
+    .acoes-conteudo {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+
+        .acoes-conteudo form {
+            margin: 0;
+        }
+
+
+        .acoes-conteudo button {
+            border: 0;
+            padding: 9px 14px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            font-weight: 700;
+            background: #eee9ff;
+            color: #674bc4;
+            white-space: nowrap;
+        }
+
+
+            .acoes-conteudo button:hover {
+                background: #e4dcff;
+            }
+
+
+            .acoes-conteudo button.excluir {
+                background: #fff0f0;
+                color: #c44343;
+            }
+
+
+                .acoes-conteudo button.excluir:hover {
+                    background: #ffe2e2;
+                }
+
+
+    /* =====================================================
+           MENSAGENS
+        ====================================================== */
+
+    .mensagem {
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+
+        .mensagem.sucesso {
+            background: #edfff4;
+            color: #267446;
+        }
+
+
+        .mensagem.erro {
+            background: #fff0f0;
+            color: #ae3838;
+        }
+
+
+    /* =====================================================
+           TABLET
+        ====================================================== */
+
+    @@media (max-width: 900px) {
+
+        .conteudo-item {
+            grid-template-columns: 130px minmax(0, 1fr);
+        }
+
+
+        .preview-conteudo {
+            width: 130px;
+            height: 105px;
+        }
+
+
+        .acoes-conteudo {
+            grid-column: 1 / -1;
+            justify-content: flex-end;
+        }
+    }
+
+
+    /* =====================================================
+           MOBILE
+        ====================================================== */
+
+    @@media (max-width: 700px) {
+
+        .conteudos-page {
+            padding: 25px 14px 50px;
+        }
+
+
+        .conteudos-header {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 24px;
+        }
+
+
+            .conteudos-header h1 {
+                font-size: 26px;
+            }
+
+
+        .contador-conteudos {
+            width: 100%;
+        }
+
+
+        .adicionar-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .novo-conteudo-box {
+            padding: 22px 18px;
+        }
+
+
+        .novo-conteudo-topo {
+            flex-direction: column;
+        }
+
+
+        .fechar-formulario {
+            position: absolute;
+            right: 30px;
+        }
+
+
+        .btn-publicar-conteudo {
+            width: 100%;
+        }
+
+
+        .meus-conteudos {
+            padding: 22px 16px;
+        }
+
+
+        .conteudo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+
+        .preview-conteudo {
+            width: 100%;
+            height: 220px;
+        }
+
+
+        .conteudo-info {
+            width: 100%;
+        }
+
+
+        .acoes-conteudo {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+
+            .acoes-conteudo form {
+                flex: 1;
+            }
+
+
+            .acoes-conteudo button {
+                width: 100%;
+                justify-content: center;
+            }
+    }
+</style>

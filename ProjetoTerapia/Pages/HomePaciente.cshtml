@@ -6,7 +6,14 @@
     <aside class="sidebar">
 
         <div class="brand">
-            <img src="/imagem/AlinhaVIDA.png" alt="AlinhaVida" />
+            <a href="/"
+               class="brand-link"
+               title="Ir para a página inicial do AlinhaVIDA">
+
+                <img src="/imagem/AlinhaVIDA.png"
+                     alt="AlinhaVIDA" />
+
+            </a>
         </div>
 
         <nav class="menu">
@@ -131,7 +138,11 @@
 
             <div class="info-card">
                 <span class="number">01</span>
-                <h3>Entenda seus sinais</h3>
+
+                <h3>
+                    Entenda seus sinais
+                </h3>
+
                 <p>
                     Faça o teste emocional e acompanhe seus resultados ao longo do tempo.
                 </p>
@@ -139,18 +150,29 @@
 
             <div class="info-card">
                 <span class="number">02</span>
-                <h3>Registre sua evolução</h3>
+
+                <h3>
+                    Registre sua evolução
+                </h3>
+
                 <p>
                     Use o diário emocional para escrever sobre seus dias, sentimentos e pensamentos.
                 </p>
             </div>
 
-            <a href="/Clinicas" class="info-card info-card-link">
+            <a href="/Clinicas"
+               class="info-card info-card-link">
+
                 <span class="number">03</span>
-                <h3>Busque apoio</h3>
+
+                <h3>
+                    Busque apoio
+                </h3>
+
                 <p>
                     Encontre profissionais preparados para ajudar você em sua jornada.
                 </p>
+
             </a>
 
         </section>
@@ -160,42 +182,72 @@
             <div class="diario-card" id="diario">
 
                 <div class="section-title">
-                    <span>Check-in emocional</span>
-                    <h2>Como você está se sentindo hoje?</h2>
+
+                    <span>
+                        Check-in emocional
+                    </span>
+
+                    <h2>
+                        Como você está se sentindo hoje?
+                    </h2>
+
                     <p>
                         Escolha uma nota e escreva uma anotação sobre o seu dia.
                     </p>
+
                 </div>
 
                 <form method="post">
 
-                    <input type="hidden" asp-for="Nota" id="notaHumor" />
+                    <input type="hidden"
+                           asp-for="Nota"
+                           id="notaHumor" />
 
                     <div class="mood-options">
 
-                        <button type="button" class="mood-btn" data-nota="1">
+                        <button type="button"
+                                class="mood-btn"
+                                data-nota="1">
+
                             <strong>1</strong>
                             <span>Muito difícil</span>
+
                         </button>
 
-                        <button type="button" class="mood-btn" data-nota="2">
+                        <button type="button"
+                                class="mood-btn"
+                                data-nota="2">
+
                             <strong>2</strong>
                             <span>Difícil</span>
+
                         </button>
 
-                        <button type="button" class="mood-btn" data-nota="3">
+                        <button type="button"
+                                class="mood-btn"
+                                data-nota="3">
+
                             <strong>3</strong>
                             <span>Neutro</span>
+
                         </button>
 
-                        <button type="button" class="mood-btn" data-nota="4">
+                        <button type="button"
+                                class="mood-btn"
+                                data-nota="4">
+
                             <strong>4</strong>
                             <span>Bem</span>
+
                         </button>
 
-                        <button type="button" class="mood-btn" data-nota="5">
+                        <button type="button"
+                                class="mood-btn"
+                                data-nota="5">
+
                             <strong>5</strong>
                             <span>Muito bem</span>
+
                         </button>
 
                     </div>
@@ -203,7 +255,8 @@
                     <textarea asp-for="Observacao"
                               placeholder="Escreva aqui como foi seu dia, o que sentiu ou algo que deseja lembrar..."></textarea>
 
-                    <button type="submit" class="btn-save">
+                    <button type="submit"
+                            class="btn-save">
                         Salvar registro
                     </button>
 
@@ -211,11 +264,19 @@
 
             </div>
 
-            <div class="historico-card" id="historico">
+            <div class="historico-card"
+                 id="historico">
 
                 <div class="section-title">
-                    <span>Histórico recente</span>
-                    <h2>Seus últimos registros</h2>
+
+                    <span>
+                        Histórico recente
+                    </span>
+
+                    <h2>
+                        Seus últimos registros
+                    </h2>
+
                 </div>
 
                 @if (Model.Registros.Any())
@@ -238,9 +299,9 @@
 
                                     <p>
                                         @(string.IsNullOrWhiteSpace(item.Observacao)
-                                                                        ? "Sem anotação neste registro."
-                                                                        : item.Observacao)
-                            </p>
+                                            ? "Sem anotação neste registro."
+                                            : item.Observacao)
+                                    </p>
 
                                     <small>
                                         @item.Data.ToString("HH:mm")
@@ -249,17 +310,22 @@
                                 </div>
 
                             </div>
-                                        }
+                        }
 
                     </div>
                 }
                 else
                 {
                     <div class="empty-state">
-                        <h3>Nenhum registro ainda</h3>
+
+                        <h3>
+                            Nenhum registro ainda
+                        </h3>
+
                         <p>
                             Comece registrando como você está se sentindo hoje.
                         </p>
+
                     </div>
                 }
 
@@ -292,6 +358,11 @@
         display: flex;
     }
 
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+
     .sidebar {
         width: 280px;
         background: linear-gradient(180deg, #0f766e, #0ea5e9);
@@ -311,10 +382,22 @@
         text-align: center;
     }
 
-        .brand img {
-            width: 190px;
-            max-width: 100%;
-        }
+    .brand-link {
+        display: block;
+        text-decoration: none;
+    }
+
+    .brand img {
+        width: 190px;
+        max-width: 100%;
+        display: block;
+        margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       MENU
+    ========================================================= */
 
     .menu {
         display: flex;
@@ -322,26 +405,36 @@
         gap: 12px;
     }
 
-        .menu a {
-            color: rgba(255,255,255,.88);
-            text-decoration: none;
-            padding: 14px 16px;
-            border-radius: 14px;
-            font-weight: 500;
-            transition: .25s;
-        }
+    .menu a {
+        color: rgba(255,255,255,.88);
+        text-decoration: none;
+        padding: 14px 16px;
+        border-radius: 14px;
+        font-weight: 500;
+        transition: .25s;
+    }
 
-            .menu a:hover,
-            .menu a.active {
-                background: rgba(255,255,255,.16);
-                color: white;
-            }
+    .menu a:hover,
+    .menu a.active {
+        background: rgba(255,255,255,.16);
+        color: white;
+    }
+
+
+    /* =========================================================
+       CONTEÚDO
+    ========================================================= */
 
     .main-content {
         margin-left: 280px;
         width: calc(100% - 280px);
         padding: 38px;
     }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
 
     .hero {
         display: grid;
@@ -407,6 +500,11 @@
         border: 1px solid #dbeafe;
     }
 
+
+    /* =========================================================
+       RESUMO
+    ========================================================= */
+
     .hero-card {
         background: white;
         border-radius: 26px;
@@ -417,21 +515,26 @@
         box-shadow: 0 18px 40px rgba(15,23,42,.08);
     }
 
-        .hero-card span {
-            color: #64748b;
-            font-weight: 600;
-        }
+    .hero-card span {
+        color: #64748b;
+        font-weight: 600;
+    }
 
-        .hero-card h2 {
-            font-size: 70px;
-            color: #0ea5e9;
-            line-height: 1;
-            margin: 18px 0;
-        }
+    .hero-card h2 {
+        font-size: 70px;
+        color: #0ea5e9;
+        line-height: 1;
+        margin: 18px 0;
+    }
 
-        .hero-card p {
-            color: #64748b;
-        }
+    .hero-card p {
+        color: #64748b;
+    }
+
+
+    /* =========================================================
+       CARDS
+    ========================================================= */
 
     .cards-grid {
         display: grid;
@@ -448,28 +551,28 @@
         border: 1px solid #e2e8f0;
     }
 
-        .info-card .number {
-            display: inline-flex;
-            width: 42px;
-            height: 42px;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-            background: #ecfeff;
-            color: #0f766e;
-            font-weight: 800;
-            margin-bottom: 18px;
-        }
+    .info-card .number {
+        display: inline-flex;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: #ecfeff;
+        color: #0f766e;
+        font-weight: 800;
+        margin-bottom: 18px;
+    }
 
-        .info-card h3 {
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
+    .info-card h3 {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
 
-        .info-card p {
-            color: #64748b;
-            line-height: 1.6;
-        }
+    .info-card p {
+        color: #64748b;
+        line-height: 1.6;
+    }
 
     .info-card-link {
         text-decoration: none;
@@ -478,11 +581,16 @@
         transition: .25s;
     }
 
-        .info-card-link:hover {
-            transform: translateY(-3px);
-            border-color: #7dd3fc;
-            box-shadow: 0 22px 50px rgba(14,165,233,.12);
-        }
+    .info-card-link:hover {
+        transform: translateY(-3px);
+        border-color: #7dd3fc;
+        box-shadow: 0 22px 50px rgba(14,165,233,.12);
+    }
+
+
+    /* =========================================================
+       CONTEÚDO INFERIOR
+    ========================================================= */
 
     .content-grid {
         display: grid;
@@ -517,6 +625,11 @@
         margin-bottom: 22px;
     }
 
+
+    /* =========================================================
+       HUMOR
+    ========================================================= */
+
     .mood-options {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -534,29 +647,34 @@
         color: #334155;
     }
 
-        .mood-btn strong {
-            display: block;
-            font-size: 24px;
-            color: #0f766e;
-            margin-bottom: 6px;
-        }
+    .mood-btn strong {
+        display: block;
+        font-size: 24px;
+        color: #0f766e;
+        margin-bottom: 6px;
+    }
 
-        .mood-btn span {
-            font-size: 12px;
-            font-weight: 600;
-        }
+    .mood-btn span {
+        font-size: 12px;
+        font-weight: 600;
+    }
 
-        .mood-btn:hover,
-        .mood-btn.selected {
-            background: linear-gradient(135deg,#14b8a6,#0ea5e9);
-            color: white;
-            transform: translateY(-2px);
-        }
+    .mood-btn:hover,
+    .mood-btn.selected {
+        background: linear-gradient(135deg,#14b8a6,#0ea5e9);
+        color: white;
+        transform: translateY(-2px);
+    }
 
-            .mood-btn:hover strong,
-            .mood-btn.selected strong {
-                color: white;
-            }
+    .mood-btn:hover strong,
+    .mood-btn.selected strong {
+        color: white;
+    }
+
+
+    /* =========================================================
+       TEXTAREA
+    ========================================================= */
 
     textarea {
         width: 100%;
@@ -571,11 +689,11 @@
         line-height: 1.6;
     }
 
-        textarea:focus {
-            border-color: #0ea5e9;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(14,165,233,.12);
-        }
+    textarea:focus {
+        border-color: #0ea5e9;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(14,165,233,.12);
+    }
 
     .btn-save {
         margin-top: 16px;
@@ -589,6 +707,11 @@
         font-size: 16px;
         cursor: pointer;
     }
+
+
+    /* =========================================================
+       HISTÓRICO
+    ========================================================= */
 
     .timeline {
         display: flex;
@@ -639,14 +762,19 @@
         text-align: center;
     }
 
-        .empty-state h3 {
-            margin-bottom: 8px;
-        }
+    .empty-state h3 {
+        margin-bottom: 8px;
+    }
 
-        .empty-state p {
-            color: #64748b;
-            line-height: 1.6;
-        }
+    .empty-state p {
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       RESULTADO DO TESTE
+    ========================================================= */
 
     .resultado-teste-card {
         background: white;
@@ -661,29 +789,29 @@
         gap: 24px;
     }
 
-        .resultado-teste-card.vazio {
-            grid-template-columns: 1fr auto;
-        }
+    .resultado-teste-card.vazio {
+        grid-template-columns: 1fr auto;
+    }
 
-            .resultado-info-principal span,
-            .resultado-teste-card.vazio span {
-                color: #0ea5e9;
-                font-size: 14px;
-                font-weight: 800;
-            }
+    .resultado-info-principal span,
+    .resultado-teste-card.vazio span {
+        color: #0ea5e9;
+        font-size: 14px;
+        font-weight: 800;
+    }
 
-            .resultado-info-principal h2,
-            .resultado-teste-card.vazio h2 {
-                margin: 8px 0;
-                font-size: 28px;
-                color: #0f172a;
-            }
+    .resultado-info-principal h2,
+    .resultado-teste-card.vazio h2 {
+        margin: 8px 0;
+        font-size: 28px;
+        color: #0f172a;
+    }
 
-            .resultado-info-principal p,
-            .resultado-teste-card.vazio p {
-                color: #64748b;
-                line-height: 1.6;
-            }
+    .resultado-info-principal p,
+    .resultado-teste-card.vazio p {
+        color: #64748b;
+        line-height: 1.6;
+    }
 
     .resultado-info-principal small {
         display: block;
@@ -696,27 +824,27 @@
         gap: 14px;
     }
 
-        .resultado-numeros div {
-            min-width: 130px;
-            padding: 18px;
-            border-radius: 20px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-        }
+    .resultado-numeros div {
+        min-width: 130px;
+        padding: 18px;
+        border-radius: 20px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
 
-        .resultado-numeros span {
-            display: block;
-            color: #64748b;
-            font-size: 13px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+    .resultado-numeros span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
 
-        .resultado-numeros strong {
-            font-size: 26px;
-            color: #0ea5e9;
-        }
+    .resultado-numeros strong {
+        font-size: 26px;
+        color: #0ea5e9;
+    }
 
     .btn-refazer-teste {
         padding: 15px 22px;
@@ -727,6 +855,11 @@
         font-weight: 800;
         white-space: nowrap;
     }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================= */
 
     @@media(max-width: 1000px) {
 
@@ -752,9 +885,9 @@
             grid-template-columns: 1fr;
         }
 
-            .hero h1 {
-                font-size: 34px;
-            }
+        .hero h1 {
+            font-size: 34px;
+        }
 
         .resultado-teste-card,
         .resultado-teste-card.vazio {
@@ -768,15 +901,16 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-            .resultado-numeros div {
-                min-width: 0;
-            }
+        .resultado-numeros div {
+            min-width: 0;
+        }
 
         .btn-refazer-teste {
             width: 100%;
             text-align: center;
         }
     }
+
 
     /* =========================================================
        MOBILE - HOME DO PACIENTE
@@ -793,13 +927,13 @@
             border-radius: 26px;
         }
 
-            .hero h1 {
-                font-size: 30px;
-            }
+        .hero h1 {
+            font-size: 30px;
+        }
 
-            .hero p {
-                font-size: 15px;
-            }
+        .hero p {
+            font-size: 15px;
+        }
 
         .hero-actions {
             display: grid;
@@ -818,9 +952,9 @@
             border-radius: 24px;
         }
 
-            .hero-card h2 {
-                font-size: 58px;
-            }
+        .hero-card h2 {
+            font-size: 58px;
+        }
 
         .resultado-teste-card {
             padding: 24px 20px;
@@ -828,35 +962,35 @@
             overflow: hidden;
         }
 
-            .resultado-info-principal h2,
-            .resultado-teste-card.vazio h2 {
-                font-size: 30px;
-                line-height: 1.2;
-            }
+        .resultado-info-principal h2,
+        .resultado-teste-card.vazio h2 {
+            font-size: 30px;
+            line-height: 1.2;
+        }
 
-            .resultado-info-principal p,
-            .resultado-teste-card.vazio p {
-                font-size: 15px;
-            }
+        .resultado-info-principal p,
+        .resultado-teste-card.vazio p {
+            font-size: 15px;
+        }
 
         .resultado-numeros {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
 
-            .resultado-numeros div {
-                padding: 14px 10px;
-                border-radius: 18px;
-            }
+        .resultado-numeros div {
+            padding: 14px 10px;
+            border-radius: 18px;
+        }
 
-            .resultado-numeros span {
-                font-size: 12px;
-            }
+        .resultado-numeros span {
+            font-size: 12px;
+        }
 
-            .resultado-numeros strong {
-                font-size: 22px;
-                word-break: break-word;
-            }
+        .resultado-numeros strong {
+            font-size: 22px;
+            word-break: break-word;
+        }
 
         .diario-card,
         .historico-card,
@@ -885,17 +1019,17 @@
             border-radius: 16px;
         }
 
-            .mood-btn strong {
-                font-size: 24px;
-                margin-bottom: 4px;
-            }
+        .mood-btn strong {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
 
-            .mood-btn span {
-                display: block;
-                font-size: 10px;
-                line-height: 1.2;
-                font-weight: 700;
-            }
+        .mood-btn span {
+            display: block;
+            font-size: 10px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
 
         textarea {
             min-height: 130px;
@@ -915,6 +1049,11 @@
         }
     }
 
+
+    /* =========================================================
+       CELULARES PEQUENOS
+    ========================================================= */
+
     @@media(max-width: 420px) {
 
         .resultado-numeros {
@@ -931,29 +1070,40 @@
             padding: 8px 3px;
         }
 
-            .mood-btn strong {
-                font-size: 22px;
-            }
+        .mood-btn strong {
+            font-size: 22px;
+        }
 
-            .mood-btn span {
-                font-size: 9px;
-            }
+        .mood-btn span {
+            font-size: 9px;
+        }
     }
 
 </style>
 
 <script>
-    const botoesHumor = document.querySelectorAll('.mood-btn');
-    const inputNota = document.getElementById('notaHumor');
+
+    const botoesHumor =
+        document.querySelectorAll('.mood-btn');
+
+    const inputNota =
+        document.getElementById('notaHumor');
 
     botoesHumor.forEach(botao => {
+
         botao.addEventListener('click', () => {
 
-            botoesHumor.forEach(b => b.classList.remove('selected'));
+            botoesHumor.forEach(
+                b => b.classList.remove('selected')
+            );
 
             botao.classList.add('selected');
 
-            inputNota.value = botao.getAttribute('data-nota');
+            inputNota.value =
+                botao.getAttribute('data-nota');
+
         });
+
     });
+
 </script>

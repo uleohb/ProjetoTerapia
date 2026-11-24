@@ -22,6 +22,98 @@ namespace ProjetoTerapia.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ProjetoTerapia.Models.AceiteTermoProfissional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AceitouCobrancaRecorrente")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AceitouPoliticaPrivacidade")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AceitouTermos")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ClinicaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CpfSnapshot")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime>("DataAceiteUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiasTesteGratisInformados")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DocumentoSnapshot")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EmailSnapshot")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("HashPoliticaPrivacidade")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("HashTermos")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("IpAceite")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NomeProfissionalSnapshot")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OrigemAceite")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PeriodicidadeInformada")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("ValorInformado")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("VersaoPoliticaPrivacidade")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("VersaoTermos")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClinicaId");
+
+                    b.HasIndex("ClinicaId", "VersaoTermos");
+
+                    b.ToTable("AceitesTermosProfissionais");
+                });
+
             modelBuilder.Entity("ProjetoTerapia.Models.AdminLog", b =>
                 {
                     b.Property<int>("Id")
@@ -247,6 +339,119 @@ namespace ProjetoTerapia.Migrations
                     b.ToTable("AlteracoesClinicas");
                 });
 
+            modelBuilder.Entity("ProjetoTerapia.Models.AssinaturaProfissional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ClinicaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataAtualizacaoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataAutorizacaoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataCancelamentoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataCriacaoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataUltimoPagamentoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiasTesteGratis")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExternalReference")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("FimTesteGratisUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Frequencia")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("InicioTesteGratisUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LinkAutorizacao")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("MercadoPagoPlanId")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("MercadoPagoPreapprovalId")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Moeda")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("NomePlano")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Observacao")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ProximaCobrancaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("RenovacaoAutomatica")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("StatusUltimoPagamento")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TipoFrequencia")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UltimoPagamentoId")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("Valor")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClinicaId");
+
+                    b.HasIndex("ExternalReference");
+
+                    b.HasIndex("MercadoPagoPreapprovalId")
+                        .IsUnique()
+                        .HasFilter("[MercadoPagoPreapprovalId] IS NOT NULL");
+
+                    b.ToTable("AssinaturasProfissionais");
+                });
+
             modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
                 {
                     b.Property<int>("Id")
@@ -285,10 +490,17 @@ namespace ProjetoTerapia.Migrations
                     b.Property<string>("CodigoVendedorIndicacao")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ConselhoProfissional")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime?>("DataAprovacao")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DataPagamento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataValidacaoProfissional")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DataVencimento")
@@ -337,10 +549,33 @@ namespace ProjetoTerapia.Migrations
                     b.Property<string>("NomePlano")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NomeRetornadoConselho")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NumeroRegistroProfissional")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("OrigemValidacaoProfissional")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<bool>("Pago")
                         .HasColumnType("bit");
 
                     b.Property<bool>("PerfilCompleto")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Profissao")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RQE")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("RegistroProfissionalValidado")
                         .HasColumnType("bit");
 
                     b.Property<string>("SenhaHash")
@@ -350,14 +585,25 @@ namespace ProjetoTerapia.Migrations
                     b.Property<string>("Site")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StatusValidacaoProfissional")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("Telefone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UfRegistroProfissional")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
                     b.Property<decimal>("Valor")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("ValorPlano")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("VendedorId")
@@ -431,6 +677,58 @@ namespace ProjetoTerapia.Migrations
                     b.HasIndex("ResultadoTestePacienteId");
 
                     b.ToTable("Consultas");
+                });
+
+            modelBuilder.Entity("ProjetoTerapia.Models.ConteudoProfissional", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ClinicaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DataAtualizacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Legenda")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Titulo")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("UrlArquivo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UrlThumbnail")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClinicaId");
+
+                    b.ToTable("ConteudosProfissionais");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.DivulgacaoRegional", b =>
@@ -787,6 +1085,16 @@ namespace ProjetoTerapia.Migrations
                     b.ToTable("RecuperacoesSenha");
                 });
 
+            modelBuilder.Entity("ProjetoTerapia.Models.AceiteTermoProfissional", b =>
+                {
+                    b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
+                        .WithMany("AceitesTermosProfissionais")
+                        .HasForeignKey("ClinicaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Clinica");
+                });
+
             modelBuilder.Entity("ProjetoTerapia.Models.AdminLog", b =>
                 {
                     b.HasOne("ProjetoTerapia.Models.AdminUsuario", "AdminUsuario")
@@ -805,6 +1113,16 @@ namespace ProjetoTerapia.Migrations
                         .HasForeignKey("ClinicaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Clinica");
+                });
+
+            modelBuilder.Entity("ProjetoTerapia.Models.AssinaturaProfissional", b =>
+                {
+                    b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
+                        .WithMany("AssinaturasProfissionais")
+                        .HasForeignKey("ClinicaId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Clinica");
                 });
@@ -839,6 +1157,17 @@ namespace ProjetoTerapia.Migrations
                     b.Navigation("Paciente");
 
                     b.Navigation("ResultadoTestePaciente");
+                });
+
+            modelBuilder.Entity("ProjetoTerapia.Models.ConteudoProfissional", b =>
+                {
+                    b.HasOne("ProjetoTerapia.Models.Clinica", "Clinica")
+                        .WithMany()
+                        .HasForeignKey("ClinicaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Clinica");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.DivulgacaoRegional", b =>
@@ -920,6 +1249,13 @@ namespace ProjetoTerapia.Migrations
                         .IsRequired();
 
                     b.Navigation("Clinica");
+                });
+
+            modelBuilder.Entity("ProjetoTerapia.Models.Clinica", b =>
+                {
+                    b.Navigation("AceitesTermosProfissionais");
+
+                    b.Navigation("AssinaturasProfissionais");
                 });
 
             modelBuilder.Entity("ProjetoTerapia.Models.Paciente", b =>

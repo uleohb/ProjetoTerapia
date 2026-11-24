@@ -47,6 +47,13 @@ namespace ProjetoTerapia.Pages
         public bool PacienteLogado { get; set; }
 
 
+        // ID do profissional atualmente logado.
+        // Usado somente para permitir que ele visualize
+        // o próprio card na vitrine mesmo quando o perfil
+        // estiver marcado como não público.
+        public int? ClinicaLogadaId { get; set; }
+
+
         // =====================================================
         // GET
         // =====================================================
@@ -59,6 +66,31 @@ namespace ProjetoTerapia.Pages
                         "PacienteLogado"
                     )
                 );
+
+
+            // =================================================
+            // PROFISSIONAL LOGADO
+            // =================================================
+            //
+            // Quando existe uma clínica logada, guardamos o ID
+            // dela para permitir uma prévia privada na vitrine.
+            // Isso NÃO torna o perfil público para pacientes ou
+            // visitantes: somente a própria sessão profissional
+            // consegue enxergar o card invisível.
+
+            var clinicaLogadaSessao =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
+
+
+            if (int.TryParse(
+                    clinicaLogadaSessao,
+                    out int idClinicaLogada))
+            {
+                ClinicaLogadaId =
+                    idClinicaLogada;
+            }
 
 
             /*
@@ -81,12 +113,6 @@ namespace ProjetoTerapia.Pages
              * alterações nessas clínicas.
              *
              * Isso reduz memória e processamento.
-             *
-             * ExibirPublicamente:
-             *
-             * Permite manter contas de teste funcionando
-             * normalmente no sistema, mas escondidas da
-             * vitrine pública.
              */
 
             IQueryable<Clinica> query =
@@ -96,7 +122,13 @@ namespace ProjetoTerapia.Pages
                         c =>
                             c.Aprovado &&
                             c.Pago &&
-                            c.ExibirPublicamente
+                            (
+                                c.ExibirPublicamente ||
+                                (
+                                    ClinicaLogadaId.HasValue &&
+                                    c.Id == ClinicaLogadaId.Value
+                                )
+                            )
                     );
 
 

@@ -8,12 +8,25 @@
 
     <div class="pagamento-card">
 
-        <!-- LOGO -->
         <div class="logo-area-pagamento">
             <img src="/imagem/AlinhaVIDA.png"
                  class="logo-pagamento"
                  alt="AlinhaVIDA" />
         </div>
+
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="mensagem sucesso">
+                @TempData["Sucesso"]
+            </div>
+        }
+
+        @if (TempData["Erro"] != null)
+        {
+            <div class="mensagem erro">
+                @TempData["Erro"]
+            </div>
+        }
 
         @if (Model.Clinica != null)
         {
@@ -37,21 +50,164 @@
                     Voltar ao painel
                 </a>
             }
+            else if (Model.AssinaturaAtiva)
+            {
+                <span class="badge-pagamento ativo">
+                    Assinatura ativa
+                </span>
+
+                @if (Model.EmTesteGratis)
+                {
+                    <h1>
+                        Seus 7 dias gratuitos estão ativos
+                    </h1>
+
+                    <p class="descricao-principal">
+                        Seu plano profissional já está liberado.
+                        Nenhuma cobrança foi realizada neste momento.
+                    </p>
+
+                    <div class="trial-ativo">
+                        <span class="trial-icone">✓</span>
+
+                        <div>
+                            <strong>
+                                Período gratuito em andamento
+                            </strong>
+
+                            <p>
+                                Sua primeira cobrança de
+                                <strong>R$ 450,00</strong>
+                                será realizada após o término dos 7 dias gratuitos.
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <h1>
+                        Sua assinatura está ativa
+                    </h1>
+
+                    <p class="descricao-principal">
+                        Seu plano profissional está ativo
+                        e possui renovação automática anual.
+                    </p>
+                }
+
+                <div class="info-plano">
+
+                    <div>
+                        <span>Plano</span>
+                        <strong>Plano Profissional Anual</strong>
+                    </div>
+
+                    <div>
+                        <span>Valor</span>
+                        <strong>R$ 450,00 / ano</strong>
+                    </div>
+
+                    @if (Model.EmTesteGratis &&
+                         Model.FimTesteGratisLocal.HasValue)
+                    {
+                        <div>
+                            <span>Fim dos 7 dias grátis</span>
+
+                            <strong>
+                                @Model.FimTesteGratisLocal.Value.ToString("dd/MM/yyyy")
+                            </strong>
+                        </div>
+                    }
+
+                    @if (Model.ProximaCobrancaLocal.HasValue)
+                    {
+                        <div>
+                            <span>Próxima cobrança</span>
+
+                            <strong>
+                                @Model.ProximaCobrancaLocal.Value.ToString("dd/MM/yyyy")
+                            </strong>
+                        </div>
+                    }
+
+                    <div>
+                        <span>Renovação automática</span>
+                        <strong class="status-renovacao">Ativada</strong>
+                    </div>
+
+                </div>
+
+                <p class="observacao-cancelamento">
+                    Na próxima etapa vamos colocar no painel
+                    a opção de gerenciar e cancelar a assinatura.
+                </p>
+
+                <a asp-page="/PainelClinica"
+                   class="btn-principal">
+                    Ir para o painel
+                </a>
+            }
+            else if (Model.AssinaturaPendente)
+            {
+                <span class="badge-pagamento pendente">
+                    Autorização pendente
+                </span>
+
+                <h1>
+                    Falta concluir sua assinatura
+                </h1>
+
+                <p class="descricao-principal">
+                    Sua assinatura já foi criada.
+                    Conclua a autorização no Mercado Pago
+                    para iniciar os 7 dias gratuitos.
+                </p>
+
+                <div class="plano-box">
+
+                    <div class="trial-destaque">
+                        <span>7 dias grátis</span>
+                        <strong>R$ 0 hoje</strong>
+                    </div>
+
+                    <p class="texto-pendente">
+                        Depois do período gratuito, o plano passa a custar
+                        <strong>R$ 450,00 por ano</strong>,
+                        com renovação automática até o cancelamento.
+                    </p>
+
+                </div>
+
+                <div class="acoes-pagamento">
+
+                    <a href="@(Model.AssinaturaAtual?.LinkAutorizacao)"
+                       class="btn-principal btn-pagar">
+                        Continuar no Mercado Pago
+                    </a>
+
+                    <a asp-page="/PainelClinica"
+                       class="btn-secundario">
+                        Voltar ao painel
+                    </a>
+
+                </div>
+            }
             else if (Model.Clinica.Pago &&
                      !Model.PlanoVencido &&
                      !Model.PlanoPertoDeVencer)
             {
                 <span class="badge-pagamento ativo">
-                    Plano ativo
+                    Plano atual ativo
                 </span>
 
                 <h1>
-                    Sua assinatura está ativa
+                    Seu plano profissional está ativo
                 </h1>
 
                 <p class="descricao-principal">
-                    Seu perfil profissional já está liberado na plataforma.
-                    O pagamento só será necessário novamente próximo ao vencimento.
+                    Seu plano atual continua válido.
+                    A assinatura recorrente ficará disponível
+                    quando chegar o período de renovação.
                 </p>
 
                 <div class="info-plano">
@@ -66,10 +222,7 @@
 
                     <div>
                         <span>Valor</span>
-
-                        <strong>
-                            @Model.ValorPlanoFormatado
-                        </strong>
+                        <strong>@Model.ValorPlanoFormatado</strong>
                     </div>
 
                     <div>
@@ -91,47 +244,42 @@
             }
             else
             {
-                <!-- SEM BADGE "ATIVAÇÃO PROFISSIONAL" -->
+                <span class="badge-pagamento teste">
+                    7 dias grátis
+                </span>
 
                 <h1 class="titulo-ativacao">
-                    @if (Model.PlanoVencido)
-                    {
-                        <text>Renove seu plano profissional</text>
-                    }
-                    else if (Model.PlanoPertoDeVencer)
-                    {
-                        <text>Renove sua assinatura</text>
-                    }
-                    else
-                    {
-                        <text>Ative seu plano profissional</text>
-                    }
+                    Ative seu plano profissional
                 </h1>
 
                 <p class="descricao-principal">
-                    Após a confirmação do pagamento,
-                    seu perfil fica disponível para pacientes
-                    encontrarem você na plataforma.
+                    Autorize sua assinatura agora e use o AlinhaVIDA
+                    por 7 dias sem cobrança.
                 </p>
 
                 @if (Model.PlanoPertoDeVencer)
                 {
                     <div class="alerta-renovacao">
-                        Seu plano vence em
+                        Seu plano atual vence em
                         <strong>@Model.DiasRestantes dia(s)</strong>.
-                        Você já pode realizar a renovação.
                     </div>
                 }
 
                 @if (Model.PlanoVencido)
                 {
                     <div class="alerta-vencido">
-                        Seu plano está vencido.
-                        Renove para manter seu perfil ativo na plataforma.
+                        Seu plano anterior está vencido.
+                        Ative a nova assinatura para continuar utilizando
+                        os recursos do plano profissional.
                     </div>
                 }
 
                 <div class="plano-box">
+
+                    <div class="trial-destaque">
+                        <span>Primeiros 7 dias</span>
+                        <strong>GRÁTIS</strong>
+                    </div>
 
                     <span class="plano-nome">
                         Plano Profissional Anual
@@ -142,29 +290,53 @@
                     </strong>
 
                     <div class="plano-periodo">
-                        por ano
+                        por ano, após o período gratuito
                     </div>
 
                     <p class="parcelamento">
-                        Equivalente a 12x de R$ 37,50.
+                        Hoje: <strong>R$ 0,00</strong>.
+                        A primeira cobrança ocorre somente
+                        depois dos 7 dias gratuitos.
                     </p>
 
                     <div class="separador-plano"></div>
 
-                    <div class="mercado-pago-info">
+                    <div class="beneficios-plano">
 
-                        <div class="icone-seguranca">
-                            ✓
+                        <div>
+                            <span>✓</span>
+                            Perfil profissional na plataforma
                         </div>
 
                         <div>
+                            <span>✓</span>
+                            Conteúdos profissionais no perfil
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            Acesso aos recursos do painel profissional
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            Renovação automática anual
+                        </div>
+
+                    </div>
+
+                    <div class="mercado-pago-info">
+
+                        <div class="icone-seguranca">✓</div>
+
+                        <div>
                             <strong>
-                                Pagamento seguro via Mercado Pago
+                                Assinatura segura via Mercado Pago
                             </strong>
 
                             <p>
-                                Após a confirmação do pagamento,
-                                seu plano será ativado automaticamente.
+                                O meio de pagamento é autorizado
+                                no ambiente do Mercado Pago.
                             </p>
                         </div>
 
@@ -172,24 +344,79 @@
 
                 </div>
 
-                <div class="acoes-pagamento">
+                <form method="post"
+                      asp-page-handler="Pagar"
+                      id="formAssinatura">
 
-                    <form method="post"
-                          asp-page-handler="Pagar">
+                    <div class="termos-box">
+
+                        <label class="aceite-item">
+
+                            <input asp-for="AceitouTermosEPrivacidade"
+                                   id="aceiteTermos" />
+
+                            <span class="check-visual"></span>
+
+                            <span class="texto-aceite">
+                                Li e aceito os
+                                <a href="/termos/profissionais"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    Termos de Uso do Profissional
+                                </a>
+                                e a
+                                <a href="/politica-de-privacidade"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    Política de Privacidade
+                                </a>.
+                            </span>
+
+                        </label>
+
+                        <label class="aceite-item">
+
+                            <input asp-for="AceitouCobrancaRecorrente"
+                                   id="aceiteCobranca" />
+
+                            <span class="check-visual"></span>
+
+                            <span class="texto-aceite">
+                                Estou ciente de que terei
+                                <strong>7 dias gratuitos</strong>
+                                e, após esse período, será realizada
+                                cobrança de
+                                <strong>R$ 450,00 por ano</strong>,
+                                com renovação automática anual
+                                até o cancelamento.
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                    <p class="aviso-aceite">
+                        Os dois aceites são obrigatórios
+                        para iniciar a assinatura.
+                    </p>
+
+                    <div class="acoes-pagamento">
 
                         <button type="submit"
-                                class="btn-principal btn-pagar">
-                            Pagar com Mercado Pago
+                                class="btn-principal btn-pagar"
+                                id="btnAssinar"
+                                disabled>
+                            Aceitar e iniciar 7 dias grátis
                         </button>
 
-                    </form>
+                        <a asp-page="/PainelClinica"
+                           class="btn-secundario">
+                            Voltar ao painel
+                        </a>
 
-                    <a asp-page="/PainelClinica"
-                       class="btn-secundario">
-                        Voltar ao painel
-                    </a>
+                    </div>
 
-                </div>
+                </form>
             }
         }
 
@@ -197,15 +424,9 @@
 
 </div>
 
-
 <style>
 
     @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
-
-    /* =====================================================
-           GERAL
-        ===================================================== */
 
     * {
         box-sizing: border-box;
@@ -228,11 +449,6 @@
         background: transparent !important;
     }
 
-
-    /* =====================================================
-           PÁGINA
-        ===================================================== */
-
     .pagamento-page {
         min-height: 100vh;
         display: flex;
@@ -241,13 +457,11 @@
         padding: 40px 20px;
         position: relative;
         overflow: hidden;
-        background: radial-gradient( circle at top left, rgba(14,165,233,.20), transparent 34% ), radial-gradient( circle at bottom right, rgba(124,58,237,.16), transparent 35% ), linear-gradient( 135deg, #e0f7ff 0%, #f8fcff 48%, #edf3ff 100% );
+        background:
+            radial-gradient(circle at top left, rgba(14,165,233,.20), transparent 34%),
+            radial-gradient(circle at bottom right, rgba(124,58,237,.16), transparent 35%),
+            linear-gradient(135deg, #e0f7ff 0%, #f8fcff 48%, #edf3ff 100%);
     }
-
-
-    /* =====================================================
-           EFEITOS DE FUNDO
-        ===================================================== */
 
     .rgb {
         position: absolute;
@@ -272,17 +486,12 @@
         right: -100px;
     }
 
-
-    /* =====================================================
-           CARD
-        ===================================================== */
-
     .pagamento-card {
         width: 100%;
-        max-width: 620px;
+        max-width: 660px;
         position: relative;
         z-index: 2;
-        background: rgba(255,255,255,.94);
+        background: rgba(255,255,255,.95);
         border: 1px solid rgba(226,232,240,.95);
         backdrop-filter: blur(18px);
         border-radius: 34px;
@@ -291,16 +500,9 @@
         text-align: center;
     }
 
-
-    /* =====================================================
-           LOGO
-        ===================================================== */
-
     .logo-area-pagamento {
-        width: 100%;
         display: flex;
         justify-content: center;
-        align-items: center;
         margin-bottom: 18px;
     }
 
@@ -310,13 +512,29 @@
         max-width: 82%;
         height: auto;
         object-fit: contain;
-        margin: 0 auto;
     }
 
+    .mensagem {
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin: 0 0 20px;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.55;
+        text-align: left;
+    }
 
-    /* =====================================================
-           BADGES
-        ===================================================== */
+    .mensagem.sucesso {
+        color: #166534;
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+    }
+
+    .mensagem.erro {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+    }
 
     .badge-pagamento {
         display: inline-block;
@@ -329,20 +547,25 @@
         margin-bottom: 18px;
     }
 
-        .badge-pagamento.ativo {
-            background: #dcfce7;
-            color: #166534;
-        }
+    .badge-pagamento.ativo {
+        background: #dcfce7;
+        color: #166534;
+    }
 
-        .badge-pagamento.analise {
-            background: #fef3c7;
-            color: #92400e;
-        }
+    .badge-pagamento.analise {
+        background: #fef3c7;
+        color: #92400e;
+    }
 
+    .badge-pagamento.teste {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
 
-    /* =====================================================
-           TEXTO
-        ===================================================== */
+    .badge-pagamento.pendente {
+        background: #e0f2fe;
+        color: #075985;
+    }
 
     h1 {
         margin: 0 0 14px;
@@ -353,29 +576,42 @@
         font-weight: 800;
     }
 
-    .titulo-ativacao {
-        margin-top: 4px;
-    }
-
     .descricao-principal {
-        max-width: 500px;
+        max-width: 520px;
         margin: 0 auto 26px;
         color: #64748b;
         line-height: 1.7;
         font-size: 16px;
     }
 
-
-    /* =====================================================
-           PLANO
-        ===================================================== */
-
     .plano-box {
-        background: linear-gradient( 145deg, #f8fafc, #f5f9ff );
+        background: linear-gradient(145deg, #f8fafc, #f5f9ff);
         border: 1px solid #e2e8f0;
         border-radius: 24px;
         padding: 28px;
-        margin: 24px 0 28px;
+        margin: 24px 0;
+    }
+
+    .trial-destaque {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 22px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #ede9fe, #e0f2fe);
+        color: #4c1d95;
+        text-align: left;
+    }
+
+    .trial-destaque span {
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .trial-destaque strong {
+        font-size: 18px;
+        font-weight: 900;
     }
 
     .plano-nome {
@@ -389,48 +625,84 @@
     .plano-valor {
         display: block;
         font-size: 38px;
-        line-height: 1.1;
         color: #0f172a;
         font-weight: 800;
     }
 
     .plano-periodo {
         color: #64748b;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
-        margin-top: 4px;
+        margin-top: 6px;
     }
 
-    .parcelamento {
+    .parcelamento,
+    .texto-pendente {
         color: #64748b;
         margin: 14px 0 20px;
-        font-size: 15px;
+        font-size: 14px;
+        line-height: 1.65;
     }
 
     .separador-plano {
-        width: 100%;
         height: 1px;
         background: #e2e8f0;
         margin: 22px 0;
     }
 
+    .beneficios-plano {
+        display: grid;
+        gap: 11px;
+        margin-bottom: 20px;
+        text-align: left;
+    }
 
-    /* =====================================================
-           MERCADO PAGO
-        ===================================================== */
+    .beneficios-plano div {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 600;
+    }
 
-    .mercado-pago-info {
+    .beneficios-plano span {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .mercado-pago-info,
+    .trial-ativo {
         display: flex;
         align-items: flex-start;
         gap: 12px;
         text-align: left;
-        background: white;
-        border: 1px solid #e2e8f0;
         border-radius: 18px;
         padding: 16px 18px;
     }
 
-    .icone-seguranca {
+    .mercado-pago-info {
+        background: white;
+        border: 1px solid #e2e8f0;
+    }
+
+    .trial-ativo {
+        margin-bottom: 22px;
+        background: #f5f3ff;
+        border: 1px solid #c4b5fd;
+    }
+
+    .icone-seguranca,
+    .trial-icone {
         width: 34px;
         height: 34px;
         min-width: 34px;
@@ -438,29 +710,109 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background: #dcfce7;
-        color: #15803d;
         font-weight: 900;
     }
 
-    .mercado-pago-info strong {
-        display: block;
-        color: #0f172a;
-        font-size: 14px;
-        margin-bottom: 4px;
+    .icone-seguranca {
+        background: #dcfce7;
+        color: #15803d;
     }
 
-    .mercado-pago-info p {
-        margin: 0;
+    .trial-icone {
+        background: #7c3aed;
+        color: white;
+    }
+
+    .mercado-pago-info strong,
+    .trial-ativo strong {
+        color: #0f172a;
+        font-size: 14px;
+    }
+
+    .mercado-pago-info p,
+    .trial-ativo p {
+        margin: 4px 0 0;
         color: #64748b;
         font-size: 13px;
         line-height: 1.55;
     }
 
+    .termos-box {
+        margin: 6px 0 12px;
+        display: grid;
+        gap: 12px;
+        text-align: left;
+    }
 
-    /* =====================================================
-           PLANO ATIVO
-        ===================================================== */
+    .aceite-item {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px 16px;
+        border: 1px solid #dbe4ee;
+        border-radius: 16px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .aceite-item:hover {
+        border-color: #93c5fd;
+        background: #f8fbff;
+    }
+
+    .aceite-item input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .check-visual {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        margin-top: 2px;
+        border: 2px solid #94a3b8;
+        border-radius: 6px;
+        background: white;
+        position: relative;
+    }
+
+    .aceite-item input[type="checkbox"]:checked + .check-visual {
+        border-color: #0ea5e9;
+        background: #0ea5e9;
+    }
+
+    .aceite-item input[type="checkbox"]:checked + .check-visual::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    .texto-aceite {
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    .texto-aceite a {
+        color: #0284c7;
+        font-weight: 800;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .aviso-aceite {
+        margin: 0 0 20px;
+        color: #94a3b8;
+        font-size: 12px;
+    }
 
     .info-plano {
         background: #f8fafc;
@@ -469,46 +821,49 @@
         padding: 24px;
         margin: 24px 0;
         display: grid;
-        grid-template-columns: 1fr;
         gap: 14px;
         text-align: left;
     }
 
-        .info-plano div {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 16px;
-        }
+    .info-plano div {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 16px;
+    }
 
-        .info-plano span {
-            display: block;
-            color: #94a3b8;
-            font-size: 12px;
-            font-weight: 800;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: .3px;
-        }
+    .info-plano span {
+        display: block;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
 
-        .info-plano strong {
-            color: #0f172a;
-            font-size: 15px;
-        }
+    .info-plano strong {
+        color: #0f172a;
+        font-size: 15px;
+    }
 
+    .status-renovacao {
+        color: #15803d !important;
+    }
 
-    /* =====================================================
-           AVISOS
-        ===================================================== */
+    .observacao-cancelamento {
+        margin: -8px 0 22px;
+        color: #94a3b8;
+        font-size: 12px;
+        line-height: 1.55;
+    }
 
     .alerta-renovacao,
     .alerta-vencido {
         padding: 16px 18px;
         border-radius: 16px;
         margin: 20px 0;
-        font-weight: 600;
         font-size: 14px;
-        line-height: 1.55;
+        font-weight: 600;
     }
 
     .alerta-renovacao {
@@ -523,23 +878,12 @@
         border: 1px solid #fecaca;
     }
 
-
-    /* =====================================================
-           BOTÕES
-        ===================================================== */
-
     .acoes-pagamento {
         display: flex;
         gap: 12px;
         justify-content: center;
-        align-items: stretch;
         flex-wrap: wrap;
     }
-
-        .acoes-pagamento form {
-            margin: 0;
-            display: flex;
-        }
 
     .btn-principal,
     .btn-secundario {
@@ -552,19 +896,25 @@
         text-decoration: none;
         font-size: 14px;
         font-weight: 800;
-        transition: transform .25s, box-shadow .25s, background .25s;
+        transition: .2s;
     }
 
     .btn-principal {
         color: white;
-        background: linear-gradient( 135deg, #14b8a6, #0ea5e9 );
+        background: linear-gradient(135deg, #14b8a6, #0ea5e9);
         box-shadow: 0 14px 28px rgba(14,165,233,.18);
         border: none;
         cursor: pointer;
     }
 
+    .btn-principal:disabled {
+        cursor: not-allowed;
+        opacity: .45;
+        box-shadow: none;
+    }
+
     .btn-pagar {
-        min-width: 230px;
+        min-width: 270px;
     }
 
     .btn-secundario {
@@ -572,24 +922,6 @@
         background: white;
         border: 1px solid #dbeafe;
     }
-
-        .btn-principal:hover,
-        .btn-secundario:hover {
-            transform: translateY(-2px);
-        }
-
-    .btn-principal:hover {
-        box-shadow: 0 18px 34px rgba(14,165,233,.25);
-    }
-
-    .btn-secundario:hover {
-        background: #f8fbff;
-    }
-
-
-    /* =====================================================
-           MOBILE
-        ===================================================== */
 
     @@media (max-width: 600px) {
 
@@ -602,46 +934,29 @@
             border-radius: 26px;
         }
 
-        .logo-area-pagamento {
-            margin-bottom: 16px;
-        }
-
         .logo-pagamento {
             width: 235px;
-            max-width: 85%;
         }
 
         h1 {
             font-size: 29px;
-            letter-spacing: -.8px;
         }
 
         .descricao-principal {
             font-size: 14px;
-            line-height: 1.65;
         }
 
         .plano-box {
             padding: 22px 18px;
-            border-radius: 20px;
         }
 
-        .plano-valor {
-            font-size: 34px;
-        }
-
-        .mercado-pago-info {
-            padding: 15px;
-        }
-
-        .acoes-pagamento {
-            width: 100%;
+        .trial-destaque {
             flex-direction: column;
         }
 
-            .acoes-pagamento form {
-                width: 100%;
-            }
+        .acoes-pagamento {
+            flex-direction: column;
+        }
 
         .btn-principal,
         .btn-secundario,
@@ -652,3 +967,31 @@
     }
 
 </style>
+
+<script>
+    (function () {
+
+        const termos =
+            document.getElementById("aceiteTermos");
+
+        const cobranca =
+            document.getElementById("aceiteCobranca");
+
+        const botao =
+            document.getElementById("btnAssinar");
+
+        if (!termos || !cobranca || !botao)
+            return;
+
+        function atualizar() {
+            botao.disabled =
+                !termos.checked ||
+                !cobranca.checked;
+        }
+
+        termos.addEventListener("change", atualizar);
+        cobranca.addEventListener("change", atualizar);
+
+        atualizar();
+    })();
+</script>

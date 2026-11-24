@@ -1,7 +1,7 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,118 +11,315 @@ namespace ProjetoTerapia.Pages
     {
         private readonly AppDbContext _context;
 
+
         public Clinica Clinica { get; set; } = new();
 
-        public List<string> ListaEspecialidades { get; set; } = new();
 
-        public bool EhDonoPerfil { get; set; } = false;
+        public List<string> ListaEspecialidades { get; set; }
+            = new();
 
-        public PerfilClinicaModel(AppDbContext context)
+
+        public List<ConteudoProfissional> Conteudos { get; set; }
+            = new();
+
+
+        public bool EhDonoPerfil { get; set; }
+            = false;
+
+
+        public bool PacienteLogado { get; set; }
+            = false;
+
+
+        public PerfilClinicaModel(
+            AppDbContext context)
         {
             _context = context;
         }
 
-        public bool PacienteLogado { get; set; } = false;
 
-        public IActionResult OnGet(int? id)
+        // =====================================================
+        // GET
+        // =====================================================
+
+        public IActionResult OnGet(
+            int? id)
         {
-            var clinicaLogada = HttpContext.Session.GetString("ClinicaLogada");
-            var pacienteLogado = HttpContext.Session.GetString("PacienteLogado");
+            var clinicaLogada =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
 
-            PacienteLogado = !string.IsNullOrEmpty(pacienteLogado);
+
+            var pacienteLogado =
+                HttpContext.Session.GetString(
+                    "PacienteLogado"
+                );
+
+
+            PacienteLogado =
+                !string.IsNullOrEmpty(
+                    pacienteLogado
+                );
+
+
+            // =================================================
+            // PERFIL ABERTO PELO ID
+            // =================================================
 
             if (id.HasValue)
             {
-                Clinica = _context.Clinicas
-                    .FirstOrDefault(c => c.Id == id.Value)!;
+                Clinica =
+                    _context.Clinicas
+                        .FirstOrDefault(c =>
+                            c.Id == id.Value
+                        )!;
+
 
                 if (Clinica == null)
                 {
                     return NotFound();
                 }
 
+
                 EhDonoPerfil =
                     pacienteLogado == null &&
                     clinicaLogada != null &&
-                    int.TryParse(clinicaLogada, out int clinicaLogadaId) &&
+                    int.TryParse(
+                        clinicaLogada,
+                        out int clinicaLogadaId
+                    ) &&
                     clinicaLogadaId == Clinica.Id;
 
+
+                // =================================================
+                // PERFIL INVISÍVEL
+                // =================================================
+                //
+                // Se o profissional desativou a exibição pública,
+                // somente o próprio profissional logado consegue
+                // abrir a página de prévia.
+                //
+                // Visitantes e pacientes recebem 404 mesmo que
+                // tentem acessar a URL diretamente pelo ID.
+
+                if (!Clinica.ExibirPublicamente &&
+                    !EhDonoPerfil)
+                {
+                    return NotFound();
+                }
+
+
+                // Não contamos visualização do próprio dono.
                 if (!EhDonoPerfil)
                 {
                     Clinica.Visualizacoes++;
+
                     _context.SaveChanges();
                 }
             }
+
+            // =================================================
+            // PRÓPRIO PROFISSIONAL SEM ID
+            // =================================================
+
             else
             {
                 if (clinicaLogada == null)
                 {
-                    return RedirectToPage("/LoginClinica");
+                    return RedirectToPage(
+                        "/LoginClinica"
+                    );
                 }
 
-                Clinica = _context.Clinicas
-                    .FirstOrDefault(c => c.Id == int.Parse(clinicaLogada))!;
+
+                if (!int.TryParse(
+                        clinicaLogada,
+                        out int clinicaId))
+                {
+                    HttpContext.Session.Remove(
+                        "ClinicaLogada"
+                    );
+
+
+                    return RedirectToPage(
+                        "/LoginClinica"
+                    );
+                }
+
+
+                Clinica =
+                    _context.Clinicas
+                        .FirstOrDefault(c =>
+                            c.Id == clinicaId
+                        )!;
+
 
                 if (Clinica == null)
                 {
-                    return RedirectToPage("/LoginClinica");
+                    HttpContext.Session.Remove(
+                        "ClinicaLogada"
+                    );
+
+
+                    return RedirectToPage(
+                        "/LoginClinica"
+                    );
                 }
 
-                EhDonoPerfil = true;
+
+                EhDonoPerfil =
+                    true;
             }
 
+
             CarregarEspecialidades();
+
+            CarregarConteudos();
+
 
             return Page();
         }
 
-        public IActionResult OnGetWhatsapp(int id)
+
+        // =====================================================
+        // WHATSAPP
+        // =====================================================
+
+        public IActionResult OnGetWhatsapp(
+            int id)
         {
-            var clinica = _context.Clinicas
-                .FirstOrDefault(c => c.Id == id);
+            var clinica =
+                _context.Clinicas
+                    .FirstOrDefault(c =>
+                        c.Id == id
+                    );
+
 
             if (clinica == null)
             {
                 return NotFound();
             }
 
-            var clinicaLogada = HttpContext.Session.GetString("ClinicaLogada");
-            var pacienteLogado = HttpContext.Session.GetString("PacienteLogado");
+
+            var clinicaLogada =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
+
+
+            var pacienteLogado =
+                HttpContext.Session.GetString(
+                    "PacienteLogado"
+                );
+
 
             var ehDono =
                 pacienteLogado == null &&
                 clinicaLogada != null &&
-                int.TryParse(clinicaLogada, out int clinicaLogadaId) &&
+                int.TryParse(
+                    clinicaLogada,
+                    out int clinicaLogadaId
+                ) &&
                 clinicaLogadaId == clinica.Id;
+
+
+            // Perfil invisível não deve permitir contato público
+            // por URL direta. O próprio dono ainda pode abrir
+            // sua página de prévia normalmente.
+            if (!clinica.ExibirPublicamente &&
+                !ehDono)
+            {
+                return NotFound();
+            }
+
 
             if (!ehDono)
             {
                 clinica.CliquesWhatsapp++;
+
                 _context.SaveChanges();
             }
 
-            var telefone = new string((clinica.Telefone ?? "")
-                .Where(char.IsDigit)
-                .ToArray());
 
-            if (string.IsNullOrWhiteSpace(telefone))
+            var telefone =
+                new string(
+                    (clinica.Telefone ?? "")
+                        .Where(
+                            char.IsDigit
+                        )
+                        .ToArray()
+                );
+
+
+            if (string.IsNullOrWhiteSpace(
+                    telefone))
             {
-                return RedirectToPage("/PerfilClinica", new { id = clinica.Id });
+                return RedirectToPage(
+                    "/PerfilClinica",
+                    new
+                    {
+                        id = clinica.Id
+                    }
+                );
             }
 
-            return Redirect($"https://wa.me/{telefone}");
+
+            return Redirect(
+                $"https://wa.me/{telefone}"
+            );
         }
+
+
+        // =====================================================
+        // ESPECIALIDADES
+        // =====================================================
 
         private void CarregarEspecialidades()
         {
-            if (!string.IsNullOrEmpty(Clinica.Especialidades))
+            ListaEspecialidades.Clear();
+
+
+            if (!string.IsNullOrEmpty(
+                    Clinica.Especialidades))
             {
-                ListaEspecialidades = Clinica.Especialidades
-                    .Split(',')
-                    .Select(e => e.Trim())
-                    .Where(e => !string.IsNullOrWhiteSpace(e))
-                    .ToList();
+                ListaEspecialidades =
+                    Clinica.Especialidades
+                        .Split(',')
+                        .Select(e =>
+                            e.Trim()
+                        )
+                        .Where(e =>
+                            !string.IsNullOrWhiteSpace(
+                                e
+                            )
+                        )
+                        .ToList();
             }
+        }
+
+
+        // =====================================================
+        // CONTEÚDOS DO PERFIL
+        // =====================================================
+
+        private void CarregarConteudos()
+        {
+            Conteudos =
+                _context
+                    .ConteudosProfissionais
+                    .Where(c =>
+                        c.ClinicaId == Clinica.Id &&
+                        c.Ativo
+                    )
+                    .OrderBy(c =>
+                        c.Ordem
+                    )
+                    .ThenByDescending(c =>
+                        c.DataCadastro
+                    )
+                    .Take(6)
+                    .ToList();
         }
     }
 }

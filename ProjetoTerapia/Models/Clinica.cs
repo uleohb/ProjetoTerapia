@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoTerapia.Models
 {
@@ -19,6 +18,7 @@ namespace ProjetoTerapia.Models
 
         public string Telefone { get; set; } = "";
 
+
         // =====================================================
         // STATUS DA CONTA
         // =====================================================
@@ -27,6 +27,16 @@ namespace ProjetoTerapia.Models
 
         public bool ClinicaAlteracaoPendente { get; set; } = false;
 
+        /*
+         * Mantemos Pago por compatibilidade com o sistema atual.
+         *
+         * Depois que a assinatura recorrente estiver totalmente
+         * implementada, esse campo continuará servindo como um
+         * indicador rápido de acesso ao plano.
+         *
+         * A fonte principal do status financeiro passará a ser
+         * AssinaturaProfissional.
+         */
         public bool Pago { get; set; } = false;
 
 
@@ -57,8 +67,10 @@ namespace ProjetoTerapia.Models
 
         public string SenhaHash { get; set; } = "";
 
+
         [NotMapped]
         public string Senha { get; set; } = "";
+
 
         [NotMapped]
         public string ConfirmarSenha { get; set; } = "";
@@ -70,7 +82,7 @@ namespace ProjetoTerapia.Models
 
         public string Especialidades { get; set; } = "";
 
-        public string Documento { get; set; } = ""; // CRP, CRM, etc.
+        public string Documento { get; set; } = "";
 
         public string CEP { get; set; } = "";
 
@@ -84,29 +96,34 @@ namespace ProjetoTerapia.Models
 
         public string? Site { get; set; }
 
-        public string CPF { get; set; } = ""; // para pessoa física
+        public string CPF { get; set; } = "";
 
 
         // =====================================================
         // APROVAÇÃO
         // =====================================================
 
-        // Data em que a clínica/profissional foi aprovado.
         public DateTime? DataAprovacao { get; set; }
 
 
         // =====================================================
-        // PLANO
+        // PLANO - CAMPOS LEGADOS / COMPATIBILIDADE
         // =====================================================
+
+        /*
+         * Esses campos continuam existindo porque várias
+         * páginas atuais do AlinhaVIDA ainda dependem deles.
+         *
+         * A nova assinatura recorrente ficará registrada
+         * também na tabela AssinaturasProfissionais.
+         */
 
         public string? NomePlano { get; set; }
 
         public decimal? ValorPlano { get; set; }
 
-        // Data em que o pagamento foi confirmado.
         public DateTime? DataPagamento { get; set; }
 
-        // Vencimento da assinatura anual.
         public DateTime? DataVencimento { get; set; }
 
 
@@ -135,11 +152,85 @@ namespace ProjetoTerapia.Models
 
 
         // =====================================================
-        // MERCADO PAGO
+        // MERCADO PAGO - CAMPOS LEGADOS
         // =====================================================
+
+        /*
+         * Mantidos temporariamente para não quebrar
+         * o fluxo de pagamento atual.
+         *
+         * Assinaturas recorrentes passarão a utilizar
+         * AssinaturaProfissional.
+         */
 
         public string? MercadoPagoPlanoPaymentId { get; set; }
 
         public string? MercadoPagoPlanoStatus { get; set; }
+
+
+        // =====================================================
+        // IDENTIFICAÇÃO PROFISSIONAL
+        // =====================================================
+
+        [StringLength(50)]
+        public string? Profissao { get; set; }
+
+
+        [StringLength(20)]
+        public string? ConselhoProfissional { get; set; }
+
+
+        [StringLength(50)]
+        public string? NumeroRegistroProfissional { get; set; }
+
+
+        [StringLength(2)]
+        public string? UfRegistroProfissional { get; set; }
+
+
+        [StringLength(50)]
+        public string? RQE { get; set; }
+
+
+        // =====================================================
+        // VALIDAÇÃO PROFISSIONAL
+        // =====================================================
+
+        public bool RegistroProfissionalValidado { get; set; } = false;
+
+
+        [StringLength(30)]
+        public string StatusValidacaoProfissional { get; set; } = "Pendente";
+
+
+        public DateTime? DataValidacaoProfissional { get; set; }
+
+
+        [StringLength(200)]
+        public string? NomeRetornadoConselho { get; set; }
+
+
+        [StringLength(50)]
+        public string? OrigemValidacaoProfissional { get; set; }
+
+
+        // =====================================================
+        // ASSINATURAS RECORRENTES
+        // =====================================================
+
+        public ICollection<AssinaturaProfissional>
+            AssinaturasProfissionais
+        { get; set; }
+            = new List<AssinaturaProfissional>();
+
+
+        // =====================================================
+        // ACEITES DOS TERMOS
+        // =====================================================
+
+        public ICollection<AceiteTermoProfissional>
+            AceitesTermosProfissionais
+        { get; set; }
+            = new List<AceiteTermoProfissional>();
     }
 }

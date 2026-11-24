@@ -264,12 +264,30 @@ app.UseAuthorization();
 
 
 // =============================================================
-// HOME
+// REDIRECIONAMENTO DA URL ANTIGA
 // =============================================================
 
-app.MapGet("/", context =>
+/*
+ * A página Teste.cshtml agora utiliza:
+ *
+ * @page "/"
+ *
+ * Portanto, a página principal oficial é:
+ *
+ * https://alinhavida.com.br/
+ *
+ * Este redirecionamento existe apenas para quem ainda acessar
+ * algum link antigo com /Teste.
+ *
+ * Não usamos redirecionamento permanente enquanto validamos,
+ * para evitar cache de redirecionamento no navegador.
+ */
+app.MapGet("/Teste", context =>
 {
-    context.Response.Redirect("/Teste");
+    context.Response.Redirect(
+        "/",
+        permanent: false
+    );
 
     return Task.CompletedTask;
 });
