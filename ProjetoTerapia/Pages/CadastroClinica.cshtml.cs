@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
-using Microsoft.AspNetCore.Hosting;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
@@ -35,28 +37,46 @@ namespace ProjetoTerapia.Pages
         [BindProperty]
         public string? CodigoVendedor { get; set; } = "";
 
+        // =====================================================
+        // GET
+        // =====================================================
+
         public IActionResult OnGet(string? vendedor)
         {
             CapturarCodigoVendedor(vendedor);
 
-            var id = HttpContext.Session.GetString("ClinicaLogada");
+            var id =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
 
-            if (id != null)
+            if (!string.IsNullOrWhiteSpace(id) &&
+                int.TryParse(id, out int clinicaId))
             {
-                var clinica = _context.Clinicas
-                    .FirstOrDefault(c => c.Id == int.Parse(id));
+                var clinica =
+                    _context.Clinicas
+                        .FirstOrDefault(
+                            c => c.Id == clinicaId
+                        );
 
                 if (clinica != null)
                 {
                     NovaClinica = clinica;
 
-                    if (!string.IsNullOrEmpty(clinica.Especialidades))
+                    if (!string.IsNullOrWhiteSpace(
+                        clinica.Especialidades))
                     {
-                        EspecialidadesSelecionadas = clinica.Especialidades
-                            .Split(',')
-                            .Select(e => e.Trim())
-                            .Where(e => !string.IsNullOrWhiteSpace(e))
-                            .ToList();
+                        EspecialidadesSelecionadas =
+                            clinica.Especialidades
+                                .Split(',')
+                                .Select(
+                                    e => e.Trim()
+                                )
+                                .Where(
+                                    e =>
+                                        !string.IsNullOrWhiteSpace(e)
+                                )
+                                .ToList();
                     }
                 }
             }
@@ -64,42 +84,110 @@ namespace ProjetoTerapia.Pages
             return Page();
         }
 
+        // =====================================================
+        // POST
+        // =====================================================
+
         public IActionResult OnPost()
         {
-            ModelState.Remove(nameof(CodigoVendedor));
+            ModelState.Remove(
+                nameof(CodigoVendedor)
+            );
 
-            CapturarCodigoVendedor(CodigoVendedor);
+            CapturarCodigoVendedor(
+                CodigoVendedor
+            );
 
-            CapturarCodigoVendedor(CodigoVendedor);
+            var id =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
 
-            var id = HttpContext.Session.GetString("ClinicaLogada");
+            Clinica clinica;
 
-            Clinica? clinica;
-            bool editandoPerfil = id != null;
+            var editandoPerfil =
+                !string.IsNullOrWhiteSpace(id);
+
+            // =================================================
+            // EDIÇÃO
+            // =================================================
 
             if (editandoPerfil)
             {
-                clinica = _context.Clinicas
-                    .FirstOrDefault(c => c.Id == int.Parse(id!));
-
-                if (clinica == null)
+                if (!int.TryParse(
+                    id,
+                    out int clinicaId))
                 {
-                    return RedirectToPage("/LoginClinica");
+                    return RedirectToPage(
+                        "/LoginClinica"
+                    );
                 }
+
+                var clinicaExistente =
+                    _context.Clinicas
+                        .FirstOrDefault(
+                            c => c.Id == clinicaId
+                        );
+
+                if (clinicaExistente == null)
+                {
+                    return RedirectToPage(
+                        "/LoginClinica"
+                    );
+                }
+
+                clinica =
+                    clinicaExistente;
+
+                /*
+                 * Não existe mais aprovação manual.
+                 *
+                 * Mantemos Aprovado = true somente
+                 * por compatibilidade com partes antigas
+                 * do sistema.
+                 */
+                clinica.Aprovado =
+                    true;
+
+                clinica.ClinicaAlteracaoPendente =
+                    false;
             }
+
+            // =================================================
+            // NOVO CADASTRO
+            // =================================================
+
             else
             {
-                clinica = new Clinica();
+                clinica =
+                    new Clinica
+                    {
+                        /*
+                         * Cadastro liberado automaticamente.
+                         * Não existe mais aprovação manual.
+                         */
+                        Aprovado = true,
 
-                clinica.Aprovado = false;
-                clinica.Pago = false;
-                clinica.PerfilCompleto = false;
-                clinica.ClinicaAlteracaoPendente = false;
+                        Pago = false,
 
-                AplicarVendedorNaClinica(clinica);
+                        PerfilCompleto = false,
 
-                _context.Clinicas.Add(clinica);
+                        ClinicaAlteracaoPendente =
+                            false
+                    };
+
+                AplicarVendedorNaClinica(
+                    clinica
+                );
+
+                _context.Clinicas.Add(
+                    clinica
+                );
             }
+
+            // =================================================
+            // TIPO DE ATENDIMENTO
+            // =================================================
 
             if (!NovaClinica.AtendimentoOnline &&
                 !NovaClinica.AtendimentoPresencial)
@@ -110,284 +198,414 @@ namespace ProjetoTerapia.Pages
                 );
 
                 RecarregarEspecialidadesSelecionadas();
+
                 return Page();
             }
+
+            // =================================================
+            // NORMALIZAÇÃO
+            // =================================================
 
             NormalizarCPF();
+
             NormalizarCEP();
+
             NormalizarTelefone();
+
             NormalizarInstagram();
+
             NormalizarSite();
 
-            if (!ValidarDadosDaClinica(clinica))
+            // =================================================
+            // VALIDAÇÕES
+            // =================================================
+
+            if (!ValidarDadosDaClinica(
+                clinica))
             {
                 RecarregarEspecialidadesSelecionadas();
+
                 return Page();
             }
 
-            var especialidadesTexto = ObterEspecialidadesFormatadas();
+            // =================================================
+            // ESPECIALIDADES
+            // =================================================
 
-            var fotoNova = SalvarFotoRecortada();
+            var especialidadesTexto =
+                ObterEspecialidadesFormatadas();
 
-            /*
-                REGRA IMPORTANTE:
-                Se a clínica já foi aprovada, não salva direto no perfil público.
-                Cria uma solicitação de alteração para o admin aprovar.
-            */
-            if (editandoPerfil && clinica.Aprovado)
-            {
-                CriarOuAtualizarAlteracaoPendente(
-                    clinica,
-                    especialidadesTexto,
-                    fotoNova
-                );
+            // =================================================
+            // FOTO
+            // =================================================
 
-                clinica.ClinicaAlteracaoPendente = true;
+            var fotoNova =
+                SalvarFotoRecortada();
 
-                _context.SaveChanges();
+            // =================================================
+            // SALVAR DIRETAMENTE
+            // =================================================
+            //
+            // Não existe mais fluxo de alteração pendente
+            // ou aprovação pelo administrador.
+            //
 
-                TempData["Sucesso"] =
-                    "Alterações salvas com sucesso. Aguarde a aprovação da nossa equipe.";
-
-                return RedirectToPage("/CadastroClinica");
-            }
-
-            /*
-                Se for cadastro novo ou perfil ainda não aprovado,
-                pode salvar direto porque ainda não aparece publicamente.
-            */
             AtualizarClinicaDireto(
                 clinica,
                 especialidadesTexto,
                 fotoNova
             );
 
+            /*
+             * Garante compatibilidade com qualquer
+             * código antigo que ainda consulte Aprovado.
+             */
+            clinica.Aprovado =
+                true;
+
+            clinica.ClinicaAlteracaoPendente =
+                false;
+
             _context.SaveChanges();
+
+            // =================================================
+            // NOVO CADASTRO
+            // =================================================
 
             if (!editandoPerfil)
             {
-                HttpContext.Session.Remove("PacienteLogado");
+                HttpContext.Session.Remove(
+                    "PacienteLogado"
+                );
 
                 HttpContext.Session.SetString(
                     "ClinicaLogada",
                     clinica.Id.ToString()
                 );
+
+                TempData["Sucesso"] =
+                    "Cadastro concluído. Agora ative seu plano para iniciar os 7 dias grátis.";
+
+                return RedirectToPage(
+                    "/PagamentoClinica"
+                );
             }
 
-            TempData["Sucesso"] =
-                "Cadastro enviado com sucesso. Aguarde a análise da nossa equipe.";
+            // =================================================
+            // EDIÇÃO
+            // =================================================
 
-            return RedirectToPage("/CadastroClinica");
+            TempData["Sucesso"] =
+                "Alterações salvas com sucesso.";
+
+            return RedirectToPage(
+                "/CadastroClinica"
+            );
         }
+
+        // =====================================================
+        // ATUALIZAR CLÍNICA
+        // =====================================================
 
         private void AtualizarClinicaDireto(
             Clinica clinica,
             string especialidadesTexto,
             string? fotoNova)
         {
-            clinica.Especialidades = especialidadesTexto;
+            clinica.Especialidades =
+                especialidadesTexto;
 
-            clinica.Nome = NovaClinica.Nome;
+            clinica.Nome =
+                NovaClinica.Nome;
 
-            if (!string.IsNullOrWhiteSpace(NovaClinica.Email))
+            if (!string.IsNullOrWhiteSpace(
+                NovaClinica.Email))
             {
-                clinica.Email = NovaClinica.Email;
+                clinica.Email =
+                    NovaClinica.Email;
             }
 
-            clinica.Descricao = NovaClinica.Descricao;
-            clinica.CEP = NovaClinica.CEP;
-            clinica.Cidade = NovaClinica.Cidade;
-            clinica.Endereco = NovaClinica.Endereco;
-            clinica.Telefone = NovaClinica.Telefone;
-            clinica.Instagram = NovaClinica.Instagram ?? "";
-            clinica.Site = NovaClinica.Site ?? "";
-            clinica.Documento = NovaClinica.Documento;
-            clinica.CPF = NovaClinica.CPF;
-            clinica.Valor = NovaClinica.Valor;
+            clinica.Descricao =
+                NovaClinica.Descricao;
 
-            clinica.AtendimentoOnline = NovaClinica.AtendimentoOnline;
-            clinica.AtendimentoPresencial = NovaClinica.AtendimentoPresencial;
+            clinica.CEP =
+                NovaClinica.CEP;
 
-            if (!string.IsNullOrWhiteSpace(fotoNova))
+            clinica.Cidade =
+                NovaClinica.Cidade;
+
+            clinica.Endereco =
+                NovaClinica.Endereco;
+
+            clinica.Telefone =
+                NovaClinica.Telefone;
+
+            clinica.Instagram =
+                NovaClinica.Instagram ?? "";
+
+            clinica.Site =
+                NovaClinica.Site ?? "";
+
+            clinica.Documento =
+                NovaClinica.Documento;
+
+            clinica.CPF =
+                NovaClinica.CPF;
+
+            clinica.Valor =
+                NovaClinica.Valor;
+
+            clinica.AtendimentoOnline =
+                NovaClinica.AtendimentoOnline;
+
+            clinica.AtendimentoPresencial =
+                NovaClinica.AtendimentoPresencial;
+
+            if (!string.IsNullOrWhiteSpace(
+                fotoNova))
             {
-                clinica.FotoPerfil = fotoNova;
+                clinica.FotoPerfil =
+                    fotoNova;
             }
 
-            clinica.PerfilCompleto = true;
+            clinica.PerfilCompleto =
+                true;
         }
 
-        private void CriarOuAtualizarAlteracaoPendente(
-            Clinica clinica,
-            string especialidadesTexto,
-            string? fotoNova)
-        {
-            var alteracao = _context.AlteracoesClinicas
-                .FirstOrDefault(a =>
-                    a.ClinicaId == clinica.Id &&
-                    a.Status == "Pendente"
-                );
-
-            if (alteracao == null)
-            {
-                alteracao = new AlteracaoClinica
-                {
-                    ClinicaId = clinica.Id,
-                    Status = "Pendente",
-                    DataSolicitacao = DateTime.Now
-                };
-
-                _context.AlteracoesClinicas.Add(alteracao);
-            }
-
-            alteracao.Nome = NovaClinica.Nome;
-            alteracao.Email = clinica.Email;
-            alteracao.Telefone = NovaClinica.Telefone;
-            alteracao.CEP = NovaClinica.CEP;
-            alteracao.Cidade = NovaClinica.Cidade;
-            alteracao.Endereco = NovaClinica.Endereco;
-            alteracao.Descricao = NovaClinica.Descricao;
-            alteracao.Especialidades = especialidadesTexto;
-            alteracao.Documento = NovaClinica.Documento;
-            alteracao.CPF = NovaClinica.CPF;
-            alteracao.Valor = NovaClinica.Valor;
-            alteracao.AtendimentoOnline = NovaClinica.AtendimentoOnline;
-            alteracao.AtendimentoPresencial = NovaClinica.AtendimentoPresencial;
-            alteracao.Instagram = NovaClinica.Instagram ?? "";
-            alteracao.Site = NovaClinica.Site ?? "";
-            alteracao.FotoPerfil = !string.IsNullOrWhiteSpace(fotoNova)
-                ? fotoNova
-                : clinica.FotoPerfil;
-
-            alteracao.Status = "Pendente";
-            alteracao.MotivoRecusa = null;
-            alteracao.DataAnalise = null;
-            alteracao.NomeAdminAnalise = null;
-        }
+        // =====================================================
+        // ESPECIALIDADES
+        // =====================================================
 
         private string ObterEspecialidadesFormatadas()
         {
-            var especialidades = Request.Form["Especialidades"];
+            var especialidades =
+                Request.Form["Especialidades"];
 
-            var lista = especialidades
-                .Select(e => e?.Trim() ?? "")
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(20)
-                .ToList();
+            var lista =
+                especialidades
+                    .Select(
+                        e => e?.Trim() ?? ""
+                    )
+                    .Where(
+                        e =>
+                            !string.IsNullOrWhiteSpace(e)
+                    )
+                    .Distinct(
+                        StringComparer.OrdinalIgnoreCase
+                    )
+                    .Take(20)
+                    .ToList();
 
-            return string.Join(",", lista);
+            return string.Join(
+                ",",
+                lista
+            );
         }
+
+        // =====================================================
+        // TELEFONE
+        // =====================================================
 
         private void NormalizarTelefone()
         {
-            var telefone = ApenasNumeros(NovaClinica.Telefone);
+            var telefone =
+                ApenasNumeros(
+                    NovaClinica.Telefone
+                );
 
-            if (string.IsNullOrWhiteSpace(telefone))
+            if (string.IsNullOrWhiteSpace(
+                telefone))
             {
-                NovaClinica.Telefone = "";
+                NovaClinica.Telefone =
+                    "";
+
                 return;
             }
 
-            if ((telefone.Length == 10 || telefone.Length == 11) &&
+            if ((telefone.Length == 10 ||
+                 telefone.Length == 11) &&
                 !telefone.StartsWith("55"))
             {
-                telefone = "55" + telefone;
+                telefone =
+                    "55" + telefone;
             }
 
-            NovaClinica.Telefone = telefone;
+            NovaClinica.Telefone =
+                telefone;
         }
+
+        // =====================================================
+        // INSTAGRAM
+        // =====================================================
 
         private void NormalizarInstagram()
         {
-            if (!string.IsNullOrEmpty(NovaClinica.Instagram))
+            if (string.IsNullOrWhiteSpace(
+                NovaClinica.Instagram))
             {
-                NovaClinica.Instagram = NovaClinica.Instagram
+                return;
+            }
+
+            NovaClinica.Instagram =
+                NovaClinica.Instagram
                     .Replace("@", "")
                     .Trim();
 
-                if (!NovaClinica.Instagram.StartsWith("http"))
-                {
-                    NovaClinica.Instagram =
-                        "https://instagram.com/" + NovaClinica.Instagram;
-                }
+            if (!NovaClinica.Instagram.StartsWith(
+                "http",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                NovaClinica.Instagram =
+                    "https://instagram.com/" +
+                    NovaClinica.Instagram;
             }
         }
+
+        // =====================================================
+        // SITE
+        // =====================================================
 
         private void NormalizarSite()
         {
-            if (!string.IsNullOrEmpty(NovaClinica.Site))
+            if (string.IsNullOrWhiteSpace(
+                NovaClinica.Site))
             {
-                NovaClinica.Site = NovaClinica.Site.Trim();
+                return;
+            }
 
-                if (!NovaClinica.Site.StartsWith("http"))
-                {
-                    NovaClinica.Site = "https://" + NovaClinica.Site;
-                }
+            NovaClinica.Site =
+                NovaClinica.Site.Trim();
+
+            if (!NovaClinica.Site.StartsWith(
+                "http",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                NovaClinica.Site =
+                    "https://" +
+                    NovaClinica.Site;
             }
         }
 
+        // =====================================================
+        // FOTO
+        // =====================================================
+
         private string? SalvarFotoRecortada()
         {
-            if (string.IsNullOrWhiteSpace(FotoFinal))
+            if (string.IsNullOrWhiteSpace(
+                FotoFinal))
             {
                 return null;
             }
 
-            var base64 = FotoFinal;
-
-            if (base64.Contains(","))
+            try
             {
-                base64 = base64.Split(',')[1];
+                var base64 =
+                    FotoFinal;
+
+                if (base64.Contains(","))
+                {
+                    base64 =
+                        base64.Split(',')[1];
+                }
+
+                var bytes =
+                    Convert.FromBase64String(
+                        base64
+                    );
+
+                var pastaUploads =
+                    Path.Combine(
+                        _environment.WebRootPath,
+                        "uploads"
+                    );
+
+                if (!Directory.Exists(
+                    pastaUploads))
+                {
+                    Directory.CreateDirectory(
+                        pastaUploads
+                    );
+                }
+
+                var nomeArquivo =
+                    Guid.NewGuid()
+                        .ToString() +
+                    ".jpg";
+
+                var caminhoArquivo =
+                    Path.Combine(
+                        pastaUploads,
+                        nomeArquivo
+                    );
+
+                System.IO.File.WriteAllBytes(
+                    caminhoArquivo,
+                    bytes
+                );
+
+                return "/uploads/" +
+                       nomeArquivo;
             }
-
-            var bytes = Convert.FromBase64String(base64);
-
-            var pastaUploads = Path.Combine(
-                _environment.WebRootPath,
-                "uploads"
-            );
-
-            if (!Directory.Exists(pastaUploads))
+            catch
             {
-                Directory.CreateDirectory(pastaUploads);
+                ModelState.AddModelError(
+                    "",
+                    "Não foi possível salvar a foto enviada."
+                );
+
+                return null;
             }
-
-            var nomeArquivo = Guid.NewGuid().ToString() + ".jpg";
-
-            var caminhoArquivo = Path.Combine(
-                pastaUploads,
-                nomeArquivo
-            );
-
-            System.IO.File.WriteAllBytes(caminhoArquivo, bytes);
-
-            return "/uploads/" + nomeArquivo;
         }
+
+        // =====================================================
+        // RECARREGAR ESPECIALIDADES
+        // =====================================================
 
         private void RecarregarEspecialidadesSelecionadas()
         {
-            var especialidades = Request.Form["Especialidades"];
+            var especialidades =
+                Request.Form["Especialidades"];
 
-            EspecialidadesSelecionadas = especialidades
-                .Select(e => e ?? "")
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                .ToList();
+            EspecialidadesSelecionadas =
+                especialidades
+                    .Select(
+                        e => e ?? ""
+                    )
+                    .Where(
+                        e =>
+                            !string.IsNullOrWhiteSpace(e)
+                    )
+                    .ToList();
         }
 
-        private void CapturarCodigoVendedor(string? codigo)
+        // =====================================================
+        // VENDEDOR
+        // =====================================================
+
+        private void CapturarCodigoVendedor(
+            string? codigo)
         {
-            if (string.IsNullOrWhiteSpace(codigo))
+            if (string.IsNullOrWhiteSpace(
+                codigo))
             {
                 return;
             }
 
-            var codigoNormalizado = codigo.Trim().ToUpper();
+            var codigoNormalizado =
+                codigo
+                    .Trim()
+                    .ToUpperInvariant();
 
-            var vendedor = _context.Vendedores
-                .FirstOrDefault(v =>
-                    v.CodigoIndicacao == codigoNormalizado &&
-                    v.Ativo
-                );
+            var vendedor =
+                _context.Vendedores
+                    .FirstOrDefault(
+                        v =>
+                            v.CodigoIndicacao ==
+                                codigoNormalizado
+                            &&
+                            v.Ativo
+                    );
 
             if (vendedor == null)
             {
@@ -399,184 +617,371 @@ namespace ProjetoTerapia.Pages
                 vendedor.CodigoIndicacao
             );
 
-            CodigoVendedor = vendedor.CodigoIndicacao;
+            CodigoVendedor =
+                vendedor.CodigoIndicacao;
         }
 
         private Vendedor? BuscarVendedorDaSessao()
         {
-            var codigo = HttpContext.Session.GetString("CodigoVendedorIndicacao");
+            var codigo =
+                HttpContext.Session.GetString(
+                    "CodigoVendedorIndicacao"
+                );
 
-            if (string.IsNullOrWhiteSpace(codigo))
+            if (string.IsNullOrWhiteSpace(
+                codigo))
             {
                 return null;
             }
 
             return _context.Vendedores
-                .FirstOrDefault(v =>
-                    v.CodigoIndicacao == codigo &&
-                    v.Ativo
+                .FirstOrDefault(
+                    v =>
+                        v.CodigoIndicacao ==
+                            codigo
+                        &&
+                        v.Ativo
                 );
         }
 
-        private void AplicarVendedorNaClinica(Clinica clinica)
+        private void AplicarVendedorNaClinica(
+            Clinica clinica)
         {
             if (clinica.VendedorId.HasValue)
             {
                 return;
             }
 
-            var vendedor = BuscarVendedorDaSessao();
+            var vendedor =
+                BuscarVendedorDaSessao();
 
             if (vendedor == null)
             {
                 return;
             }
 
-            clinica.VendedorId = vendedor.Id;
-            clinica.CodigoVendedorIndicacao = vendedor.CodigoIndicacao;
+            clinica.VendedorId =
+                vendedor.Id;
+
+            clinica.CodigoVendedorIndicacao =
+                vendedor.CodigoIndicacao;
         }
+
+        // =====================================================
+        // CPF / CEP
+        // =====================================================
 
         private void NormalizarCPF()
         {
-            NovaClinica.CPF = ApenasNumeros(NovaClinica.CPF);
+            NovaClinica.CPF =
+                ApenasNumeros(
+                    NovaClinica.CPF
+                );
         }
 
         private void NormalizarCEP()
         {
-            NovaClinica.CEP = ApenasNumeros(NovaClinica.CEP);
+            NovaClinica.CEP =
+                ApenasNumeros(
+                    NovaClinica.CEP
+                );
         }
 
-        private string ApenasNumeros(string? valor)
+        private string ApenasNumeros(
+            string? valor)
         {
-            if (string.IsNullOrWhiteSpace(valor))
+            if (string.IsNullOrWhiteSpace(
+                valor))
             {
                 return "";
             }
 
-            return new string(valor.Where(char.IsDigit).ToArray());
+            return new string(
+                valor
+                    .Where(char.IsDigit)
+                    .ToArray()
+            );
         }
 
-        private bool ValidarDadosDaClinica(Clinica clinicaAtual)
+        // =====================================================
+        // VALIDAÇÃO DOS DADOS
+        // =====================================================
+
+        private bool ValidarDadosDaClinica(
+            Clinica clinicaAtual)
         {
-            var valido = true;
+            var valido =
+                true;
 
-            var clinicasExistentes = _context.Clinicas
-                .Where(c => c.Id != clinicaAtual.Id)
-                .ToList();
+            var clinicasExistentes =
+                _context.Clinicas
+                    .Where(
+                        c =>
+                            c.Id !=
+                            clinicaAtual.Id
+                    )
+                    .ToList();
 
-            if (string.IsNullOrWhiteSpace(NovaClinica.CPF))
+            // =================================================
+            // CPF
+            // =================================================
+
+            if (string.IsNullOrWhiteSpace(
+                NovaClinica.CPF))
             {
-                ModelState.AddModelError("NovaClinica.CPF", "Informe o CPF.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.CPF",
+                    "Informe o CPF."
+                );
+
+                valido =
+                    false;
             }
-            else if (!CpfValido(NovaClinica.CPF))
+            else if (!CpfValido(
+                NovaClinica.CPF))
             {
-                ModelState.AddModelError("NovaClinica.CPF", "Informe um CPF válido.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.CPF",
+                    "Informe um CPF válido."
+                );
+
+                valido =
+                    false;
             }
-            else if (clinicasExistentes.Any(c => ApenasNumeros(c.CPF) == NovaClinica.CPF))
+            else if (clinicasExistentes.Any(
+                c =>
+                    ApenasNumeros(c.CPF) ==
+                    NovaClinica.CPF))
             {
-                ModelState.AddModelError("NovaClinica.CPF", "Este CPF já está em uso.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.CPF",
+                    "Este CPF já está em uso."
+                );
+
+                valido =
+                    false;
             }
 
-            if (string.IsNullOrWhiteSpace(NovaClinica.Telefone))
+            // =================================================
+            // TELEFONE
+            // =================================================
+
+            if (string.IsNullOrWhiteSpace(
+                NovaClinica.Telefone))
             {
-                ModelState.AddModelError("NovaClinica.Telefone", "Informe o telefone.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.Telefone",
+                    "Informe o telefone."
+                );
+
+                valido =
+                    false;
             }
-            else if (!TelefoneValido(NovaClinica.Telefone))
+            else if (!TelefoneValido(
+                NovaClinica.Telefone))
             {
-                ModelState.AddModelError("NovaClinica.Telefone", "Informe um telefone válido com DDD.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.Telefone",
+                    "Informe um telefone válido com DDD."
+                );
+
+                valido =
+                    false;
             }
-            else if (clinicasExistentes.Any(c => ApenasNumeros(c.Telefone) == NovaClinica.Telefone))
+            else if (clinicasExistentes.Any(
+                c =>
+                    ApenasNumeros(c.Telefone) ==
+                    NovaClinica.Telefone))
             {
-                ModelState.AddModelError("NovaClinica.Telefone", "Este telefone já está em uso.");
-                valido = false;
+                ModelState.AddModelError(
+                    "NovaClinica.Telefone",
+                    "Este telefone já está em uso."
+                );
+
+                valido =
+                    false;
             }
 
-            if (!string.IsNullOrWhiteSpace(NovaClinica.CEP) &&
+            // =================================================
+            // CEP
+            // =================================================
+
+            if (!string.IsNullOrWhiteSpace(
+                    NovaClinica.CEP)
+                &&
                 NovaClinica.CEP.Length != 8)
             {
-                ModelState.AddModelError("NovaClinica.CEP", "Informe um CEP válido com 8 números.");
-                valido = false;
-            }
-
-            if (string.IsNullOrWhiteSpace(NovaClinica.Cidade))
-            {
-                ModelState.AddModelError("NovaClinica.Cidade", "Informe a cidade principal de atendimento.");
-                valido = false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(NovaClinica.Documento))
-            {
-                NovaClinica.Documento = NovaClinica.Documento.Trim().ToUpper();
-
-                var documentoJaExiste = clinicasExistentes.Any(c =>
-                    !string.IsNullOrWhiteSpace(c.Documento) &&
-                    c.Documento.Trim().ToUpper() == NovaClinica.Documento
+                ModelState.AddModelError(
+                    "NovaClinica.CEP",
+                    "Informe um CEP válido com 8 números."
                 );
+
+                valido =
+                    false;
+            }
+
+            // =================================================
+            // CIDADE
+            // =================================================
+
+            if (string.IsNullOrWhiteSpace(
+                NovaClinica.Cidade))
+            {
+                ModelState.AddModelError(
+                    "NovaClinica.Cidade",
+                    "Informe a cidade principal de atendimento."
+                );
+
+                valido =
+                    false;
+            }
+
+            // =================================================
+            // REGISTRO PROFISSIONAL
+            // =================================================
+
+            if (!string.IsNullOrWhiteSpace(
+                NovaClinica.Documento))
+            {
+                NovaClinica.Documento =
+                    NovaClinica.Documento
+                        .Trim()
+                        .ToUpperInvariant();
+
+                var documentoJaExiste =
+                    clinicasExistentes.Any(
+                        c =>
+                            !string.IsNullOrWhiteSpace(
+                                c.Documento
+                            )
+                            &&
+                            c.Documento
+                                .Trim()
+                                .ToUpper() ==
+                            NovaClinica.Documento
+                    );
 
                 if (documentoJaExiste)
                 {
-                    ModelState.AddModelError("NovaClinica.Documento", "Este registro profissional já está em uso.");
-                    valido = false;
+                    ModelState.AddModelError(
+                        "NovaClinica.Documento",
+                        "Este registro profissional já está em uso."
+                    );
+
+                    valido =
+                        false;
                 }
             }
 
-            var instagramAtual = NormalizarInstagramParaComparacao(NovaClinica.Instagram);
+            // =================================================
+            // INSTAGRAM
+            // =================================================
 
-            if (!string.IsNullOrWhiteSpace(instagramAtual))
-            {
-                var instagramJaExiste = clinicasExistentes.Any(c =>
-                    NormalizarInstagramParaComparacao(c.Instagram) == instagramAtual
+            var instagramAtual =
+                NormalizarInstagramParaComparacao(
+                    NovaClinica.Instagram
                 );
+
+            if (!string.IsNullOrWhiteSpace(
+                instagramAtual))
+            {
+                var instagramJaExiste =
+                    clinicasExistentes.Any(
+                        c =>
+                            NormalizarInstagramParaComparacao(
+                                c.Instagram
+                            )
+                            ==
+                            instagramAtual
+                    );
 
                 if (instagramJaExiste)
                 {
-                    ModelState.AddModelError("NovaClinica.Instagram", "Este Instagram já está em uso.");
-                    valido = false;
+                    ModelState.AddModelError(
+                        "NovaClinica.Instagram",
+                        "Este Instagram já está em uso."
+                    );
+
+                    valido =
+                        false;
                 }
             }
-
-
 
             return valido;
         }
 
-        private string NormalizarInstagramParaComparacao(string? instagram)
+        // =====================================================
+        // NORMALIZAR INSTAGRAM PARA COMPARAÇÃO
+        // =====================================================
+
+        private string NormalizarInstagramParaComparacao(
+            string? instagram)
         {
-            if (string.IsNullOrWhiteSpace(instagram))
+            if (string.IsNullOrWhiteSpace(
+                instagram))
             {
                 return "";
             }
 
-            var valor = instagram.Trim().ToLower();
+            var valor =
+                instagram
+                    .Trim()
+                    .ToLowerInvariant();
 
-            valor = valor.Replace("https://", "");
-            valor = valor.Replace("http://", "");
-            valor = valor.Replace("www.", "");
+            valor =
+                valor.Replace(
+                    "https://",
+                    ""
+                );
 
-            if (valor.StartsWith("instagram.com/"))
+            valor =
+                valor.Replace(
+                    "http://",
+                    ""
+                );
+
+            valor =
+                valor.Replace(
+                    "www.",
+                    ""
+                );
+
+            if (valor.StartsWith(
+                "instagram.com/"))
             {
-                valor = valor.Replace("instagram.com/", "");
+                valor =
+                    valor.Replace(
+                        "instagram.com/",
+                        ""
+                    );
             }
 
             if (valor.StartsWith("@"))
             {
-                valor = valor.Substring(1);
+                valor =
+                    valor.Substring(1);
             }
 
-            valor = valor.Split("?")[0];
-            valor = valor.Trim().Trim('/');
+            valor =
+                valor.Split("?")[0];
+
+            valor =
+                valor
+                    .Trim()
+                    .Trim('/');
 
             return valor;
         }
 
-        private bool TelefoneValido(string telefone)
+        // =====================================================
+        // TELEFONE VÁLIDO
+        // =====================================================
+
+        private bool TelefoneValido(
+            string telefone)
         {
-            if (string.IsNullOrWhiteSpace(telefone))
+            if (string.IsNullOrWhiteSpace(
+                telefone))
             {
                 return false;
             }
@@ -586,49 +991,81 @@ namespace ProjetoTerapia.Pages
                 return false;
             }
 
-            return telefone.Length == 12 || telefone.Length == 13;
+            return telefone.Length == 12 ||
+                   telefone.Length == 13;
         }
 
-        private bool CpfValido(string cpf)
+        // =====================================================
+        // CPF VÁLIDO
+        // =====================================================
+
+        private bool CpfValido(
+            string cpf)
         {
-            cpf = ApenasNumeros(cpf);
+            cpf =
+                ApenasNumeros(
+                    cpf
+                );
 
             if (cpf.Length != 11)
             {
                 return false;
             }
 
-            if (cpf.All(c => c == cpf[0]))
+            if (cpf.All(
+                c => c == cpf[0]))
             {
                 return false;
             }
 
-            var soma = 0;
+            var soma =
+                0;
 
-            for (var i = 0; i < 9; i++)
+            for (var i = 0;
+                 i < 9;
+                 i++)
             {
-                soma += (cpf[i] - '0') * (10 - i);
+                soma +=
+                    (cpf[i] - '0') *
+                    (10 - i);
             }
 
-            var resto = soma % 11;
-            var digito1 = resto < 2 ? 0 : 11 - resto;
+            var resto =
+                soma % 11;
 
-            if ((cpf[9] - '0') != digito1)
+            var digito1 =
+                resto < 2
+                    ? 0
+                    : 11 - resto;
+
+            if ((cpf[9] - '0') !=
+                digito1)
             {
                 return false;
             }
 
-            soma = 0;
+            soma =
+                0;
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0;
+                 i < 10;
+                 i++)
             {
-                soma += (cpf[i] - '0') * (11 - i);
+                soma +=
+                    (cpf[i] - '0') *
+                    (11 - i);
             }
 
-            resto = soma % 11;
-            var digito2 = resto < 2 ? 0 : 11 - resto;
+            resto =
+                soma % 11;
 
-            return (cpf[10] - '0') == digito2;
+            var digito2 =
+                resto < 2
+                    ? 0
+                    : 11 - resto;
+
+            return (cpf[10] - '0') ==
+                   digito2;
         }
     }
 }

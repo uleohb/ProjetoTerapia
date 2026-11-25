@@ -62,129 +62,49 @@
 
             </header>
 
-        @if (Model.AlteracaoPendente != null)
-            {
-                <div class="alerta-alteracao analise">
-                    <div class="alerta-alteracao-icone">
-                        <i class="fa-regular fa-clock"></i>
-                    </div>
+        @if (!Model.Clinica!.Pago)
+        {
+            <section class="alerta status-aprovado">
 
-                    <div>
-                        <strong>Alterações em análise</strong>
-                        <p>
-                            Suas alterações foram enviadas com sucesso e estão aguardando aprovação da nossa equipe.
-                        </p>
-                    </div>
+                <div class="alerta-icone">
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
-            }
 
-            @if (Model.AlteracaoRecusada != null)
-            {
-                <div class="alerta-recusa-compacto">
+                <div>
+                    <h2>Ative seu plano profissional</h2>
 
-                    <form method="post"
-                          asp-page-handler="ExcluirAlteracaoRecusada"
-                          class="form-fechar-recusa"
-                          onsubmit="sessionStorage.setItem('voltarTopoPainel', '1')">
-
-                        <input type="hidden"
-                               name="alteracaoId"
-                               value="@Model.AlteracaoRecusada.Id" />
-
-                        <button type="submit"
-                                class="btn-fechar-recusa"
-                                title="Remover aviso">
-                            ×
-                        </button>
-
-                    </form>
-
-                    <div class="recusa-icone">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                    </div>
-
-                    <div class="recusa-conteudo">
-
-                        <strong>
-                            Alterações recusadas
-                        </strong>
-
-                        <p>
-                            @(string.IsNullOrWhiteSpace(Model.AlteracaoRecusada.MotivoRecusa)
-                                                ? "Suas alterações não foram aprovadas pela nossa equipe."
-                                                : Model.AlteracaoRecusada.MotivoRecusa)
-                </p>
-
-                        <a href="/CadastroClinica" class="btn-corrigir-recusa">
-                            Corrigir alterações
-                        </a>
-
-                    </div>
-
+                    <p>
+                        Seu cadastro está pronto. Ative o plano para iniciar os 7 dias grátis
+                        e começar a usar os recursos profissionais do AlinhaVIDA.
+                    </p>
                 </div>
-                }
 
-        @if (!Model.Clinica!.Aprovado)
-            {
-                <section class="alerta status-analise">
+                <a href="/PagamentoClinica" class="btn-alerta">
+                    Ativar plano
+                </a>
 
-                    <div class="alerta-icone">
-                        <i class="fa-solid fa-hourglass-half"></i>
-                    </div>
+            </section>
+        }
 
-                    <div>
-                        <h2>Cadastro em análise</h2>
+        @if (Model.Clinica.Pago)
+        {
+            <section class="alerta status-ativo">
 
-                        <p>
-                            Sua clínica está aguardando aprovação. Assim que for aprovada,
-                            você poderá ativar seu plano e aparecer na vitrine da plataforma.
-                        </p>
-                    </div>
+                <div class="alerta-icone">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
 
-                </section>
-            }
+                <div>
+                    <h2>Plano ativo</h2>
 
-            @if (Model.Clinica!.Aprovado && !Model.Clinica.Pago)
-            {
-                <section class="alerta status-aprovado">
+                    <p>
+                        Seu acesso profissional está ativo e seu perfil pode aparecer para pacientes
+                        conforme suas configurações de visibilidade.
+                    </p>
+                </div>
 
-                    <div class="alerta-icone">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-
-                    <div>
-                        <h2>Sua clínica foi aprovada</h2>
-
-                        <p>
-                            Seu perfil está pronto. Ative seu plano para começar a receber pacientes.
-                        </p>
-                    </div>
-
-                    <a href="/PagamentoClinica" class="btn-alerta">
-                        Ativar plano
-                    </a>
-
-                </section>
-            }
-
-            @if (Model.Clinica!.Pago)
-            {
-                <section class="alerta status-ativo">
-
-                    <div class="alerta-icone">
-                        <i class="fa-solid fa-shield-heart"></i>
-                    </div>
-
-                    <div>
-                        <h2>Plano ativo</h2>
-
-                        <p>
-                            Sua clínica está disponível para receber pacientes na plataforma.
-                        </p>
-                    </div>
-
-                </section>
-            }
+            </section>
+        }
 
             @if (Model.Clinica != null && Model.Clinica.Pago && Model.DiasRestantes.HasValue && Model.DiasRestantes <= 30 && !Model.PlanoVencido)
             {

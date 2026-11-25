@@ -2,15 +2,22 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ProjetoTerapia.Models;
-using System;
 using System.Globalization;
-using System.Linq;
 
 namespace ProjetoTerapia.Pages
 {
     public class PainelClinicaModel : PageModel
     {
         private readonly AppDbContext _context;
+
+        public PainelClinicaModel(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // =====================================================
+        // DADOS PRINCIPAIS
+        // =====================================================
 
         public Clinica? Clinica { get; set; }
 
@@ -24,11 +31,14 @@ namespace ProjetoTerapia.Pages
 
         public string StatusPlano { get; set; } = "";
 
-        public string NomePlanoPrincipalFormatado { get; set; } = "Nenhum plano ativo";
+        public string NomePlanoPrincipalFormatado { get; set; } =
+            "Nenhum plano ativo";
 
-        public string ValorPlanoFormatado { get; set; } = "Não definido";
+        public string ValorPlanoFormatado { get; set; } =
+            "Não definido";
 
-        public string DataVencimentoFormatada { get; set; } = "Não definido";
+        public string DataVencimentoFormatada { get; set; } =
+            "Não definido";
 
         public int? DiasRestantes { get; set; }
 
@@ -36,201 +46,323 @@ namespace ProjetoTerapia.Pages
 
         public bool PerfilPublicoAtivo { get; set; }
 
-        public string NomePlanoRegionalFormatado { get; set; } = "Nenhuma divulgação ativa";
+        // =====================================================
+        // DIVULGAÇÃO REGIONAL
+        // =====================================================
 
-        public string ValorPlanoRegionalFormatado { get; set; } = "R$ 0,00";
+        public string NomePlanoRegionalFormatado { get; set; } =
+            "Nenhuma divulgação ativa";
+
+        public string ValorPlanoRegionalFormatado { get; set; } =
+            "R$ 0,00";
 
         public string CidadesPlanoRegional { get; set; } = "";
 
-        public string DataFimPlanoRegionalFormatada { get; set; } = "Não definido";
+        public string DataFimPlanoRegionalFormatada { get; set; } =
+            "Não definido";
 
         public int? DiasRestantesPlanoRegional { get; set; }
 
-        public AlteracaoClinica? AlteracaoPendente { get; set; }
-
-        public AlteracaoClinica? AlteracaoRecusada { get; set; }
-
-        public PainelClinicaModel(AppDbContext context)
-        {
-            _context = context;
-        }
+        // =====================================================
+        // GET
+        // =====================================================
 
         public IActionResult OnGet()
         {
-            var id = HttpContext.Session.GetString("ClinicaLogada");
+            var id =
+                HttpContext.Session.GetString(
+                    "ClinicaLogada"
+                );
 
-            if (id == null)
-                return RedirectToPage("/LoginClinica");
+            if (string.IsNullOrWhiteSpace(id) ||
+                !int.TryParse(id, out int clinicaId))
+            {
+                return RedirectToPage(
+                    "/LoginClinica"
+                );
+            }
 
-            Clinica = _context.Clinicas.FirstOrDefault(c => c.Id == int.Parse(id));
+            Clinica =
+                _context.Clinicas
+                    .FirstOrDefault(
+                        c => c.Id == clinicaId
+                    );
 
             if (Clinica == null)
-                return RedirectToPage("/LoginClinica");
+            {
+                return RedirectToPage(
+                    "/LoginClinica"
+                );
+            }
 
-            AtualizarDivulgacoesRegionaisVencidas(Clinica.Id);
+            AtualizarDivulgacoesRegionaisVencidas(
+                Clinica.Id
+            );
 
-            CarregarAvisosAlteracao(Clinica.Id);
-
-            CarregarDivulgacaoRegionalAtiva(Clinica.Id);
+            CarregarDivulgacaoRegionalAtiva(
+                Clinica.Id
+            );
 
             CarregarResumo();
 
             return Page();
         }
 
+        // =====================================================
+        // RESUMO DO PAINEL
+        // =====================================================
+
         private void CarregarResumo()
         {
             if (Clinica == null)
-                return;
-
-            Visualizacoes = Clinica.Visualizacoes;
-            CliquesWhatsapp = Clinica.CliquesWhatsapp;
-
-            TaxaConversao = Visualizacoes > 0
-                ? Math.Round((CliquesWhatsapp * 100.0) / Visualizacoes, 1)
-                : 0;
-
-            PerfilPublicoAtivo = Clinica.Aprovado && Clinica.Pago && Clinica.PerfilCompleto;
-
-            if (Clinica.Pago)
             {
-                NomePlanoPrincipalFormatado = string.IsNullOrWhiteSpace(Clinica.NomePlano)
-                    ? "Plano Profissional"
-                    : Clinica.NomePlano;
-
-                var valorPlano = Clinica.ValorPlano ?? 450;
-
-                ValorPlanoFormatado = valorPlano.ToString("C", new CultureInfo("pt-BR"));
+                return;
             }
+
+            Visualizacoes =
+                Clinica.Visualizacoes;
+
+            CliquesWhatsapp =
+                Clinica.CliquesWhatsapp;
+
+            TaxaConversao =
+                Visualizacoes > 0
+                    ? Math.Round(
+                        (CliquesWhatsapp * 100.0) /
+                        Visualizacoes,
+                        1
+                    )
+                    : 0;
+
+            DiasRestantes = null;
+            PlanoVencido = false;
+
+            // =================================================
+            // VENCIMENTO
+            // =================================================
 
             if (Clinica.DataVencimento.HasValue)
             {
-                DataVencimentoFormatada = Clinica.DataVencimento.Value.ToString("dd/MM/yyyy");
+                DataVencimentoFormatada =
+                    Clinica.DataVencimento
+                        .Value
+                        .ToString(
+                            "dd/MM/yyyy"
+                        );
 
-                DiasRestantes = (int)Math.Ceiling(
-                    (Clinica.DataVencimento.Value.Date - DateTime.Today).TotalDays
-                );
+                DiasRestantes =
+                    (int)Math.Ceiling(
+                        (
+                            Clinica.DataVencimento
+                                .Value
+                                .Date
+                            -
+                            DateTime.Today
+                        )
+                        .TotalDays
+                    );
 
-                PlanoVencido = DiasRestantes < 0;
+                PlanoVencido =
+                    DiasRestantes < 0;
             }
 
-            if (!Clinica.Aprovado)
+            // =================================================
+            // PERFIL PÚBLICO
+            // =================================================
+            //
+            // NÃO depende mais de aprovação do administrador.
+            //
+            // Para aparecer publicamente:
+            //
+            // - plano ativo
+            // - plano não vencido
+            // - perfil completo
+            // - ExibirPublicamente = true
+            //
+
+            PerfilPublicoAtivo =
+                Clinica.Pago &&
+                !PlanoVencido &&
+                Clinica.PerfilCompleto &&
+                Clinica.ExibirPublicamente;
+
+            // =================================================
+            // PLANO
+            // =================================================
+
+            if (Clinica.Pago)
             {
-                StatusPlano = "Cadastro em análise";
+                NomePlanoPrincipalFormatado =
+                    string.IsNullOrWhiteSpace(
+                        Clinica.NomePlano
+                    )
+                        ? "Plano Profissional"
+                        : Clinica.NomePlano;
+
+                var valorPlano =
+                    Clinica.ValorPlano ??
+                    450m;
+
+                ValorPlanoFormatado =
+                    valorPlano.ToString(
+                        "C",
+                        new CultureInfo(
+                            "pt-BR"
+                        )
+                    );
             }
-            else if (Clinica.Aprovado && !Clinica.Pago)
+            else
             {
-                StatusPlano = "Aguardando ativação";
+                NomePlanoPrincipalFormatado =
+                    "Nenhum plano ativo";
+
+                ValorPlanoFormatado =
+                    "R$ 450,00";
             }
-            else if (Clinica.Pago && PlanoVencido)
+
+            // =================================================
+            // STATUS
+            // =================================================
+
+            if (!Clinica.Pago)
             {
-                StatusPlano = "Plano vencido";
+                StatusPlano =
+                    "Aguardando ativação";
             }
-            else if (Clinica.Pago)
+            else if (PlanoVencido)
             {
-                StatusPlano = "Plano ativo";
+                StatusPlano =
+                    "Plano vencido";
+            }
+            else
+            {
+                StatusPlano =
+                    "Plano ativo";
             }
         }
 
-        private void CarregarDivulgacaoRegionalAtiva(int clinicaId)
+        // =====================================================
+        // CARREGAR DIVULGAÇÃO REGIONAL
+        // =====================================================
+
+        private void CarregarDivulgacaoRegionalAtiva(
+            int clinicaId)
         {
-            DivulgacaoRegionalAtiva = _context.DivulgacoesRegionais
-                .Where(d =>
-                    d.ClinicaId == clinicaId &&
-                    d.Pago &&
-                    d.Aprovado &&
-                    d.Ativo &&
-                    (!d.DataFim.HasValue || d.DataFim.Value.Date >= DateTime.Today))
-                .OrderByDescending(d => d.DataInicio ?? d.DataPagamento ?? d.DataSolicitacao)
-                .FirstOrDefault();
+            DivulgacaoRegionalAtiva =
+                _context.DivulgacoesRegionais
+                    .Where(
+                        d =>
+                            d.ClinicaId == clinicaId &&
+                            d.Pago &&
+
+                            /*
+                             * Este Aprovado pertence SOMENTE
+                             * à Divulgação Regional.
+                             *
+                             * Não tem relação com aprovação
+                             * do profissional.
+                             */
+                            d.Aprovado &&
+
+                            d.Ativo &&
+                            (
+                                !d.DataFim.HasValue ||
+                                d.DataFim.Value.Date >=
+                                DateTime.Today
+                            )
+                    )
+                    .OrderByDescending(
+                        d =>
+                            d.DataInicio ??
+                            d.DataPagamento ??
+                            d.DataSolicitacao
+                    )
+                    .FirstOrDefault();
 
             if (DivulgacaoRegionalAtiva == null)
-                return;
-
-            NomePlanoRegionalFormatado = DivulgacaoRegionalAtiva.NomePlano;
-            ValorPlanoRegionalFormatado = DivulgacaoRegionalAtiva.Valor.ToString("C", new CultureInfo("pt-BR"));
-            CidadesPlanoRegional = DivulgacaoRegionalAtiva.CidadesSelecionadas;
-
-            if (DivulgacaoRegionalAtiva.DataFim.HasValue)
             {
-                DataFimPlanoRegionalFormatada = DivulgacaoRegionalAtiva.DataFim.Value.ToString("dd/MM/yyyy");
+                return;
+            }
 
-                DiasRestantesPlanoRegional = (int)Math.Ceiling(
-                    (DivulgacaoRegionalAtiva.DataFim.Value.Date - DateTime.Today).TotalDays
-                );
+            NomePlanoRegionalFormatado =
+                DivulgacaoRegionalAtiva.NomePlano;
+
+            ValorPlanoRegionalFormatado =
+                DivulgacaoRegionalAtiva
+                    .Valor
+                    .ToString(
+                        "C",
+                        new CultureInfo(
+                            "pt-BR"
+                        )
+                    );
+
+            CidadesPlanoRegional =
+                DivulgacaoRegionalAtiva
+                    .CidadesSelecionadas;
+
+            if (DivulgacaoRegionalAtiva
+                .DataFim
+                .HasValue)
+            {
+                DataFimPlanoRegionalFormatada =
+                    DivulgacaoRegionalAtiva
+                        .DataFim
+                        .Value
+                        .ToString(
+                            "dd/MM/yyyy"
+                        );
+
+                DiasRestantesPlanoRegional =
+                    (int)Math.Ceiling(
+                        (
+                            DivulgacaoRegionalAtiva
+                                .DataFim
+                                .Value
+                                .Date
+                            -
+                            DateTime.Today
+                        )
+                        .TotalDays
+                    );
             }
         }
 
-        private void AtualizarDivulgacoesRegionaisVencidas(int clinicaId)
+        // =====================================================
+        // DESATIVAR DIVULGAÇÕES VENCIDAS
+        // =====================================================
+
+        private void AtualizarDivulgacoesRegionaisVencidas(
+            int clinicaId)
         {
-            var divulgacoesVencidas = _context.DivulgacoesRegionais
-                .Where(d =>
-                    d.ClinicaId == clinicaId &&
-                    d.Ativo &&
-                    d.DataFim.HasValue &&
-                    d.DataFim.Value.Date < DateTime.Today)
-                .ToList();
+            var divulgacoesVencidas =
+                _context.DivulgacoesRegionais
+                    .Where(
+                        d =>
+                            d.ClinicaId == clinicaId &&
+                            d.Ativo &&
+                            d.DataFim.HasValue &&
+                            d.DataFim.Value.Date <
+                            DateTime.Today
+                    )
+                    .ToList();
 
             if (!divulgacoesVencidas.Any())
-                return;
-
-            foreach (var divulgacao in divulgacoesVencidas)
             {
-                divulgacao.Ativo = false;
-                divulgacao.Status = "Expirado";
+                return;
+            }
+
+            foreach (var divulgacao
+                in divulgacoesVencidas)
+            {
+                divulgacao.Ativo =
+                    false;
+
+                divulgacao.Status =
+                    "Expirado";
             }
 
             _context.SaveChanges();
-        }
-
-        private void CarregarAvisosAlteracao(int clinicaId)
-        {
-            var ultimaAlteracao = _context.AlteracoesClinicas
-                .Where(a => a.ClinicaId == clinicaId)
-                .OrderByDescending(a => a.DataSolicitacao)
-                .FirstOrDefault();
-
-            if (ultimaAlteracao == null)
-                return;
-
-            if (ultimaAlteracao.Status == "Pendente")
-            {
-                AlteracaoPendente = ultimaAlteracao;
-            }
-
-            if (ultimaAlteracao.Status == "Recusada")
-            {
-                AlteracaoRecusada = ultimaAlteracao;
-            }
-        }
-
-        public IActionResult OnPostExcluirAlteracaoRecusada(int alteracaoId)
-        {
-            var id = HttpContext.Session.GetString("ClinicaLogada");
-
-            if (string.IsNullOrEmpty(id))
-            {
-                return RedirectToPage("/LoginClinica");
-            }
-
-            var clinicaId = int.Parse(id);
-
-            var alteracao = _context.AlteracoesClinicas
-                .FirstOrDefault(a =>
-                    a.Id == alteracaoId &&
-                    a.ClinicaId == clinicaId &&
-                    a.Status == "Recusada"
-                );
-
-            if (alteracao != null)
-            {
-                alteracao.Status = "Recusa visualizada";
-                alteracao.DataAnalise ??= DateTime.Now;
-
-                _context.SaveChanges();
-            }
-
-            return RedirectToPage("/PainelClinica");
         }
     }
 }

@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using ProjetoTerapia.Models;
 using System.Globalization;
@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProjetoTerapia.Pages
 {
@@ -15,23 +16,17 @@ namespace ProjetoTerapia.Pages
     {
         private const decimal VALOR_PLANO = 450m;
         private const int DIAS_TRIAL = 7;
+
         private const string NOME_PLANO_MP =
             "AlinhaVIDA - Plano Profissional Anual";
 
         private const string VERSAO_TERMOS = "1.0";
         private const string VERSAO_PRIVACIDADE = "1.0";
 
-
         private readonly AppDbContext _context;
-
-        private readonly IHttpClientFactory
-            _httpClientFactory;
-
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
-
-        private readonly IWebHostEnvironment
-            _environment;
-
+        private readonly IWebHostEnvironment _environment;
 
         public PagamentoClinicaModel(
             AppDbContext context,
@@ -40,15 +35,10 @@ namespace ProjetoTerapia.Pages
             IWebHostEnvironment environment)
         {
             _context = context;
-
-            _httpClientFactory =
-                httpClientFactory;
-
+            _httpClientFactory = httpClientFactory;
             _config = config;
-
             _environment = environment;
         }
-
 
         // =====================================================
         // DADOS DA TELA
@@ -56,20 +46,15 @@ namespace ProjetoTerapia.Pages
 
         public Clinica? Clinica { get; set; }
 
-
         public AssinaturaProfissional?
             AssinaturaAtual
         { get; set; }
 
-
         public int? DiasRestantes { get; set; }
-
 
         public bool PlanoVencido { get; set; }
 
-
         public bool PlanoPertoDeVencer { get; set; }
-
 
         public string ValorPlanoFormatado { get; set; } =
             VALOR_PLANO.ToString(
@@ -77,26 +62,15 @@ namespace ProjetoTerapia.Pages
                 new CultureInfo("pt-BR")
             );
 
-
         // =====================================================
         // ACEITES
         // =====================================================
 
         [BindProperty]
-        public bool AceitouTermosEPrivacidade
-        {
-            get;
-            set;
-        }
-
+        public bool AceitouTermosEPrivacidade { get; set; }
 
         [BindProperty]
-        public bool AceitouCobrancaRecorrente
-        {
-            get;
-            set;
-        }
-
+        public bool AceitouCobrancaRecorrente { get; set; }
 
         // =====================================================
         // STATUS DA ASSINATURA
@@ -111,7 +85,6 @@ namespace ProjetoTerapia.Pages
                 StringComparison.OrdinalIgnoreCase
             );
 
-
         public bool AssinaturaPendente =>
             AssinaturaAtual != null &&
             string.Equals(
@@ -123,7 +96,6 @@ namespace ProjetoTerapia.Pages
                 AssinaturaAtual.LinkAutorizacao
             );
 
-
         public bool EmTesteGratis =>
             AssinaturaAtiva &&
             AssinaturaAtual?.FimTesteGratisUtc != null &&
@@ -131,25 +103,21 @@ namespace ProjetoTerapia.Pages
                 .FimTesteGratisUtc
                 .Value > DateTime.UtcNow;
 
-
         public DateTime? FimTesteGratisLocal =>
             AssinaturaAtual?
                 .FimTesteGratisUtc?
                 .ToLocalTime();
-
 
         public DateTime? ProximaCobrancaLocal =>
             AssinaturaAtual?
                 .ProximaCobrancaUtc?
                 .ToLocalTime();
 
-
         // =====================================================
         // GET
         // =====================================================
 
-        public async Task<IActionResult>
-            OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
             if (!await CarregarClinicaAsync())
             {
@@ -158,56 +126,68 @@ namespace ProjetoTerapia.Pages
                 );
             }
 
-
-            /*
-             * Quando o Mercado Pago devolve o
-             * profissional para o AlinhaVIDA,
-             * consultamos a API para confirmar
-             * o status real da assinatura.
-             */
             if (string.Equals(
-                Request
-                    .Query["assinatura"]
-                    .ToString(),
+                Request.Query["assinatura"].ToString(),
                 "retorno",
                 StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
-                    await
-                        SincronizarAssinaturaAtualAsync();
-
+                    await SincronizarAssinaturaAtualAsync();
 
                     if (AssinaturaAtiva)
                     {
                         TempData["Sucesso"] =
                             "Assinatura autorizada. Seus 7 dias gratuitos começaram.";
                     }
+                    else
+                    {
+                        TempData["Sucesso"] =
+                            "Recebemos seu retorno do Mercado Pago. A assinatura está sendo confirmada.";
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    Console.WriteLine(
+                        "======================================"
+                    );
 
+                    Console.WriteLine(
+                        "ERRO AO SINCRONIZAR ASSINATURA"
+                    );
 
-                    TempData["Erro"] =
-                        "O Mercado Pago retornou ao AlinhaVIDA, mas ainda não foi possível confirmar a assinatura.";
+                    Console.WriteLine(
+                        ex.ToString()
+                    );
+
+                    Console.WriteLine(
+                        "======================================"
+                    );
+
+                    if (_environment.IsDevelopment())
+                    {
+                        TempData["Erro"] =
+                            "ERRO MERCADO PAGO: " +
+                            ex.Message;
+                    }
+                    else
+                    {
+                        TempData["Erro"] =
+                            "O Mercado Pago retornou ao AlinhaVIDA, mas ainda não foi possível confirmar a assinatura.";
+                    }
                 }
             }
 
-
             await CarregarAssinaturaAtualAsync();
-
 
             return Page();
         }
-
 
         // =====================================================
         // INICIAR ASSINATURA
         // =====================================================
 
-        public async Task<IActionResult>
-            OnPostPagarAsync()
+        public async Task<IActionResult> OnPostPagarAsync()
         {
             if (!await CarregarClinicaAsync() ||
                 Clinica == null)
@@ -217,51 +197,22 @@ namespace ProjetoTerapia.Pages
                 );
             }
 
-
-            // =================================================
-            // PRECISA ESTAR APROVADO
-            // =================================================
-
-            if (!Clinica.Aprovado)
-            {
-                TempData["Erro"] =
-                    "Seu cadastro precisa ser aprovado antes de ativar o plano.";
-
-
-                return RedirectToPage(
-                    "/PagamentoClinica"
-                );
-            }
-
-
+            
             await CarregarAssinaturaAtualAsync();
-
-
-            // =================================================
-            // JÁ POSSUI ASSINATURA ATIVA
-            // =================================================
 
             if (AssinaturaAtiva)
             {
                 TempData["Erro"] =
                     "Sua assinatura recorrente já está ativa.";
 
-
                 return RedirectToPage(
                     "/PagamentoClinica"
                 );
             }
 
-
-            // =================================================
-            // JÁ EXISTE CHECKOUT PENDENTE
-            // =================================================
-
             /*
-             * Se já criamos uma assinatura no
-             * Mercado Pago e o profissional
-             * ainda não concluiu a autorização,
-             * reutilizamos o mesmo link.
+             * Se já existe um checkout pendente,
+             * reaproveitamos o link do plano.
              */
             if (AssinaturaPendente &&
                 !string.IsNullOrWhiteSpace(
@@ -275,15 +226,10 @@ namespace ProjetoTerapia.Pages
                 );
             }
 
-
-            // =================================================
-            // PLANO ANTIGO AINDA ATIVO
-            // =================================================
-
             /*
-             * Evita assinatura duplicada caso
-             * o profissional ainda possua o
-             * plano antigo ativo.
+             * Evita assinatura duplicada para quem
+             * ainda está no plano antigo e longe
+             * do vencimento.
              */
             if (Clinica.Pago &&
                 !PlanoVencido &&
@@ -292,16 +238,10 @@ namespace ProjetoTerapia.Pages
                 TempData["Erro"] =
                     "Seu plano atual ainda está ativo.";
 
-
                 return RedirectToPage(
                     "/PagamentoClinica"
                 );
             }
-
-
-            // =================================================
-            // TERMOS OBRIGATÓRIOS
-            // =================================================
 
             if (!AceitouTermosEPrivacidade ||
                 !AceitouCobrancaRecorrente)
@@ -309,36 +249,35 @@ namespace ProjetoTerapia.Pages
                 TempData["Erro"] =
                     "Leia e aceite os Termos de Uso, a Política de Privacidade e a cobrança recorrente anual.";
 
-
                 return RedirectToPage(
                     "/PagamentoClinica"
                 );
             }
 
-
             try
             {
-                // =============================================
-                // REGISTRAR ACEITE
-                // =============================================
-
                 await RegistrarAceiteAsync(
                     Clinica
                 );
 
+                var externalReference =
+                    $"ALINHAVIDA-CLINICA-{Clinica.Id}-{Guid.NewGuid():N}";
 
-                // =============================================
-                // OBTER / CRIAR PLANO MERCADO PAGO
-                // =============================================
-
-                var planId =
-                    await
-                        ObterOuCriarPlanoMercadoPagoAsync();
-
-
-                // =============================================
-                // CRIAR REGISTRO INTERNO
-                // =============================================
+                /*
+                 * NÃO criamos /preapproval aqui.
+                 *
+                 * O Mercado Pago exige card_token_id
+                 * quando criamos uma assinatura
+                 * diretamente associada a um plano.
+                 *
+                 * Criamos o plano e usamos o init_point.
+                 * O cartão é informado diretamente
+                 * dentro do Mercado Pago.
+                 */
+                var plano =
+                    await CriarPlanoCheckoutMercadoPagoAsync(
+                        externalReference
+                    );
 
                 var assinatura =
                     new AssinaturaProfissional
@@ -346,55 +285,51 @@ namespace ProjetoTerapia.Pages
                         ClinicaId =
                             Clinica.Id,
 
-
                         ExternalReference =
-                            $"ALINHAVIDA-CLINICA-{Clinica.Id}-{Guid.NewGuid():N}",
-
+                            externalReference,
 
                         NomePlano =
                             "Plano Profissional Anual",
 
-
                         MercadoPagoPlanId =
-                            planId,
+                            plano.Id,
 
+                        MercadoPagoPreapprovalId =
+                            null,
+
+                        LinkAutorizacao =
+                            plano.InitPoint,
 
                         Status =
                             "pending",
 
-
                         Ativa =
                             false,
-
 
                         RenovacaoAutomatica =
                             true,
 
-
                         Valor =
                             VALOR_PLANO,
-
 
                         Moeda =
                             "BRL",
 
-
                         Frequencia =
                             12,
-
 
                         TipoFrequencia =
                             "months",
 
-
                         DiasTesteGratis =
                             DIAS_TRIAL,
 
-
                         DataCriacaoUtc =
+                            DateTime.UtcNow,
+
+                        DataAtualizacaoUtc =
                             DateTime.UtcNow
                     };
-
 
                 _context
                     .AssinaturasProfissionais
@@ -402,105 +337,42 @@ namespace ProjetoTerapia.Pages
                         assinatura
                     );
 
-
                 await _context
                     .SaveChangesAsync();
 
-
-                // =============================================
-                // CRIAR ASSINATURA NO MERCADO PAGO
-                // =============================================
-
-                try
-                {
-                    var retorno =
-                        await
-                            CriarAssinaturaMercadoPagoAsync(
-                                Clinica,
-                                assinatura,
-                                planId
-                            );
-
-
-                    assinatura
-                        .MercadoPagoPreapprovalId =
-                            retorno.Id;
-
-
-                    assinatura
-                        .LinkAutorizacao =
-                            retorno.InitPoint;
-
-
-                    assinatura.Status =
-                        string.IsNullOrWhiteSpace(
-                            retorno.Status
-                        )
-                        ? "pending"
-                        : retorno.Status;
-
-
-                    assinatura
-                        .DataAtualizacaoUtc =
-                            DateTime.UtcNow;
-
-
-                    await _context
-                        .SaveChangesAsync();
-
-
-                    if (string.IsNullOrWhiteSpace(
-                        assinatura
-                            .LinkAutorizacao))
-                    {
-                        throw new Exception(
-                            "O Mercado Pago não retornou o link de autorização."
-                        );
-                    }
-
-
-                    return Redirect(
-                        assinatura
-                            .LinkAutorizacao
-                    );
-                }
-                catch (Exception ex)
-                {
-                    assinatura.Status =
-                        "error";
-
-
-                    assinatura.Ativa =
-                        false;
-
-
-                    assinatura
-                        .DataAtualizacaoUtc =
-                            DateTime.UtcNow;
-
-
-                    assinatura.Observacao =
-                        LimitarTexto(
-                            ex.Message,
-                            1000
-                        );
-
-
-                    await _context
-                        .SaveChangesAsync();
-
-
-                    throw;
-                }
+                return Redirect(
+                    plano.InitPoint
+                );
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(
+                    "======================================"
+                );
 
+                Console.WriteLine(
+                    "ERRO MERCADO PAGO"
+                );
 
-                TempData["Erro"] =
-                    "Não foi possível iniciar a assinatura agora. Confira a integração do Mercado Pago e tente novamente.";
+                Console.WriteLine(
+                    ex.ToString()
+                );
 
+                Console.WriteLine(
+                    "======================================"
+                );
+
+                if (_environment.IsDevelopment())
+                {
+                    TempData["Erro"] =
+                        "ERRO MERCADO PAGO: " +
+                        ex.Message;
+                }
+                else
+                {
+                    TempData["Erro"] =
+                        "Não foi possível iniciar a assinatura agora. Tente novamente.";
+                }
 
                 return RedirectToPage(
                     "/PagamentoClinica"
@@ -508,13 +380,11 @@ namespace ProjetoTerapia.Pages
             }
         }
 
-
         // =====================================================
         // CARREGAR CLÍNICA
         // =====================================================
 
-        private async Task<bool>
-            CarregarClinicaAsync()
+        private async Task<bool> CarregarClinicaAsync()
         {
             var id =
                 HttpContext
@@ -523,7 +393,6 @@ namespace ProjetoTerapia.Pages
                         "ClinicaLogada"
                     );
 
-
             if (string.IsNullOrWhiteSpace(id) ||
                 !int.TryParse(
                     id,
@@ -531,7 +400,6 @@ namespace ProjetoTerapia.Pages
             {
                 return false;
             }
-
 
             Clinica =
                 await _context
@@ -542,12 +410,10 @@ namespace ProjetoTerapia.Pages
                             clinicaId
                     );
 
-
             if (Clinica == null)
             {
                 return false;
             }
-
 
             ValorPlanoFormatado =
                 (
@@ -561,22 +427,11 @@ namespace ProjetoTerapia.Pages
                     )
                 );
 
+            DiasRestantes = null;
+            PlanoVencido = false;
+            PlanoPertoDeVencer = false;
 
-            DiasRestantes =
-                null;
-
-
-            PlanoVencido =
-                false;
-
-
-            PlanoPertoDeVencer =
-                false;
-
-
-            if (Clinica
-                .DataVencimento
-                .HasValue)
+            if (Clinica.DataVencimento.HasValue)
             {
                 DiasRestantes =
                     (int)Math.Ceiling(
@@ -586,29 +441,23 @@ namespace ProjetoTerapia.Pages
                                 .Value
                                 .Date
                             -
-                            DateTime
-                                .Today
+                            DateTime.Today
                         )
                         .TotalDays
                     );
 
-
                 PlanoVencido =
                     DiasRestantes < 0;
-
 
                 PlanoPertoDeVencer =
                     DiasRestantes >= 0 &&
                     DiasRestantes <= 30;
             }
 
-
             await CarregarAssinaturaAtualAsync();
-
 
             return true;
         }
-
 
         // =====================================================
         // CARREGAR ASSINATURA
@@ -622,10 +471,8 @@ namespace ProjetoTerapia.Pages
                 AssinaturaAtual =
                     null;
 
-
                 return;
             }
-
 
             AssinaturaAtual =
                 await _context
@@ -651,36 +498,30 @@ namespace ProjetoTerapia.Pages
                     .FirstOrDefaultAsync();
         }
 
-
         // =====================================================
         // REGISTRAR ACEITE DOS TERMOS
         // =====================================================
 
-        private async Task
-            RegistrarAceiteAsync(
-                Clinica clinica)
+        private async Task RegistrarAceiteAsync(
+            Clinica clinica)
         {
             var hashTermos =
-                await
-                    CalcularHashArquivoAsync(
-                        Path.Combine(
-                            "Pages",
-                            "TermosProfissional.cshtml"
-                        ),
-                        $"AlinhaVIDA-TermosProfissionais-{VERSAO_TERMOS}"
-                    );
-
+                await CalcularHashArquivoAsync(
+                    Path.Combine(
+                        "Pages",
+                        "TermosProfissional.cshtml"
+                    ),
+                    $"AlinhaVIDA-TermosProfissionais-{VERSAO_TERMOS}"
+                );
 
             var hashPrivacidade =
-                await
-                    CalcularHashArquivoAsync(
-                        Path.Combine(
-                            "Pages",
-                            "PoliticaPrivacidade.cshtml"
-                        ),
-                        $"AlinhaVIDA-PoliticaPrivacidade-{VERSAO_PRIVACIDADE}"
-                    );
-
+                await CalcularHashArquivoAsync(
+                    Path.Combine(
+                        "Pages",
+                        "PoliticaPrivacidade.cshtml"
+                    ),
+                    $"AlinhaVIDA-PoliticaPrivacidade-{VERSAO_PRIVACIDADE}"
+                );
 
             var aceite =
                 new AceiteTermoProfissional
@@ -688,57 +529,44 @@ namespace ProjetoTerapia.Pages
                     ClinicaId =
                         clinica.Id,
 
-
                     VersaoTermos =
                         VERSAO_TERMOS,
-
 
                     HashTermos =
                         hashTermos,
 
-
                     AceitouTermos =
                         true,
-
 
                     VersaoPoliticaPrivacidade =
                         VERSAO_PRIVACIDADE,
 
-
                     HashPoliticaPrivacidade =
                         hashPrivacidade,
-
 
                     AceitouPoliticaPrivacidade =
                         true,
 
-
                     AceitouCobrancaRecorrente =
                         true,
-
 
                     ValorInformado =
                         VALOR_PLANO,
 
-
                     DiasTesteGratisInformados =
                         DIAS_TRIAL,
-
 
                     PeriodicidadeInformada =
                         "Anual",
 
-
                     DataAceiteUtc =
                         DateTime.UtcNow,
-
 
                     IpAceite =
                         HttpContext
                             .Connection
                             .RemoteIpAddress?
                             .ToString(),
-
 
                     UserAgent =
                         LimitarTexto(
@@ -750,10 +578,8 @@ namespace ProjetoTerapia.Pages
                             1000
                         ),
 
-
                     OrigemAceite =
                         "PagamentoClinica",
-
 
                     NomeProfissionalSnapshot =
                         LimitarTexto(
@@ -761,20 +587,17 @@ namespace ProjetoTerapia.Pages
                             200
                         ),
 
-
                     EmailSnapshot =
                         LimitarTexto(
                             clinica.Email,
                             320
                         ),
 
-
                     DocumentoSnapshot =
                         LimitarTexto(
                             clinica.Documento,
                             50
                         ),
-
 
                     CpfSnapshot =
                         LimitarTexto(
@@ -783,18 +606,15 @@ namespace ProjetoTerapia.Pages
                         )
                 };
 
-
             _context
                 .AceitesTermosProfissionais
                 .Add(
                     aceite
                 );
 
-
             await _context
                 .SaveChangesAsync();
         }
-
 
         // =====================================================
         // HASH DOS TERMOS
@@ -814,7 +634,6 @@ namespace ProjetoTerapia.Pages
                         caminhoRelativo
                     );
 
-
                 if (System.IO.File.Exists(
                     caminho))
                 {
@@ -823,7 +642,6 @@ namespace ProjetoTerapia.Pages
                             .ReadAllBytesAsync(
                                 caminho
                             );
-
 
                     return Convert
                         .ToHexString(
@@ -839,7 +657,6 @@ namespace ProjetoTerapia.Pages
                 Console.WriteLine(ex);
             }
 
-
             return Convert
                 .ToHexString(
                     SHA256.HashData(
@@ -851,108 +668,19 @@ namespace ProjetoTerapia.Pages
                 );
         }
 
-
         // =====================================================
-        // MERCADO PAGO
-        // OBTER OU CRIAR PLANO
+        // CRIAR PLANO + CHECKOUT
         // =====================================================
 
-        private async Task<string>
-            ObterOuCriarPlanoMercadoPagoAsync()
+        private async Task<PlanoMercadoPagoResponse>
+            CriarPlanoCheckoutMercadoPagoAsync(
+                string externalReference)
         {
             var accessToken =
                 ObterAccessToken();
 
-
-            /*
-             * Caso futuramente você cadastre
-             * manualmente um PlanoProfissionalId
-             * nas configurações, ele terá prioridade.
-             */
-            var planoConfigurado =
-                _config[
-                    "MercadoPago:PlanoProfissionalId"
-                ];
-
-
-            if (!string.IsNullOrWhiteSpace(
-                planoConfigurado))
-            {
-                return planoConfigurado;
-            }
-
-
-            var client =
-                _httpClientFactory
-                    .CreateClient();
-
-
-            // =================================================
-            // PROCURAR PLANO EXISTENTE
-            // =================================================
-
-            var busca =
-                Uri.EscapeDataString(
-                    NOME_PLANO_MP
-                );
-
-
-            using (
-                var request =
-                    new HttpRequestMessage(
-                        HttpMethod.Get,
-                        "https://api.mercadopago.com/preapproval_plan/search" +
-                        $"?status=active&q={busca}"
-                    )
-            )
-            {
-                request
-                    .Headers
-                    .Authorization =
-                        new AuthenticationHeaderValue(
-                            "Bearer",
-                            accessToken
-                        );
-
-
-                using var response =
-                    await client
-                        .SendAsync(
-                            request
-                        );
-
-
-                var json =
-                    await response
-                        .Content
-                        .ReadAsStringAsync();
-
-
-                if (response
-                    .IsSuccessStatusCode)
-                {
-                    var encontrado =
-                        EncontrarPlanoCompativel(
-                            json
-                        );
-
-
-                    if (!string.IsNullOrWhiteSpace(
-                        encontrado))
-                    {
-                        return encontrado;
-                    }
-                }
-            }
-
-
-            // =================================================
-            // CRIAR NOVO PLANO
-            // =================================================
-
             var baseUrl =
                 ObterBaseUrl();
-
 
             var payload =
                 new
@@ -960,6 +688,8 @@ namespace ProjetoTerapia.Pages
                     reason =
                         NOME_PLANO_MP,
 
+                    external_reference =
+                        externalReference,
 
                     auto_recurring =
                         new
@@ -967,10 +697,8 @@ namespace ProjetoTerapia.Pages
                             frequency =
                                 12,
 
-
                             frequency_type =
                                 "months",
-
 
                             free_trial =
                                 new
@@ -978,319 +706,30 @@ namespace ProjetoTerapia.Pages
                                     frequency =
                                         DIAS_TRIAL,
 
-
                                     frequency_type =
                                         "days"
                                 },
 
-
                             transaction_amount =
                                 VALOR_PLANO,
-
 
                             currency_id =
                                 "BRL"
                         },
 
-
                     back_url =
-                        $"{baseUrl}/PagamentoClinica?assinatura=retorno"
+                            $"{baseUrl}/PagamentoClinica"
                 };
-
-
-            using var createRequest =
-                new HttpRequestMessage(
-                    HttpMethod.Post,
-                    "https://api.mercadopago.com/preapproval_plan"
-                );
-
-
-            createRequest
-                .Headers
-                .Authorization =
-                    new AuthenticationHeaderValue(
-                        "Bearer",
-                        accessToken
-                    );
-
-
-            createRequest.Content =
-                new StringContent(
-                    JsonSerializer
-                        .Serialize(
-                            payload
-                        ),
-                    Encoding.UTF8,
-                    "application/json"
-                );
-
-
-            using var createResponse =
-                await client
-                    .SendAsync(
-                        createRequest
-                    );
-
-
-            var createJson =
-                await createResponse
-                    .Content
-                    .ReadAsStringAsync();
-
-
-            if (!createResponse
-                .IsSuccessStatusCode)
-            {
-                throw new Exception(
-                    "Erro ao criar plano no Mercado Pago: " +
-                    createJson
-                );
-            }
-
-
-            using var doc =
-                JsonDocument.Parse(
-                    createJson
-                );
-
-
-            var planId =
-                ObterString(
-                    doc.RootElement,
-                    "id"
-                );
-
-
-            if (string.IsNullOrWhiteSpace(
-                planId))
-            {
-                throw new Exception(
-                    "O Mercado Pago não retornou o ID do plano."
-                );
-            }
-
-
-            return planId;
-        }
-
-
-        // =====================================================
-        // LOCALIZAR PLANO COMPATÍVEL
-        // =====================================================
-
-        private string?
-            EncontrarPlanoCompativel(
-                string json)
-        {
-            try
-            {
-                using var doc =
-                    JsonDocument.Parse(
-                        json
-                    );
-
-
-                if (!doc
-                    .RootElement
-                    .TryGetProperty(
-                        "results",
-                        out var results
-                    ) ||
-                    results.ValueKind !=
-                        JsonValueKind.Array)
-                {
-                    return null;
-                }
-
-
-                foreach (
-                    var item
-                    in results
-                        .EnumerateArray())
-                {
-                    var id =
-                        ObterString(
-                            item,
-                            "id"
-                        );
-
-
-                    var reason =
-                        ObterString(
-                            item,
-                            "reason"
-                        );
-
-
-                    var status =
-                        ObterString(
-                            item,
-                            "status"
-                        );
-
-
-                    if (string.IsNullOrWhiteSpace(
-                            id) ||
-                        !string.Equals(
-                            reason,
-                            NOME_PLANO_MP,
-                            StringComparison
-                                .OrdinalIgnoreCase
-                        ) ||
-                        !string.Equals(
-                            status,
-                            "active",
-                            StringComparison
-                                .OrdinalIgnoreCase
-                        ))
-                    {
-                        continue;
-                    }
-
-
-                    if (!item
-                        .TryGetProperty(
-                            "auto_recurring",
-                            out var recurring
-                        ))
-                    {
-                        continue;
-                    }
-
-
-                    if (ObterInt(
-                            recurring,
-                            "frequency"
-                        ) != 12 ||
-                        !string.Equals(
-                            ObterString(
-                                recurring,
-                                "frequency_type"
-                            ),
-                            "months",
-                            StringComparison
-                                .OrdinalIgnoreCase
-                        ) ||
-                        ObterDecimal(
-                            recurring,
-                            "transaction_amount"
-                        ) != VALOR_PLANO ||
-                        !string.Equals(
-                            ObterString(
-                                recurring,
-                                "currency_id"
-                            ),
-                            "BRL",
-                            StringComparison
-                                .OrdinalIgnoreCase
-                        ))
-                    {
-                        continue;
-                    }
-
-
-                    if (!recurring
-                        .TryGetProperty(
-                            "free_trial",
-                            out var trial
-                        ))
-                    {
-                        continue;
-                    }
-
-
-                    if (ObterInt(
-                            trial,
-                            "frequency"
-                        ) != DIAS_TRIAL ||
-                        !string.Equals(
-                            ObterString(
-                                trial,
-                                "frequency_type"
-                            ),
-                            "days",
-                            StringComparison
-                                .OrdinalIgnoreCase
-                        ))
-                    {
-                        continue;
-                    }
-
-
-                    return id;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-
-
-            return null;
-        }
-
-
-        // =====================================================
-        // CRIAR ASSINATURA INDIVIDUAL
-        // =====================================================
-
-        private async Task<PreapprovalResponse>
-            CriarAssinaturaMercadoPagoAsync(
-                Clinica clinica,
-                AssinaturaProfissional assinatura,
-                string planId)
-        {
-            var accessToken =
-                ObterAccessToken();
-
-
-            if (string.IsNullOrWhiteSpace(
-                clinica.Email))
-            {
-                throw new Exception(
-                    "O profissional precisa possuir um e-mail válido."
-                );
-            }
-
-
-            var payload =
-                new
-                {
-                    preapproval_plan_id =
-                        planId,
-
-
-                    reason =
-                        NOME_PLANO_MP,
-
-
-                    external_reference =
-                        assinatura
-                            .ExternalReference,
-
-
-                    payer_email =
-                        clinica
-                            .Email
-                            .Trim(),
-
-
-                    back_url =
-                        $"{ObterBaseUrl()}/PagamentoClinica?assinatura=retorno"
-                };
-
 
             var client =
                 _httpClientFactory
                     .CreateClient();
 
-
             using var request =
                 new HttpRequestMessage(
                     HttpMethod.Post,
-                    "https://api.mercadopago.com/preapproval"
+                    "https://api.mercadopago.com/preapproval_plan"
                 );
-
 
             request
                 .Headers
@@ -1299,7 +738,6 @@ namespace ProjetoTerapia.Pages
                         "Bearer",
                         accessToken
                     );
-
 
             request.Content =
                 new StringContent(
@@ -1311,90 +749,49 @@ namespace ProjetoTerapia.Pages
                     "application/json"
                 );
 
-
             using var response =
-                await client
-                    .SendAsync(
-                        request
-                    );
-
+                await client.SendAsync(
+                    request
+                );
 
             var json =
                 await response
                     .Content
                     .ReadAsStringAsync();
 
-
-            if (!response
-                .IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 throw new Exception(
-                    "Erro ao criar assinatura no Mercado Pago: " +
+                    "Erro ao criar plano no Mercado Pago: " +
                     json
                 );
             }
 
+            var retorno =
+                JsonSerializer
+                    .Deserialize<
+                        PlanoMercadoPagoResponse
+                    >(json);
 
-            using var doc =
-                JsonDocument.Parse(
-                    json
-                );
-
-
-            var id =
-                ObterString(
-                    doc.RootElement,
-                    "id"
-                );
-
-
-            var initPoint =
-                ObterString(
-                    doc.RootElement,
-                    "init_point"
-                );
-
-
-            var status =
-                ObterString(
-                    doc.RootElement,
-                    "status"
-                );
-
-
-            if (string.IsNullOrWhiteSpace(
-                id))
+            if (retorno == null ||
+                string.IsNullOrWhiteSpace(
+                    retorno.Id))
             {
                 throw new Exception(
-                    "O Mercado Pago não retornou o ID da assinatura."
+                    "O Mercado Pago não retornou o ID do plano."
                 );
             }
 
-
             if (string.IsNullOrWhiteSpace(
-                initPoint))
+                retorno.InitPoint))
             {
                 throw new Exception(
-                    "O Mercado Pago não retornou o link da assinatura."
+                    "O Mercado Pago não retornou o link de checkout do plano."
                 );
             }
 
-
-            return new PreapprovalResponse
-            {
-                Id =
-                    id,
-
-
-                InitPoint =
-                    initPoint,
-
-
-                Status =
-                    status
-            };
+            return retorno;
         }
-
 
         // =====================================================
         // SINCRONIZAR ASSINATURA
@@ -1408,17 +805,22 @@ namespace ProjetoTerapia.Pages
                 return;
             }
 
-
             AssinaturaAtual =
                 await _context
                     .AssinaturasProfissionais
                     .Where(
                         a =>
                             a.ClinicaId ==
-                                Clinica.Id
+                            Clinica.Id
                             &&
-                            a.MercadoPagoPreapprovalId !=
-                                null
+                            a.Status !=
+                                "error"
+                            &&
+                            a.Status !=
+                                "cancelled"
+                            &&
+                            a.Status !=
+                                "canceled"
                     )
                     .OrderByDescending(
                         a =>
@@ -1426,34 +828,99 @@ namespace ProjetoTerapia.Pages
                     )
                     .FirstOrDefaultAsync();
 
-
-            if (AssinaturaAtual == null ||
-                string.IsNullOrWhiteSpace(
-                    AssinaturaAtual
-                        .MercadoPagoPreapprovalId
-                ))
+            if (AssinaturaAtual == null)
             {
                 return;
             }
 
+            /*
+             * No fluxo pelo init_point do plano,
+             * o preapproval só existe depois
+             * que o usuário autoriza.
+             */
+            if (string.IsNullOrWhiteSpace(
+                    AssinaturaAtual
+                        .MercadoPagoPreapprovalId)
+                &&
+                !string.IsNullOrWhiteSpace(
+                    AssinaturaAtual
+                        .MercadoPagoPlanId))
+            {
+                var encontrada =
+                    await BuscarAssinaturaPorPlanoAsync(
+                        AssinaturaAtual
+                            .MercadoPagoPlanId
+                    );
 
+                if (encontrada != null &&
+                    !string.IsNullOrWhiteSpace(
+                        encontrada.Id))
+                {
+                    AssinaturaAtual
+                        .MercadoPagoPreapprovalId =
+                            encontrada.Id;
+
+                    if (!string.IsNullOrWhiteSpace(
+                        encontrada.InitPoint))
+                    {
+                        AssinaturaAtual
+                            .LinkAutorizacao =
+                                encontrada.InitPoint;
+                    }
+
+                    await _context
+                        .SaveChangesAsync();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(
+                AssinaturaAtual
+                    .MercadoPagoPreapprovalId))
+            {
+                return;
+            }
+
+            var retorno =
+                await ConsultarAssinaturaMercadoPagoAsync(
+                    AssinaturaAtual
+                        .MercadoPagoPreapprovalId
+                );
+
+            if (retorno == null)
+            {
+                return;
+            }
+
+            await AplicarStatusAssinaturaAsync(
+                AssinaturaAtual,
+                retorno
+            );
+        }
+
+        // =====================================================
+        // BUSCAR ASSINATURA PELO PLAN ID
+        // =====================================================
+
+        private async Task<MercadoPagoPreapprovalResponse?>
+            BuscarAssinaturaPorPlanoAsync(
+                string planId)
+        {
             var client =
                 _httpClientFactory
                     .CreateClient();
 
+            var url =
+                "https://api.mercadopago.com/preapproval/search" +
+                "?preapproval_plan_id=" +
+                Uri.EscapeDataString(
+                    planId
+                );
 
             using var request =
                 new HttpRequestMessage(
                     HttpMethod.Get,
-
-                    "https://api.mercadopago.com/preapproval/" +
-
-                    Uri.EscapeDataString(
-                        AssinaturaAtual
-                            .MercadoPagoPreapprovalId
-                    )
+                    url
                 );
-
 
             request
                 .Headers
@@ -1463,164 +930,291 @@ namespace ProjetoTerapia.Pages
                         ObterAccessToken()
                     );
 
-
             using var response =
-                await client
-                    .SendAsync(
-                        request
-                    );
-
+                await client.SendAsync(
+                    request
+                );
 
             var json =
                 await response
                     .Content
                     .ReadAsStringAsync();
 
-
-            if (!response
-                .IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 throw new Exception(
-                    "Erro ao consultar assinatura: " +
+                    "Erro ao buscar assinatura pelo plano no Mercado Pago: " +
                     json
                 );
             }
 
+            var busca =
+                JsonSerializer
+                    .Deserialize<
+                        MercadoPagoPreapprovalSearchResponse
+                    >(json);
 
-            using var doc =
-                JsonDocument.Parse(
+            if (busca?.Results == null ||
+                busca.Results.Count == 0)
+            {
+                return null;
+            }
+
+            return busca
+                .Results
+                .OrderByDescending(
+                    x =>
+                        string.Equals(
+                            x.Status,
+                            "authorized",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                )
+                .ThenByDescending(
+                    x =>
+                        ConverterDataUtc(
+                            x.DateCreated
+                        )
+                        ??
+                        DateTime.MinValue
+                )
+                .FirstOrDefault();
+        }
+
+        // =====================================================
+        // CONSULTAR ASSINATURA
+        // =====================================================
+
+        private async Task<MercadoPagoPreapprovalResponse?>
+            ConsultarAssinaturaMercadoPagoAsync(
+                string preapprovalId)
+        {
+            var client =
+                _httpClientFactory
+                    .CreateClient();
+
+            using var request =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    "https://api.mercadopago.com/preapproval/" +
+                    Uri.EscapeDataString(
+                        preapprovalId
+                    )
+                );
+
+            request
+                .Headers
+                .Authorization =
+                    new AuthenticationHeaderValue(
+                        "Bearer",
+                        ObterAccessToken()
+                    );
+
+            using var response =
+                await client.SendAsync(
+                    request
+                );
+
+            var json =
+                await response
+                    .Content
+                    .ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(
+                    "Erro ao consultar assinatura no Mercado Pago: " +
                     json
                 );
+            }
 
+            return JsonSerializer
+                .Deserialize<
+                    MercadoPagoPreapprovalResponse
+                >(json);
+        }
 
-            var root =
-                doc.RootElement;
+        // =====================================================
+        // APLICAR STATUS
+        // =====================================================
 
+        private async Task
+            AplicarStatusAssinaturaAsync(
+                AssinaturaProfissional assinatura,
+                MercadoPagoPreapprovalResponse retorno)
+        {
+            assinatura.MercadoPagoPreapprovalId =
+                retorno.Id ??
+                assinatura.MercadoPagoPreapprovalId;
 
-            var status =
-                ObterString(
-                    root,
-                    "status"
-                )
-                ??
-                AssinaturaAtual
-                    .Status;
+            if (!string.IsNullOrWhiteSpace(
+                retorno.PreapprovalPlanId))
+            {
+                assinatura.MercadoPagoPlanId =
+                    retorno.PreapprovalPlanId;
+            }
 
+            if (!string.IsNullOrWhiteSpace(
+                retorno.InitPoint))
+            {
+                assinatura.LinkAutorizacao =
+                    retorno.InitPoint;
+            }
 
-            AssinaturaAtual.Status =
-                status;
+            assinatura.Status =
+                retorno.Status ??
+                assinatura.Status;
 
-
-            AssinaturaAtual
-                .DataAtualizacaoUtc =
-                    DateTime.UtcNow;
-
+            assinatura.DataAtualizacaoUtc =
+                DateTime.UtcNow;
 
             var proxima =
-                ObterDateTimeUtc(
-                    root,
-                    "next_payment_date"
+                ConverterDataUtc(
+                    retorno.NextPaymentDate
                 );
-
 
             if (proxima.HasValue)
             {
-                AssinaturaAtual
-                    .ProximaCobrancaUtc =
-                        proxima;
+                assinatura.ProximaCobrancaUtc =
+                    proxima;
             }
 
-
-            // =================================================
-            // AUTORIZADA
-            // =================================================
+            var inicioMercadoPago =
+                ConverterDataUtc(
+                    retorno.DateCreated
+                );
 
             if (string.Equals(
-                status,
+                assinatura.Status,
                 "authorized",
                 StringComparison.OrdinalIgnoreCase))
             {
-                AssinaturaAtual.Ativa =
+                assinatura.Ativa =
                     true;
 
-
-                AssinaturaAtual
-                    .DataAutorizacaoUtc ??=
-                        DateTime.UtcNow;
-
-
-                AssinaturaAtual
-                    .InicioTesteGratisUtc ??=
-                        DateTime.UtcNow;
-
-
-                /*
-                 * Se o Mercado Pago informar a
-                 * próxima cobrança, usamos essa
-                 * data como término do trial.
-                 *
-                 * Caso contrário, usamos +7 dias.
-                 */
-                AssinaturaAtual
-                    .FimTesteGratisUtc ??=
-                        proxima.HasValue
-                        ? proxima.Value
-                        : AssinaturaAtual
-                            .InicioTesteGratisUtc
-                            .Value
-                            .AddDays(
-                                DIAS_TRIAL
-                            );
-
-
-                /*
-                 * Durante os 7 dias gratuitos,
-                 * Clinica.Pago = true significa
-                 * "acesso ao plano liberado".
-                 *
-                 * Ainda não significa que houve
-                 * cobrança financeira.
-                 *
-                 * DataPagamento será atualizada
-                 * posteriormente pelo webhook.
-                 */
-                Clinica.Pago =
+                assinatura.RenovacaoAutomatica =
                     true;
 
+                assinatura.DataAutorizacaoUtc ??=
+                    DateTime.UtcNow;
 
-                Clinica.NomePlano =
-                    "Plano Profissional Anual";
+                assinatura.InicioTesteGratisUtc ??=
+                    inicioMercadoPago ??
+                    DateTime.UtcNow;
 
+                if (!assinatura
+                    .FimTesteGratisUtc
+                    .HasValue)
+                {
+                    if (proxima.HasValue &&
+                        proxima.Value >
+                            assinatura
+                                .InicioTesteGratisUtc
+                                .Value
+                        &&
+                        proxima.Value <=
+                            assinatura
+                                .InicioTesteGratisUtc
+                                .Value
+                                .AddDays(15))
+                    {
+                        assinatura.FimTesteGratisUtc =
+                            proxima.Value;
+                    }
+                    else
+                    {
+                        assinatura.FimTesteGratisUtc =
+                            assinatura
+                                .InicioTesteGratisUtc
+                                .Value
+                                .AddDays(
+                                    DIAS_TRIAL
+                                );
+                    }
+                }
 
-                Clinica.ValorPlano =
-                    VALOR_PLANO;
+                if (Clinica != null)
+                {
+                    Clinica.Pago =
+                        true;
 
+                    Clinica.NomePlano =
+                        "Plano Profissional Anual";
 
-                Clinica
-                    .MercadoPagoPlanoStatus =
-                        status;
+                    Clinica.ValorPlano =
+                        VALOR_PLANO;
 
+                    Clinica.MercadoPagoPlanoStatus =
+                        "authorized";
+                }
+            }
+            else if (string.Equals(
+                assinatura.Status,
+                "paused",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                assinatura.Ativa =
+                    false;
 
-                /*
-                 * Campo legado mantido
-                 * temporariamente.
-                 */
-                Clinica
-                    .MercadoPagoPlanoPaymentId =
-                        AssinaturaAtual
-                            .MercadoPagoPreapprovalId;
+                if (Clinica != null)
+                {
+                    Clinica.MercadoPagoPlanoStatus =
+                        "paused";
+
+                    Clinica.Pago =
+                        TemAcessoVigente(
+                            assinatura,
+                            Clinica
+                        );
+                }
+            }
+            else if (
+                string.Equals(
+                    assinatura.Status,
+                    "cancelled",
+                    StringComparison.OrdinalIgnoreCase)
+                ||
+                string.Equals(
+                    assinatura.Status,
+                    "canceled",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                assinatura.Ativa =
+                    false;
+
+                assinatura.RenovacaoAutomatica =
+                    false;
+
+                assinatura.DataCancelamentoUtc ??=
+                    DateTime.UtcNow;
+
+                if (Clinica != null)
+                {
+                    Clinica.MercadoPagoPlanoStatus =
+                        assinatura.Status;
+
+                    Clinica.Pago =
+                        TemAcessoVigente(
+                            assinatura,
+                            Clinica
+                        );
+                }
             }
             else
             {
-                AssinaturaAtual.Ativa =
+                assinatura.Ativa =
                     false;
-            }
 
+                if (Clinica != null)
+                {
+                    Clinica.MercadoPagoPlanoStatus =
+                        assinatura.Status;
+                }
+            }
 
             await _context
                 .SaveChangesAsync();
         }
-
 
         // =====================================================
         // ACCESS TOKEN
@@ -1633,7 +1227,6 @@ namespace ProjetoTerapia.Pages
                     "MercadoPago:AccessToken"
                 ];
 
-
             if (string.IsNullOrWhiteSpace(
                 token))
             {
@@ -1642,10 +1235,8 @@ namespace ProjetoTerapia.Pages
                 );
             }
 
-
             return token;
         }
-
 
         // =====================================================
         // URL BASE
@@ -1658,7 +1249,6 @@ namespace ProjetoTerapia.Pages
                     "App:BaseUrl"
                 ];
 
-
             if (string.IsNullOrWhiteSpace(
                 baseUrl))
             {
@@ -1666,161 +1256,72 @@ namespace ProjetoTerapia.Pages
                     $"{Request.Scheme}://{Request.Host}";
             }
 
-
             return baseUrl
                 .TrimEnd('/');
         }
 
+        // =====================================================
+        // ACESSO VIGENTE
+        // =====================================================
+
+        private static bool TemAcessoVigente(
+            AssinaturaProfissional assinatura,
+            Clinica clinica)
+        {
+            if (assinatura
+                    .FimTesteGratisUtc
+                    .HasValue
+                &&
+                assinatura
+                    .FimTesteGratisUtc
+                    .Value
+                    >
+                DateTime.UtcNow)
+            {
+                return true;
+            }
+
+            if (clinica
+                    .DataVencimento
+                    .HasValue
+                &&
+                clinica
+                    .DataVencimento
+                    .Value
+                    >
+                DateTime.Now)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         // =====================================================
-        // HELPERS JSON
+        // DATA
         // =====================================================
-
-        private static string?
-            ObterString(
-                JsonElement element,
-                string nome)
-        {
-            if (!element
-                .TryGetProperty(
-                    nome,
-                    out var prop
-                ))
-            {
-                return null;
-            }
-
-
-            return prop.ValueKind
-                switch
-            {
-                JsonValueKind.String =>
-                    prop.GetString(),
-
-                JsonValueKind.Number =>
-                    prop.ToString(),
-
-                _ =>
-                    null
-            };
-        }
-
-
-        private static int?
-            ObterInt(
-                JsonElement element,
-                string nome)
-        {
-            if (!element
-                .TryGetProperty(
-                    nome,
-                    out var prop
-                ))
-            {
-                return null;
-            }
-
-
-            if (prop.ValueKind ==
-                    JsonValueKind.Number &&
-                prop.TryGetInt32(
-                    out var valor
-                ))
-            {
-                return valor;
-            }
-
-
-            if (prop.ValueKind ==
-                    JsonValueKind.String &&
-                int.TryParse(
-                    prop.GetString(),
-                    out valor
-                ))
-            {
-                return valor;
-            }
-
-
-            return null;
-        }
-
-
-        private static decimal?
-            ObterDecimal(
-                JsonElement element,
-                string nome)
-        {
-            if (!element
-                .TryGetProperty(
-                    nome,
-                    out var prop
-                ))
-            {
-                return null;
-            }
-
-
-            if (prop.ValueKind ==
-                    JsonValueKind.Number &&
-                prop.TryGetDecimal(
-                    out var valor
-                ))
-            {
-                return valor;
-            }
-
-
-            if (prop.ValueKind ==
-                    JsonValueKind.String &&
-                decimal.TryParse(
-                    prop.GetString(),
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out valor
-                ))
-            {
-                return valor;
-            }
-
-
-            return null;
-        }
-
 
         private static DateTime?
-            ObterDateTimeUtc(
-                JsonElement element,
-                string nome)
+            ConverterDataUtc(
+                string? texto)
         {
-            var texto =
-                ObterString(
-                    element,
-                    nome
-                );
-
-
             if (string.IsNullOrWhiteSpace(
                 texto))
             {
                 return null;
             }
 
-
             if (DateTimeOffset.TryParse(
                 texto,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.RoundtripKind,
-                out var data
-            ))
+                out var data))
             {
                 return data.UtcDateTime;
             }
 
-
             return null;
         }
-
 
         // =====================================================
         // LIMITAR TEXTO
@@ -1837,38 +1338,70 @@ namespace ProjetoTerapia.Pages
                 return texto;
             }
 
-
             return texto.Length <= max
                 ? texto
                 : texto[..max];
         }
 
-
         // =====================================================
-        // RETORNO MERCADO PAGO
+        // DTO PLANO
         // =====================================================
 
-        private class PreapprovalResponse
+        private class PlanoMercadoPagoResponse
         {
-            public string Id
+            [JsonPropertyName("id")]
+            public string Id { get; set; } = "";
+
+            [JsonPropertyName("init_point")]
+            public string InitPoint { get; set; } = "";
+
+            [JsonPropertyName("status")]
+            public string? Status { get; set; }
+        }
+
+        // =====================================================
+        // DTO BUSCA
+        // =====================================================
+
+        private class
+            MercadoPagoPreapprovalSearchResponse
+        {
+            [JsonPropertyName("results")]
+            public List<MercadoPagoPreapprovalResponse>
+                Results
             {
                 get;
                 set;
-            } = "";
+            } = new();
+        }
 
+        // =====================================================
+        // DTO ASSINATURA
+        // =====================================================
 
-            public string InitPoint
-            {
-                get;
-                set;
-            } = "";
+        private class
+            MercadoPagoPreapprovalResponse
+        {
+            [JsonPropertyName("id")]
+            public string? Id { get; set; }
 
+            [JsonPropertyName("preapproval_plan_id")]
+            public string? PreapprovalPlanId { get; set; }
 
-            public string? Status
-            {
-                get;
-                set;
-            }
+            [JsonPropertyName("external_reference")]
+            public string? ExternalReference { get; set; }
+
+            [JsonPropertyName("init_point")]
+            public string? InitPoint { get; set; }
+
+            [JsonPropertyName("status")]
+            public string? Status { get; set; }
+
+            [JsonPropertyName("next_payment_date")]
+            public string? NextPaymentDate { get; set; }
+
+            [JsonPropertyName("date_created")]
+            public string? DateCreated { get; set; }
         }
     }
 }

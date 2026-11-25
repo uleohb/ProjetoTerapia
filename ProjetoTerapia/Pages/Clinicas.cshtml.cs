@@ -16,43 +16,33 @@ namespace ProjetoTerapia.Pages
             _context = context;
         }
 
-
         // =====================================================
         // DADOS DA TELA
         // =====================================================
 
         public List<Clinica> Clinicas { get; set; } = new();
 
-
         [BindProperty(SupportsGet = true)]
         public string Busca { get; set; } = "";
-
 
         [BindProperty(SupportsGet = true)]
         public string Perfil { get; set; } = "";
 
-
         [BindProperty(SupportsGet = true)]
         public string Cidade { get; set; } = "";
-
 
         [BindProperty(SupportsGet = true)]
         public string Atendimento { get; set; } = "";
 
-
         [BindProperty(SupportsGet = true)]
         public string Ordenar { get; set; } = "";
 
-
         public bool PacienteLogado { get; set; }
 
-
         // ID do profissional atualmente logado.
-        // Usado somente para permitir que ele visualize
-        // o próprio card na vitrine mesmo quando o perfil
-        // estiver marcado como não público.
+        // Permite que ele visualize o próprio card
+        // mesmo quando ExibirPublicamente estiver false.
         public int? ClinicaLogadaId { get; set; }
-
 
         // =====================================================
         // GET
@@ -67,22 +57,14 @@ namespace ProjetoTerapia.Pages
                     )
                 );
 
-
             // =================================================
             // PROFISSIONAL LOGADO
             // =================================================
-            //
-            // Quando existe uma clínica logada, guardamos o ID
-            // dela para permitir uma prévia privada na vitrine.
-            // Isso NÃO torna o perfil público para pacientes ou
-            // visitantes: somente a própria sessão profissional
-            // consegue enxergar o card invisível.
 
             var clinicaLogadaSessao =
                 HttpContext.Session.GetString(
                     "ClinicaLogada"
                 );
-
 
             if (int.TryParse(
                     clinicaLogadaSessao,
@@ -92,35 +74,27 @@ namespace ProjetoTerapia.Pages
                     idClinicaLogada;
             }
 
-
-            /*
-             * Usamos o RequestAborted para cancelar as consultas
-             * caso o usuário feche a página antes do carregamento.
-             */
             var cancellationToken =
                 HttpContext.RequestAborted;
 
-
-            /*
-             * =================================================
-             * CONSULTA BASE
-             * =================================================
-             *
-             * AsNoTracking:
-             *
-             * Essa página é somente leitura.
-             * Não precisamos que o Entity Framework monitore
-             * alterações nessas clínicas.
-             *
-             * Isso reduz memória e processamento.
-             */
+            // =================================================
+            // CONSULTA BASE
+            // =================================================
+            //
+            // Não existe mais aprovação manual do ADM.
+            //
+            // Para aparecer publicamente:
+            // - precisa estar com plano ativo (Pago)
+            // - precisa estar marcado para exibição pública
+            //
+            // O próprio profissional continua podendo visualizar
+            // seu card mesmo quando ExibirPublicamente = false.
 
             IQueryable<Clinica> query =
                 _context.Clinicas
                     .AsNoTracking()
                     .Where(
                         c =>
-                            c.Aprovado &&
                             c.Pago &&
                             (
                                 c.ExibirPublicamente ||
@@ -131,7 +105,6 @@ namespace ProjetoTerapia.Pages
                             )
                     );
 
-
             // =================================================
             // FILTRO DE ATENDIMENTO
             // =================================================
@@ -141,7 +114,6 @@ namespace ProjetoTerapia.Pages
             {
                 var atendimento =
                     Atendimento.Trim();
-
 
                 if (atendimento.Equals(
                     "online",
@@ -163,7 +135,6 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
-
             // =================================================
             // FILTRO DE ESPECIALIDADE
             // =================================================
@@ -173,12 +144,6 @@ namespace ProjetoTerapia.Pages
             {
                 var perfil =
                     Perfil.Trim();
-
-
-                /*
-                 * Esse filtro já é executado pelo SQL,
-                 * antes dos dados chegarem ao servidor web.
-                 */
 
                 query =
                     query.Where(
@@ -191,7 +156,6 @@ namespace ProjetoTerapia.Pages
                     );
             }
 
-
             // =================================================
             // BUSCA DAS CLÍNICAS
             // =================================================
@@ -202,31 +166,16 @@ namespace ProjetoTerapia.Pages
                         cancellationToken
                     );
 
-
-            /*
-             * =================================================
-             * CIDADES EXTRAS
-             * =================================================
-             *
-             * Antes sua página consultava
-             * DivulgacoesRegionais SEMPRE.
-             *
-             * Isso gerava uma segunda consulta ao Azure SQL
-             * mesmo quando a pessoa simplesmente abria
-             * a lista de profissionais.
-             *
-             * Agora só buscamos essas informações quando
-             * Busca ou Cidade realmente precisam delas.
-             */
+            // =================================================
+            // CIDADES EXTRAS
+            // =================================================
 
             var cidadesExtrasPorClinica =
                 new Dictionary<int, List<string>>();
 
-
             var precisaConsultarDivulgacoes =
                 !string.IsNullOrWhiteSpace(Busca) ||
                 !string.IsNullOrWhiteSpace(Cidade);
-
 
             if (precisaConsultarDivulgacoes &&
                 clinicasAtivas.Count > 0)
@@ -234,18 +183,18 @@ namespace ProjetoTerapia.Pages
                 var hoje =
                     DateTime.Today;
 
-
                 var idsClinicas =
                     clinicasAtivas
                         .Select(c => c.Id)
                         .ToList();
 
-
                 /*
-                 * Trazemos somente os campos necessários.
+                 * IMPORTANTE:
+                 * Aqui o Aprovado continua porque pertence
+                 * à DIVULGAÇÃO REGIONAL.
                  *
-                 * Não precisamos carregar toda a entidade
-                 * DivulgacaoRegional.
+                 * Não tem relação com aprovação do cadastro
+                 * profissional.
                  */
 
                 var divulgacoesAtivas =
@@ -287,17 +236,6 @@ namespace ProjetoTerapia.Pages
                             cancellationToken
                         );
 
-
-                /*
-                 * Transformamos as divulgações em um mapa:
-                 *
-                 * ClinicaId -> cidades extras
-                 *
-                 * Assim não precisamos ficar fazendo
-                 * Where + Split repetidamente para cada
-                 * profissional.
-                 */
-
                 foreach (var divulgacao
                     in divulgacoesAtivas)
                 {
@@ -326,12 +264,10 @@ namespace ProjetoTerapia.Pages
                             )
                             .ToList();
 
-
                     if (cidades.Count == 0)
                     {
                         continue;
                     }
-
 
                     if (!cidadesExtrasPorClinica
                         .TryGetValue(
@@ -346,13 +282,11 @@ namespace ProjetoTerapia.Pages
                         ] = listaExistente;
                     }
 
-
                     listaExistente.AddRange(
                         cidades
                     );
                 }
             }
-
 
             // =================================================
             // BUSCA POR TEXTO
@@ -365,7 +299,6 @@ namespace ProjetoTerapia.Pages
                     NormalizarTexto(
                         Busca.Trim()
                     );
-
 
                 clinicasAtivas =
                     clinicasAtivas
@@ -405,7 +338,6 @@ namespace ProjetoTerapia.Pages
                         .ToList();
             }
 
-
             // =================================================
             // FILTRO POR CIDADE
             // =================================================
@@ -417,7 +349,6 @@ namespace ProjetoTerapia.Pages
                     NormalizarTexto(
                         Cidade.Trim()
                     );
-
 
                 clinicasAtivas =
                     clinicasAtivas
@@ -442,7 +373,6 @@ namespace ProjetoTerapia.Pages
                         .ToList();
             }
 
-
             // =================================================
             // TERMO USADO PARA PRIORIZAR RESULTADOS
             // =================================================
@@ -457,7 +387,6 @@ namespace ProjetoTerapia.Pages
                             Busca.Trim()
                         )
                         : "";
-
 
             // =================================================
             // ORDENAÇÃO
@@ -477,7 +406,6 @@ namespace ProjetoTerapia.Pages
                             )
                             .ToList(),
 
-
                     "maior-preco" =>
                         clinicasAtivas
                             .OrderByDescending(
@@ -488,14 +416,12 @@ namespace ProjetoTerapia.Pages
                             )
                             .ToList(),
 
-
                     "nome" =>
                         clinicasAtivas
                             .OrderBy(
                                 c => c.Nome
                             )
                             .ToList(),
-
 
                     _ =>
                         OrdenacaoPadrao(
@@ -505,7 +431,6 @@ namespace ProjetoTerapia.Pages
                         )
                 };
         }
-
 
         // =====================================================
         // ORDENAÇÃO PADRÃO
@@ -519,8 +444,6 @@ namespace ProjetoTerapia.Pages
             /*
              * Quando não existe busca/cidade,
              * não faz sentido testar divulgação regional.
-             *
-             * Fazemos uma ordenação simples.
              */
 
             if (string.IsNullOrWhiteSpace(
@@ -536,11 +459,10 @@ namespace ProjetoTerapia.Pages
                     .ToList();
             }
 
-
             /*
              * Quando existe cidade/busca,
              * priorizamos profissionais que possuem
-             * divulgação regional para aquela localidade.
+             * divulgação regional naquela localidade.
              */
 
             return clinicas
@@ -568,7 +490,6 @@ namespace ProjetoTerapia.Pages
                 .ToList();
         }
 
-
         // =====================================================
         // VERIFICAR CIDADE EXTRA
         // =====================================================
@@ -584,7 +505,6 @@ namespace ProjetoTerapia.Pages
                 return false;
             }
 
-
             if (!cidadesExtrasPorClinica
                 .TryGetValue(
                     clinicaId,
@@ -592,7 +512,6 @@ namespace ProjetoTerapia.Pages
             {
                 return false;
             }
-
 
             foreach (var cidade in cidades)
             {
@@ -604,10 +523,8 @@ namespace ProjetoTerapia.Pages
                 }
             }
 
-
             return false;
         }
-
 
         // =====================================================
         // TEXTO CONTÉM
@@ -625,19 +542,16 @@ namespace ProjetoTerapia.Pages
                 return false;
             }
 
-
             var textoNormalizado =
                 NormalizarTexto(
                     texto
                 );
-
 
             return textoNormalizado.Contains(
                 buscaNormalizada,
                 StringComparison.Ordinal
             );
         }
-
 
         // =====================================================
         // NORMALIZAR TEXTO
@@ -652,18 +566,15 @@ namespace ProjetoTerapia.Pages
                 return "";
             }
 
-
             var textoMinusculo =
                 texto
                     .Trim()
                     .ToLowerInvariant();
 
-
             var textoDecomposto =
                 textoMinusculo.Normalize(
                     NormalizationForm.FormD
                 );
-
 
             var caracteres =
                 textoDecomposto
@@ -676,7 +587,6 @@ namespace ProjetoTerapia.Pages
                                 .NonSpacingMark
                     )
                     .ToArray();
-
 
             return new string(
                 caracteres
